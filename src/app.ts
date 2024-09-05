@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import { databaseService } from './utils/database';
 
 // Import Index Router
 
@@ -9,6 +10,7 @@ import helmet from 'helmet';
 const app: express.Express = express();
 
 // Connect to Database
+databaseService.connect();
 
 // Configure App
 app.set('port', process.env.PORT || 3000);

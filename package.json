@@ -8,6 +8,7 @@
     "prestart": "npm run build-ts",
     "build-ts": "npm run clean && tsc",
     "clean": "rimraf dist/",
+    "clean:logs": "rimraf logs/",
     "watch-ts": "tsc -w",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
     "lint": "eslint src/**/*.ts --fix",
