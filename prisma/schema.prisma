@@ -1,0 +1,262 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id                    String        @id @default(uuid())
+  email                 String        @unique
+  firstName             String
+  lastName              String
+  password              String
+  dateOfBirth           DateTime
+  emailVerifiedAt       DateTime?
+  emailVerificationCode String?
+  passwordResetCode     String?
+  displayImage          String?
+  orders                Order[]
+  addresses             Address[]
+  cart                  CartProduct[]
+  phoneNumbers          PhoneNumber[]
+  deliveries            Delivery[]
+  transactions          Transaction[]
+  ratings               Rating[]
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  @@index([email])
+}
+
+model Market {
+  id                    String               @id @default(uuid())
+  email                 String               @unique
+  brandName             String               @unique
+  password              String
+  emailVerifiedAt       DateTime?
+  emailVerificationCode String?
+  passwordResetCode     String?
+  displayImage          String?
+  marketCategories      MarketCategory[]
+  addresses             Address[]
+  phoneNumbers          PhoneNumber[]
+  products              Product[]
+  verification          MarketVerification[]
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  transactions          Transaction[]
+
+  @@index([email, brandName])
+}
+
+model Product {
+  id             String          @id @default(uuid())
+  name           String
+  description    String
+  price          Float
+  prevPrice      Float
+  stock          Int
+  displayImage   String
+  images         ProductImage[]
+  ratings        Rating[]
+  cart           CartProduct[]
+  category       ProductCategory
+  market         Market          @relation(fields: [marketId], references: [id])
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  deletedAt      DateTime?
+  productImageId String
+  marketId       String
+
+  @@index([name])
+}
+
+model Order {
+  id            String        @id @default(uuid())
+  customer      Customer      @relation(fields: [customerId], references: [id])
+  products      CartProduct[]
+  delivery      Delivery?
+  transaction   Transaction   @relation(fields: [transactionId], references: [id])
+  status        OrderStatus
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  deletedAt     DateTime?
+  productId     String?
+  customerId    String
+  transactionId String        @unique
+}
+
+model Transaction {
+  id         String    @id @default(uuid())
+  customer   Customer  @relation(fields: [customerId], references: [id])
+  market     Market    @relation(fields: [marketId], references: [id])
+  order      Order?
+  amount     Float
+  status     String
+  date       DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+  customerId String
+  marketId   String
+}
+
+model CartProduct {
+  id         String    @id @default(uuid())
+  customer   Customer  @relation(fields: [customerId], references: [id])
+  product    Product   @relation(fields: [productId], references: [id])
+  quantity   Int
+  totalPrice Float
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+  Order      Order?    @relation(fields: [orderId], references: [id])
+  orderId    String?
+  customerId String
+  productId  String
+}
+
+model Address {
+  id         String     @id @default(uuid())
+  customer   Customer?  @relation(fields: [customerId], references: [id])
+  market     Market?    @relation(fields: [marketId], references: [id])
+  address    String
+  city       String
+  state      String
+  country    String
+  zipCode    String?
+  postalCode String?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  deletedAt  DateTime?
+  customerId String?
+  marketId   String?
+  deliveries Delivery[]
+}
+
+model Delivery {
+  id         String         @id @default(uuid())
+  order      Order          @relation(fields: [orderId], references: [id])
+  address    Address        @relation(fields: [addressId], references: [id])
+  status     DeliveryStatus
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  deletedAt  DateTime?
+  customer   Customer?      @relation(fields: [customerId], references: [id])
+  customerId String?
+  orderId    String         @unique
+  addressId  String
+}
+
+model ProductImage {
+  id        String    @id @default(uuid())
+  product   Product   @relation(fields: [productId], references: [id])
+  url       String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  productId String
+}
+
+model PhoneNumber {
+  id         String    @id @default(uuid())
+  customer   Customer  @relation(fields: [customerId], references: [id])
+  market     Market    @relation(fields: [marketId], references: [id])
+  number     String
+  isPrimary  Boolean
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+  customerId String
+  marketId   String
+}
+
+model Rating {
+  id         String    @id @default(uuid())
+  customer   Customer  @relation(fields: [customerId], references: [id])
+  product    Product   @relation(fields: [productId], references: [id])
+  rating     Int
+  review     String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+  customerId String
+  productId  String
+}
+
+model MarketVerification {
+  id        String                   @id @default(uuid())
+  market    Market                   @relation(fields: [marketId], references: [id])
+  status    MarketVerificationStatus
+  type      MarketVerificationType
+  scope     MarketVerificationScope
+  document  String
+  createdAt DateTime                 @default(now())
+  updatedAt DateTime                 @updatedAt
+  deletedAt DateTime?
+  marketId  String
+}
+
+enum MarketVerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum MarketVerificationType {
+  BUSINESS_REGISTRATION
+  IDENTITY_VERIFICATION
+}
+
+enum MarketVerificationScope {
+  NIN
+  CAC
+  UTILITY_BILL
+  PASSPORT
+  DRIVERS_LICENSE
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum ProductCategory {
+  ELECTRONICS
+  FASHION
+  FOOD
+  HEALTH
+  HOME
+  SPORTS
+  TOYS
+}
+
+enum MarketCategory {
+  GROCERY
+  PHARMACY
+  RESTAURANT
+  BAKERY
+  CLOTHING
+  ELECTRONICS
+  FURNITURE
+  HARDWARE
+  SPORTS
+  TOYS
+}
+
+enum DeliveryStatus {
+  PICKED_UP
+  DELIVERED
+  CANCELLED
+}
