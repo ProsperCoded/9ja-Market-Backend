@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { databaseService } from './utils/database';
+import errorHandler from './utils/middlewares/error-handler.middleware';
 
 // Import Index Router
 
@@ -24,6 +25,7 @@ app.use(helmet());
 
 
 // Error Handler
+app.use(errorHandler); 
 
 // Export App
 export default app;

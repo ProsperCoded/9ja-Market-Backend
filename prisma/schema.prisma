@@ -19,10 +19,11 @@ model Customer {
   firstName             String
   lastName              String
   password              String
-  dateOfBirth           DateTime
+  dateOfBirth           DateTime?
   emailVerifiedAt       DateTime?
   emailVerificationCode String?
   passwordResetCode     String?
+  refreshToken          String?
   displayImage          String?
   orders                Order[]
   addresses             Address[]
@@ -46,6 +47,7 @@ model Market {
   emailVerificationCode String?
   passwordResetCode     String?
   displayImage          String?
+  refreshToken          String?
   marketCategories      MarketCategory[]
   addresses             Address[]
   phoneNumbers          PhoneNumber[]
