@@ -64,10 +64,24 @@ export class CustomerRepository implements ICustomerRepository {
         })
     }
 
-    create(data: Prisma.CustomerCreateInput): Promise<Customer> {
+    create(data: Prisma.CustomerCreateInput, addresses: Prisma.AddressCreateManyCustomerInput[], phoneNumbers: Prisma.PhoneNumberCreateManyCustomerInput[]): Promise<Customer> {
         return new Promise(async (resolve, reject) => {
             try {
-                const customer = await this.customerDelegate.create({ data });
+                const customer = await this.customerDelegate.create({ 
+                    data: {
+                        ...data,
+                        addresses: {
+                            createMany: {
+                                data: addresses
+                            }
+                        },
+                        phoneNumbers: {
+                            createMany : {
+                                data: phoneNumbers
+                            }
+                        }
+                    }
+                 });
                 resolve(customer)
             } catch (e) {
                 reject(e);

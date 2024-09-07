@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { IsDefined, IsString } from "class-validator";
 
-export class AddressCreateDto implements Prisma.AddressCreateInput{
+export class AddressCreateDto implements Prisma.AddressCreateManyCustomerInput{
     @IsDefined()
     @IsString()
     declare address: string;
@@ -19,7 +19,7 @@ export class AddressCreateDto implements Prisma.AddressCreateInput{
     declare country: string;
 
     @IsString()
-    declare zipCode: string;
+    declare zipCode?: string;
 
     @IsString()
     declare postalCode?: string;

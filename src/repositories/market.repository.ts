@@ -55,11 +55,11 @@ export class MarketRepository implements IMarketRepository {
     }
 
     isEmailVerified(id: string): Promise<boolean> {
-        return new Promise(async (resolve, reject)=>{
-            try{
-                const market = await this.marketDelegate.findUnique({where: {id}});
+        return new Promise(async (resolve, reject) => {
+            try {
+                const market = await this.marketDelegate.findUnique({ where: { id } });
                 resolve(!!market?.emailVerifiedAt);
-            }catch(e){
+            } catch (e) {
                 reject(e);
             }
         })
@@ -76,10 +76,24 @@ export class MarketRepository implements IMarketRepository {
         })
     }
 
-    create(data: Prisma.MarketCreateInput): Promise<Market> {
+    create(data: Prisma.MarketCreateInput, addresses: Prisma.AddressCreateManyMarketInput[], phoneNumbers: Prisma.PhoneNumberCreateManyMarketInput[]): Promise<Market> {
         return new Promise(async (resolve, reject) => {
             try {
-                const market = await this.marketDelegate.create({ data });
+                const market = await this.marketDelegate.create({
+                    data: {
+                        ...data,
+                        addresses: {
+                            createMany: {
+                                data: addresses
+                            }
+                        },
+                        phoneNumbers: {
+                            createMany: {
+                                data: phoneNumbers
+                            }
+                        }
+                    }
+                });
                 resolve(market)
             } catch (e) {
                 reject(e);

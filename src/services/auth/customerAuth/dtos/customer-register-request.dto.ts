@@ -31,14 +31,16 @@ export class CustomerRegisterRequestDto implements CustomerCreateInput {
     declare lastName: string;
 
     @IsDate()
-    dateOfBirth?: string | Date;
+    declare dateOfBirth?: string | Date;
 
+    @IsDefined()
     @IsArray()
     @IsString({ each: true })
-    phoneNumbers?: string[];
+    declare phoneNumbers: string[];
 
+    @IsDefined()
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => AddressCreateDto)
-    addresses?: AddressCreateDto[];
+    declare addresses: AddressCreateDto[];
 }

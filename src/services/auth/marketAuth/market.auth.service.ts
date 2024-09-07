@@ -139,8 +139,12 @@ export class MarketAuthService implements IAuthService {
 
         try {
             const hashedPassword = await this.bcryptService.hashPassword(password);
-            const newMarketData = { ...registerData, password: hashedPassword };
-            const newMarket = await this.marketRepository.create(newMarketData);
+            registerData.password = hashedPassword;
+
+            // Create new market
+            const { addresses, phoneNumbers, ...newMarketData } = registerData;
+            const mappedPhoneNumbers = phoneNumbers.map(number => ({ number }));
+            const newMarket = await this.marketRepository.create(newMarketData, addresses, mappedPhoneNumbers);
 
             // Send welcome email
             this.eventEmiter.emit("sendMarketWelcomeEmail", { email, brandName });

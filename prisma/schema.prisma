@@ -170,15 +170,15 @@ model ProductImage {
 
 model PhoneNumber {
   id         String    @id @default(uuid())
-  customer   Customer  @relation(fields: [customerId], references: [id])
-  market     Market    @relation(fields: [marketId], references: [id])
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  market     Market?   @relation(fields: [marketId], references: [id])
   number     String
-  isPrimary  Boolean
+  isPrimary  Boolean   @default(false)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
-  customerId String
-  marketId   String
+  customerId String?
+  marketId   String?
 }
 
 model Rating {

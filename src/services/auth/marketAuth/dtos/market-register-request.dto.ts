@@ -31,12 +31,14 @@ export class MarketRegisterRequestDto implements MarketCreateInput {
     @IsIn(Object.values($Enums.MarketCategory), { each: true })
     declare marketCategories?: $Enums.MarketCategory[];
 
+    @IsDefined()
     @IsArray()
     @IsString({ each: true })
-    declare phoneNumbers?: string[];
+    declare phoneNumbers: string[];
 
+    @IsDefined()
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => AddressCreateDto)
-    declare addresses?: AddressCreateDto[];
+    declare addresses: AddressCreateDto[];
 }

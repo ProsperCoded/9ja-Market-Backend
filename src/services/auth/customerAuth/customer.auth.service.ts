@@ -22,6 +22,7 @@ import { VerifyEmailRequestDto } from "../dtos/verify-email-request.dto";
 import { JsonWebTokenError } from "jsonwebtoken";
 import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
 import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
+import { Prisma } from "@prisma/client";
 
 
 export class CustomerAuthService implements IAuthService {
@@ -122,7 +123,6 @@ export class CustomerAuthService implements IAuthService {
 
     async register(registerData: CustomerRegisterRequestDto): Promise<boolean> {
         const { email, firstName, lastName, password } = registerData;
-
         // Check if email is already registered
         const customer = await this.customerRepository.getCustomerByEmail(email);
         if (customer) {
@@ -130,9 +130,14 @@ export class CustomerAuthService implements IAuthService {
             throw new BadRequestException(ErrorMessages.EMAIL_EXISTS);
         }
         try {
+            // Hash password
             const hashedPassword = await this.bcryptService.hashPassword(password);
-            const newCustomerData = { ...registerData, password: hashedPassword };
-            const newCustomer = await this.customerRepository.create(newCustomerData);
+            registerData.password = hashedPassword;
+
+            // Create customer
+            const { addresses, phoneNumbers, ...newCustomerData } = registerData;
+            const mappedPhoneNumbers = phoneNumbers.map(number => ({ number }));
+            const newCustomer = await this.customerRepository.create(newCustomerData, addresses, mappedPhoneNumbers);
 
             // Send welcome email
             this.eventEmiter.emit("sendCustomerWelcomeEmail", { email, firstName, lastName });
