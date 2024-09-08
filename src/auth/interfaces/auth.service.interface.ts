@@ -1,9 +1,9 @@
-import { EmailVerificationRequestDto } from "./dtos/email-verification-request.dto";
-import { ForgotPasswordRequestDto } from "./dtos/forgot-password-request.dto";
-import { LoginRequestDto } from "./dtos/login-request.dto";
-import { LoginResponseDto } from "./dtos/login-response.dto";
-import { ResetPasswordRequestDto } from "./dtos/reset-password-request.dto";
-import { VerifyEmailRequestDto } from "./dtos/verify-email-request.dto";
+import { EmailVerificationRequestDto } from "../dtos/email-verification-request.dto";
+import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
+import { LoginRequestDto } from "../dtos/login-request.dto";
+import { LoginResponseDto } from "../dtos/login-response.dto";
+import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
+import { VerifyEmailRequestDto } from "../dtos/verify-email-request.dto";
 
 
 export interface IAuthService {

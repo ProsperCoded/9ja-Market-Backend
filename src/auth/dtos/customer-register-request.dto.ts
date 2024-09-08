@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { IsArray, IsDate, IsDefined, IsEmail, IsNotEmpty, IsString, IsStrongPassword, ValidateNested } from "class-validator";
-import { AddressCreateDto } from "../../../../dtos/address-create.dto";
+import { AddressCreateDto } from "../../dtos/address-create.dto";
 import { Type } from "class-transformer";
 
 interface CustomerCreateInput extends Omit<Prisma.CustomerCreateInput, "phoneNumbers" | "addresses"> {
