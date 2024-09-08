@@ -1,4 +1,5 @@
 import { EmailPaths } from '../../constants/email-paths.enum';
+import { WinstonLogger } from '../logger/winston.logger';
 import { IEmailService } from './email.service.interface';
 // import { SMTPClient, Message } from 'emailjs';
 // import { configService } from '../config/config.service';
@@ -50,10 +51,16 @@ import { IEmailService } from './email.service.interface';
 // }
 
 export class EmailService implements IEmailService {
+    private readonly logger: WinstonLogger;
+    constructor(){
+        this.logger = new WinstonLogger("EmailService");
+    }
+
+
     sendMail({ to, subject, options }: { to: string; subject: string; options: { template: EmailPaths; data: { [key: string]: any; }; }; }): Promise<boolean> {
         return new Promise((resolve, reject) => {
             // Send email logic
-            console.log(`Email sent to ${to} with subject ${subject} and template ${options.template}`);
+            this.logger.info(`Email sent to ${to} with subject ${subject} and template ${options.template}`, options.data);
             resolve(true);
         });
     }

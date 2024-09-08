@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import { IsArray, IsDate, IsDefined, IsEmail, IsNotEmpty, IsString, IsStrongPassword, ValidateNested } from "class-validator";
+import { IsArray, IsDateString, IsDefined, IsEmail, IsNotEmpty, IsString, IsStrongPassword, ValidateNested } from "class-validator";
 import { AddressCreateDto } from "../../dtos/address-create.dto";
 import { Type } from "class-transformer";
 
@@ -30,7 +30,7 @@ export class CustomerRegisterRequestDto implements CustomerCreateInput {
     @IsString()
     declare lastName: string;
 
-    @IsDate()
+    @IsDateString()
     declare dateOfBirth?: string | Date;
 
     @IsDefined()

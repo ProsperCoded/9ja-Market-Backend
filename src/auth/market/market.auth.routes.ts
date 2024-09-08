@@ -5,7 +5,7 @@ import { WinstonLogger } from "../../utils/logger/winston.logger";
 import { BcryptService } from "../../utils/bcrypt/bcrypt.service";
 import { JWTService } from "../../utils/jwt/jwt.service";
 import { MarketRepository } from "../../repositories/market.repository";
-import { validateBody } from "../../utils/middlewares/validator.middleware";
+import { Validator } from "../../utils/middlewares/validator.middleware";
 import { LoginRequestDto } from "../dtos/login-request.dto";
 import { MarketRegisterRequestDto } from "../dtos/market-register-request.dto";
 import { EmailVerificationRequestDto } from "../dtos/email-verification-request.dto";
@@ -14,6 +14,7 @@ import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
 import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
 
 const router = Router();
+const validator = new Validator('Market Authentication');
 
 // Market Auth Service Dependencies
 const logger = new WinstonLogger('MarketAuthService');
@@ -29,22 +30,22 @@ const marketAuthService = new MarketAuthService(logger, bcryptService, jwtServic
 const marketAuthController = new MarketAuthController(marketAuthService);
 
 // Login Route
-router.post('/login', validateBody(LoginRequestDto), marketAuthController.login);
+router.post('/login', validator.single(LoginRequestDto), marketAuthController.login);
 
 // Register Route
-router.post('/register', validateBody(MarketRegisterRequestDto), marketAuthController.register);
+router.post('/register', validator.single(MarketRegisterRequestDto), marketAuthController.register);
 
 // Email Verification Route
-router.post('/email-verification', validateBody(EmailVerificationRequestDto), marketAuthController.emailVerification);
+router.post('/email-verification', validator.single(EmailVerificationRequestDto), marketAuthController.emailVerification);
 
 // Verify Email Route
-router.post('/verify-email', validateBody(VerifyEmailRequestDto), marketAuthController.verifyEmail);
+router.post('/verify-email', validator.single(VerifyEmailRequestDto), marketAuthController.verifyEmail);
 
 // Forgot Password Route
-router.post('/forgot-password', validateBody(ForgotPasswordRequestDto), marketAuthController.forgotPassword);
+router.post('/forgot-password', validator.single(ForgotPasswordRequestDto), marketAuthController.forgotPassword);
 
 // Reset Password Route
-router.post('/reset-password', validateBody(ResetPasswordRequestDto), marketAuthController.resetPassword);
+router.post('/reset-password', validator.single(ResetPasswordRequestDto), marketAuthController.resetPassword);
 
 
 export default router;

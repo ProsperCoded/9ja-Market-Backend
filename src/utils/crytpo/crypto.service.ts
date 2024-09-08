@@ -1,4 +1,4 @@
-import { createCipheriv, createDecipheriv, createHash } from 'crypto';
+import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'crypto';
 import { configService } from '../config/config.service';
 import { CryptoInterface } from './crypto.interface';
 
@@ -24,8 +24,7 @@ class CryptoService implements CryptoInterface {
     }
 
     random(): string {
-      const randomBytes = crypto.randomUUID();
-      return randomBytes.toString();
+      return randomBytes(16).toString();
     }
 
     static getInstance(): CryptoService {

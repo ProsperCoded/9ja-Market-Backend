@@ -1,7 +1,7 @@
 import { $Enums, Prisma } from "@prisma/client";
 import { Type } from "class-transformer";
 import { IsArray, IsDefined, IsEmail, IsIn, IsNotEmpty, IsString, IsStrongPassword, ValidateNested } from "class-validator";
-import { AddressCreateDto } from "../../../../dtos/address-create.dto";
+import { AddressCreateDto } from "../../dtos/address-create.dto";
 
 interface MarketCreateInput extends Omit<Prisma.MarketCreateInput, "phoneNumbers" | "addresses"> {
     phoneNumbers?: string[];

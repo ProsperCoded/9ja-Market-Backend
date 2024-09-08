@@ -1,5 +1,4 @@
 import { EventEmitter } from "stream";
-import { v4 as uuid4 } from "uuid";
 import { BcryptService } from "../../utils/bcrypt/bcrypt.service";
 import { EmailService } from "../../utils/email/email.service";
 import { JWTService } from "../../utils/jwt/jwt.service";
@@ -16,12 +15,13 @@ import { BadRequestException } from '../../utils/exceptions/bad-request.exceptio
 import { InternalServerException } from '../../utils/exceptions/internal-server.exception';
 import { EmailVerificationRequestDto } from "../dtos/email-verification-request.dto";
 import { NotFoundException } from '../../utils/exceptions/not-found.exception';
-import { VerifyEmailRequestDto } from "../dtos/verify-email-request.dto";
 import { JsonWebTokenError } from "jsonwebtoken";
 import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
 import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
 import { MarketRepository } from "../../repositories/market.repository";
 import { MarketRegisterRequestDto } from "../dtos/market-register-request.dto";
+import { IVerifyEmailRequest, VerifyEmailRequestByCodeDto, VerifyEmailRequestByTokenDto } from "../dtos/verify-email-request.dto";
+import { nanoid } from "nanoid";
 
 
 export class MarketAuthService implements IAuthService {
@@ -48,28 +48,28 @@ export class MarketAuthService implements IAuthService {
     }
 
     initializeEventHandlers() {
-        this.eventEmiter.on(`sendMarketPasswordResetEmail`, async (data: { email: string, token: string }) => {
-            const { email, token } = data;
-            const link = token;
+        this.eventEmiter.on(`sendMarketPasswordResetEmail`, async (data: { email: string, token: string, resetCode: string, url: string }) => {
+            const { email, token, resetCode, url } = data;
+            const link = url + `/${token}`;
             await this.emailService.sendMail({
                 to: email,
                 subject: "Forgot Password",
                 options: {
                     template: EmailPaths.PASSWORD_RESET,
-                    data: { link }
+                    data: { link, resetCode }
                 }
             })
         });
 
-        this.eventEmiter.on(`sendMarketEmailVerificationEmail`, async (data: { email: string, token: string }) => {
-            const { email, token } = data;
-            const link = token;
+        this.eventEmiter.on(`sendMarketEmailVerificationEmail`, async (data: { email: string, token: string, verificationCode: number, url: string }) => {
+            const { email, token, verificationCode, url } = data;
+            const link = url + `/${token}`;
             await this.emailService.sendMail({
                 to: email,
                 subject: "Email Verification",
                 options: {
                     template: EmailPaths.EMAIL_VERIFICATION,
-                    data: { link }
+                    data: { link, verificationCode }
                 }
             })
         });
@@ -92,6 +92,22 @@ export class MarketAuthService implements IAuthService {
         const hash = this.jwtService.signPayload(payload, expiresIn);
         const token = cryptoService.encrypt(hash);
         return token;
+    }
+
+    private getPayload(token: string): { [key: string]: any } {
+        const decrypted = cryptoService.decrypt(token);
+        const payload = this.jwtService.verifyToken(decrypted);
+        return payload;
+    }
+
+    private getVerifyEmailData(data: VerifyEmailRequestByCodeDto | VerifyEmailRequestByTokenDto): IVerifyEmailRequest {
+        let result: IVerifyEmailRequest;
+        if ("code" in data) {
+            result = { email: data.email, verificationCode: data.code };
+        } else {
+            result = <IVerifyEmailRequest>this.getPayload(data.token);
+        }
+        return result;
     }
 
     async login(loginData: LoginRequestDto): Promise<LoginResponseDto> {
@@ -120,7 +136,7 @@ export class MarketAuthService implements IAuthService {
         return response;
     }
 
-    async register(registerData: MarketRegisterRequestDto): Promise<boolean> {
+    async register(registerData: MarketRegisterRequestDto, url: string): Promise<boolean> {
         const { email, brandName, password } = registerData;
 
         // Check if email is already registered
@@ -150,10 +166,10 @@ export class MarketAuthService implements IAuthService {
             this.eventEmiter.emit("sendMarketWelcomeEmail", { email, brandName });
 
             // Send email verification code
-            const verificationCode = uuid4();
+            const verificationCode = nanoid(6);
             await this.marketRepository.update(newMarket.id, { emailVerificationCode: verificationCode });
             const token = this.getToken({ email, verificationCode });
-            this.eventEmiter.emit("sendMarketEmailVerificationEmail", { email, token });
+            this.eventEmiter.emit("sendMarketEmailVerificationEmail", { email, token, verificationCode, url });
             return true;
         } catch (e) {
             this.logger.error(`${ErrorMessages.REGISTER_MARKET_FAILED}: ${e}`);
@@ -161,25 +177,23 @@ export class MarketAuthService implements IAuthService {
         }
     }
 
-    async emailVerification(emailVerificationData: EmailVerificationRequestDto): Promise<boolean> {
+    async emailVerification(emailVerificationData: EmailVerificationRequestDto, url: string): Promise<boolean> {
         const { email } = emailVerificationData;
         const market = await this.marketRepository.getMarketByEmail(email);
         if (!market) {
             this.logger.error(ErrorMessages.MARKET_NOT_FOUND);
             throw new NotFoundException(ErrorMessages.MARKET_NOT_FOUND);
         }
-        const verificationCode = uuid4();
+        const verificationCode = nanoid(6);
         await this.marketRepository.update(market.id, { emailVerificationCode: verificationCode });
         const token = this.getToken({ email, verificationCode });
-        this.eventEmiter.emit("sendMarketEmailVerificationEmail", { email, token });
+        this.eventEmiter.emit("sendMarketEmailVerificationEmail", { email, token, verificationCode, url });
         return true;
     }
 
-    async verifyEmail(verifyEmailData: VerifyEmailRequestDto): Promise<boolean> {
+    async verifyEmail(verifyEmailData: VerifyEmailRequestByCodeDto | VerifyEmailRequestByTokenDto): Promise<boolean> {
         try {
-            const { token } = verifyEmailData;
-            const decrypted = cryptoService.decrypt(token);
-            const { email, verificationCode } = this.jwtService.verifyToken(decrypted);
+            const { email, verificationCode } = this.getVerifyEmailData(verifyEmailData);
             const market = await this.marketRepository.getMarketByEmail(email);
             if (!market) {
                 this.logger.error(ErrorMessages.MARKET_NOT_FOUND);
@@ -198,7 +212,6 @@ export class MarketAuthService implements IAuthService {
             } else {
                 this.logger.error(`${ErrorMessages.EMAIL_VERIFICATION_FAILED}: ${e}`);
                 throw new InternalServerException(ErrorMessages.EMAIL_VERIFICATION_FAILED);
-                // throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.EMAIL_VERIFICATION_FAILED);
             }
         }
 
@@ -211,18 +224,18 @@ export class MarketAuthService implements IAuthService {
             this.logger.error(ErrorMessages.MARKET_NOT_FOUND);
             throw new NotFoundException(ErrorMessages.MARKET_NOT_FOUND);
         }
-        const resetCode = uuid4();
+        const resetCode = nanoid(6);
         await this.marketRepository.update(market.id, { passwordResetCode: resetCode });
-        const token = this.getToken({ email, resetCode });
-        this.eventEmiter.emit("sendMarketPasswordResetEmail", { email, token });
+        // const token = this.getToken({ email, resetCode });
+        this.eventEmiter.emit("sendMarketPasswordResetEmail", { email, resetCode });
         return true;
     }
 
     async resetPassword(resetPasswordData: ResetPasswordRequestDto): Promise<boolean> {
         try {
-            const { token, newPassword } = resetPasswordData;
-            const decrypted = cryptoService.decrypt(token);
-            const { email, resetCode } = this.jwtService.verifyToken(decrypted);
+            const { resetCode, email, newPassword } = resetPasswordData;
+            // const decrypted = cryptoService.decrypt(token);
+            // const { email, resetCode } = this.jwtService.verifyToken(decrypted);
             const market = await this.marketRepository.getMarketByEmail(email);
             if (!market) {
                 this.logger.error(ErrorMessages.MARKET_NOT_FOUND);

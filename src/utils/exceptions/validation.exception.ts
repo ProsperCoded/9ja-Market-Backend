@@ -4,10 +4,10 @@ import { BaseException } from "./base.exception";
 export class ValidationException extends BaseException {
     readonly errors: any;
     readonly errorString?: string;
-    constructor(message: string, errorString?: string,  errors?: any) {
-        super(message);
+    constructor(reason: string, errorString?: string,  errors?: any) {
+        super("Validation Error");
         this.status = HttpStatus.FORBIDDEN;
-        this.reason = "Validation Error";
+        this.reason = reason;
         this.errorString = errorString;
         this.errors = errors;
     }

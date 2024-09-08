@@ -3,14 +3,14 @@ import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
 import { LoginRequestDto } from "../dtos/login-request.dto";
 import { LoginResponseDto } from "../dtos/login-response.dto";
 import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
-import { VerifyEmailRequestDto } from "../dtos/verify-email-request.dto";
+import { VerifyEmailRequestByCodeDto, VerifyEmailRequestByTokenDto } from "../dtos/verify-email-request.dto";
 
 
 export interface IAuthService {
     login(loginData: LoginRequestDto): Promise<LoginResponseDto>;
-    register(registerData: any): Promise<boolean>;
-    forgotPassword(forgotPasswordData: ForgotPasswordRequestDto): Promise<boolean>;
+    register(registerData: any, url:string): Promise<boolean>;
+    forgotPassword(forgotPasswordData: ForgotPasswordRequestDto, url: string): Promise<boolean>;
     resetPassword(resetPasswordData: ResetPasswordRequestDto): Promise<boolean>;
-    emailVerification(emailVerificationData: EmailVerificationRequestDto): Promise<boolean>;
-    verifyEmail(verifyEmailData: VerifyEmailRequestDto): Promise<boolean>;
+    emailVerification(emailVerificationData: EmailVerificationRequestDto, url: string): Promise<boolean>;
+    verifyEmail(verifyEmailData: VerifyEmailRequestByCodeDto | VerifyEmailRequestByTokenDto): Promise<boolean>;
 }

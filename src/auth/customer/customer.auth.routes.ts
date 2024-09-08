@@ -5,7 +5,7 @@ import { WinstonLogger } from "../../utils/logger/winston.logger";
 import { BcryptService } from "../../utils/bcrypt/bcrypt.service";
 import { JWTService } from "../../utils/jwt/jwt.service";
 import { CustomerRepository } from "../../repositories/customer.repository";
-import { validateBody } from "../../utils/middlewares/validator.middleware";
+import { Validator } from "../../utils/middlewares/validator.middleware";
 import { LoginRequestDto } from "../dtos/login-request.dto";
 import { CustomerRegisterRequestDto } from "../dtos/customer-register-request.dto";
 import { EmailVerificationRequestDto } from "../dtos/email-verification-request.dto";
@@ -14,6 +14,7 @@ import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
 import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
 
 const router = Router();
+const validator = new Validator('Customer Authentication');
 
 // Customer Auth Service Dependencies
 const logger = new WinstonLogger('CustomerAuthService');
@@ -29,22 +30,25 @@ const customerAuthService = new CustomerAuthService(logger, bcryptService, jwtSe
 const customerAuthController = new CustomerAuthController(customerAuthService);
 
 // Login Route
-router.post('/login', validateBody(LoginRequestDto), customerAuthController.login);
+router.post('/login', validator.single(LoginRequestDto), customerAuthController.login);
 
 // Register Route
-router.post('/register', validateBody(CustomerRegisterRequestDto), customerAuthController.register);
+router.post('/signup', validator.single(CustomerRegisterRequestDto), customerAuthController.register);
 
 // Email Verification Route
-router.post('/email-verification', validateBody(EmailVerificationRequestDto), customerAuthController.emailVerification);
+router.post('/email-verification', validator.single(EmailVerificationRequestDto), customerAuthController.emailVerification);
+
+// Verify Email By Token Param Route
+router.post('/verify-email/:token', validator.single(VerifyEmailRequestDto, "params"), customerAuthController.verifyEmailByParams);
 
 // Verify Email Route
-router.post('/verify-email', validateBody(VerifyEmailRequestDto), customerAuthController.verifyEmail);
+router.post('/verify-email', validator.single(VerifyEmailRequestDto), customerAuthController.verifyEmail);
 
 // Forgot Password Route
-router.post('/forgot-password', validateBody(ForgotPasswordRequestDto), customerAuthController.forgotPassword);
+router.post('/forgot-password', validator.single(ForgotPasswordRequestDto), customerAuthController.forgotPassword);
 
 // Reset Password Route
-router.post('/reset-password', validateBody(ResetPasswordRequestDto), customerAuthController.resetPassword);
+router.put('/reset-password', validator.single(ResetPasswordRequestDto), customerAuthController.resetPassword);
 
 
 export default router;

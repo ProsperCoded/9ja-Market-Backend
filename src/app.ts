@@ -3,7 +3,9 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { databaseService } from './utils/database';
 import { HomeController } from './home/home.controller';
+import { AppEnum } from './constants/app.enum';
 import errorHandler from './utils/middlewares/error-handler.middleware';
+import "reflect-metadata"; 
 
 // Import Index Router
 import IndexRouter from './routes';
@@ -15,7 +17,7 @@ const app: express.Express = express();
 databaseService.connect();
 
 // Configure App
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || AppEnum.PORT);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
@@ -23,7 +25,7 @@ app.use(helmet());
 
 
 // Use Index Router
-app.use('/api/v1', IndexRouter);
+app.use(AppEnum.PREFIX, IndexRouter);
 
 // Not Found Handler
 const home = new HomeController();

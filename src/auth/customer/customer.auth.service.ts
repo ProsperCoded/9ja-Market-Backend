@@ -1,5 +1,4 @@
 import { EventEmitter } from "stream";
-import { v4 as uuid4 } from "uuid";
 import { BcryptService } from "../../utils/bcrypt/bcrypt.service";
 import { EmailService } from "../../utils/email/email.service";
 import { JWTService } from "../../utils/jwt/jwt.service";
@@ -18,10 +17,11 @@ import { BadRequestException } from '../../utils/exceptions/bad-request.exceptio
 import { InternalServerException } from '../../utils/exceptions/internal-server.exception';
 import { EmailVerificationRequestDto } from "../dtos/email-verification-request.dto";
 import { NotFoundException } from '../../utils/exceptions/not-found.exception';
-import { VerifyEmailRequestDto } from "../dtos/verify-email-request.dto";
+import { IVerifyEmailRequest, VerifyEmailRequestByCodeDto, VerifyEmailRequestByTokenDto } from "../dtos/verify-email-request.dto";
 import { JsonWebTokenError } from "jsonwebtoken";
 import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
 import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
+import { nanoid } from "nanoid";
 
 
 export class CustomerAuthService implements IAuthService {
@@ -48,28 +48,28 @@ export class CustomerAuthService implements IAuthService {
     }
 
     initializeEventHandlers() {
-        this.eventEmiter.on(`sendCustomerPasswordResetEmail`, async (data: { email: string, token: string }) => {
-            const { email, token } = data;
-            const link = token;
+        this.eventEmiter.on(`sendCustomerPasswordResetEmail`, async (data: { email: string, resetCode: string }) => {
+            const { email , resetCode} = data;
+            // const link = url + `/${token}`;
             await this.emailService.sendMail({
                 to: email,
                 subject: "Forgot Password",
                 options: {
                     template: EmailPaths.PASSWORD_RESET,
-                    data: { link }
+                    data: { resetCode }
                 }
             })
         });
 
-        this.eventEmiter.on(`sendCustomerEmailVerificationEmail`, async (data: { email: string, token: string }) => {
-            const { email, token } = data;
-            const link = token;
+        this.eventEmiter.on(`sendCustomerEmailVerificationEmail`, async (data: { email: string, token: string, verificationCode: number, url: string }) => {
+            const { email, token, verificationCode, url } = data;
+            const link = url + `/${token}`;
             await this.emailService.sendMail({
                 to: email,
                 subject: "Email Verification",
                 options: {
                     template: EmailPaths.EMAIL_VERIFICATION,
-                    data: { link }
+                    data: { link, verificationCode }
                 }
             })
         });
@@ -94,6 +94,23 @@ export class CustomerAuthService implements IAuthService {
         return token;
     }
 
+    private getPayload(token: string): { [key: string]: any } {
+        const decrypted = cryptoService.decrypt(token);
+        const payload = this.jwtService.verifyToken(decrypted);
+        return payload;
+    }
+
+    private getVerifyEmailData(data: VerifyEmailRequestByCodeDto | VerifyEmailRequestByTokenDto): IVerifyEmailRequest {
+        let result: IVerifyEmailRequest;
+        if ("code" in data) {
+            result = { email: data.email, verificationCode: data.code };
+        } else {
+            result = <IVerifyEmailRequest>this.getPayload(data.token);
+        }
+        return result;
+    }
+
+
     async login(loginData: LoginRequestDto): Promise<LoginResponseDto> {
         const { email, password } = loginData;
 
@@ -108,7 +125,7 @@ export class CustomerAuthService implements IAuthService {
             this.logger.error(ErrorMessages.INVALID_EMAIL_PASSWORD);
             throw new UnauthorizedException(ErrorMessages.INVALID_EMAIL_PASSWORD);
         }
-
+        
         const payload = { email: customer.email, id: customer.id };
         const accessToken = this.getToken(payload, "10h");
         const _refreshToken = cryptoService.random();
@@ -120,8 +137,14 @@ export class CustomerAuthService implements IAuthService {
         return response;
     }
 
-    async register(registerData: CustomerRegisterRequestDto): Promise<boolean> {
-        const { email, firstName, lastName, password } = registerData;
+    async register(registerData: CustomerRegisterRequestDto, url: string): Promise<boolean> {
+        const { email, firstName, lastName, password, dateOfBirth } = registerData;
+
+        // Set up date of birth as Date object
+        if (dateOfBirth) {
+            registerData.dateOfBirth = new Date(dateOfBirth);
+        }
+
         // Check if email is already registered
         const customer = await this.customerRepository.getCustomerByEmail(email);
         if (customer) {
@@ -142,10 +165,10 @@ export class CustomerAuthService implements IAuthService {
             this.eventEmiter.emit("sendCustomerWelcomeEmail", { email, firstName, lastName });
 
             // Send email verification code
-            const verificationCode = uuid4();
+            const verificationCode = nanoid(6);
             await this.customerRepository.update(newCustomer.id, { emailVerificationCode: verificationCode });
             const token = this.getToken({ email, verificationCode });
-            this.eventEmiter.emit("sendCustomerEmailVerificationEmail", { email, token });
+            this.eventEmiter.emit("sendCustomerEmailVerificationEmail", { email, token, verificationCode, url });
             return true;
         } catch (e) {
             this.logger.error(`${ErrorMessages.REGISTER_CUSTOMER_FAILED}: ${e}`);
@@ -153,25 +176,23 @@ export class CustomerAuthService implements IAuthService {
         }
     }
 
-    async emailVerification(emailVerificationData: EmailVerificationRequestDto): Promise<boolean> {
+    async emailVerification(emailVerificationData: EmailVerificationRequestDto, url: string): Promise<boolean> {
         const { email } = emailVerificationData;
         const customer = await this.customerRepository.getCustomerByEmail(email);
         if (!customer) {
             this.logger.error(ErrorMessages.CUSTOMER_NOT_FOUND);
             throw new NotFoundException(ErrorMessages.CUSTOMER_NOT_FOUND);
         }
-        const verificationCode = uuid4();
+        const verificationCode = nanoid(6);
         await this.customerRepository.update(customer.id, { emailVerificationCode: verificationCode });
         const token = this.getToken({ email, verificationCode });
-        this.eventEmiter.emit("sendCustomerEmailVerificationEmail", { email, token });
+        this.eventEmiter.emit("sendCustomerEmailVerificationEmail", { email, token, verificationCode, url});
         return true;
     }
 
-    async verifyEmail(verifyEmailData: VerifyEmailRequestDto): Promise<boolean> {
+    async verifyEmail(verifyEmailData: VerifyEmailRequestByCodeDto | VerifyEmailRequestByTokenDto): Promise<boolean> {
         try {
-            const { token } = verifyEmailData;
-            const decrypted = cryptoService.decrypt(token);
-            const { email, verificationCode } = this.jwtService.verifyToken(decrypted);
+            const { email, verificationCode } = this.getVerifyEmailData(verifyEmailData);
             const customer = await this.customerRepository.getCustomerByEmail(email);
             if (!customer) {
                 this.logger.error(ErrorMessages.CUSTOMER_NOT_FOUND);
@@ -203,18 +224,18 @@ export class CustomerAuthService implements IAuthService {
             this.logger.error(ErrorMessages.CUSTOMER_NOT_FOUND);
             throw new NotFoundException(ErrorMessages.CUSTOMER_NOT_FOUND);
         }
-        const resetCode = uuid4();
+        const resetCode = nanoid(6);
         await this.customerRepository.update(customer.id, { passwordResetCode: resetCode });
-        const token = this.getToken({ email, resetCode });
-        this.eventEmiter.emit("sendCustomerPasswordResetEmail", { email, token });
+        // const token = this.getToken({ email, resetCode });
+        this.eventEmiter.emit("sendCustomerPasswordResetEmail", { email, resetCode });
         return true;
     }
 
     async resetPassword(resetPasswordData: ResetPasswordRequestDto): Promise<boolean> {
         try {
-            const { token, newPassword } = resetPasswordData;
-            const decrypted = cryptoService.decrypt(token);
-            const { email, resetCode } = this.jwtService.verifyToken(decrypted);
+            const { resetCode, newPassword, email } = resetPasswordData;
+            // const decrypted = cryptoService.decrypt(token);
+            // const { email, resetCode } = this.jwtService.verifyToken(decrypted);
             const customer = await this.customerRepository.getCustomerByEmail(email);
             if (!customer) {
                 this.logger.error(ErrorMessages.CUSTOMER_NOT_FOUND);

@@ -9,7 +9,7 @@ function errorHandler(error: BaseException, request: Request, response: Response
   const status = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
   const message = error.message || "Something went wrong";
 
-  const resObj = new ResponseDto(ResponseStatus.ERROR, message);
+  const resObj = new ResponseDto(ResponseStatus.ERROR, message, error);
   response.status(status).send(resObj);
   return next();
 }
