@@ -21,7 +21,7 @@ import { JsonWebTokenError } from "jsonwebtoken";
 import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
 import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
 import { MarketRepository } from "../../repositories/market.repository";
-import { MarketRegisterRequestDto } from "./dtos/market-register-request.dto";
+import { MarketRegisterRequestDto } from "../dtos/market-register-request.dto";
 
 
 export class MarketAuthService implements IAuthService {

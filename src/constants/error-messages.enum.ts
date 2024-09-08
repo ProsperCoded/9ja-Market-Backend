@@ -24,4 +24,5 @@ export enum ErrorMessages {
     BRAND_NAME_EXISTS = 'Brand Name Exists Already',
     EMAIL_VERIFICATION_FAILED = 'Email Verification Failed',
     INVALID_RESET_TOKEN = 'Invalid Reset Code',
+    VALIDATION_ERROR_MESSAGE = 'Something is wrong with your request body',
   }

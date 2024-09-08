@@ -2,7 +2,7 @@ export enum SuccessMessages {
     REGISTRATION_SUCCESSFUL = 'Registration Successful',
     LOGIN_SUCCESSFUL = 'Login Successful',
     EMAIL_VERIFICATION_SUCCESS = 'Email Verification Successful',
-    EMAIL_VERIFICATION_EMAIL_SENT = 'Email Verification Email Sent',
+    VERIFICATION_EMAIL_SENT = 'Email Verification Email Sent',
     FORGOT_PASSWORD_SUCCESS = 'Resent Link Sent Successfully',
     RESET_PASSWORD_SUCCESS = 'Password Reset Successful',
     ADD_TO_CART_SUCCESS = 'Product Added to Cart Successfully',

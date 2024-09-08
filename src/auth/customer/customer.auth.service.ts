@@ -22,7 +22,6 @@ import { VerifyEmailRequestDto } from "../dtos/verify-email-request.dto";
 import { JsonWebTokenError } from "jsonwebtoken";
 import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
 import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
-import { Prisma } from "@prisma/client";
 
 
 export class CustomerAuthService implements IAuthService {
