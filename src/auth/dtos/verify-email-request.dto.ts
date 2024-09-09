@@ -10,7 +10,7 @@ export class VerifyEmailRequestByTokenDto {
   @IsDefined()
   @IsNotEmpty()
   @IsString()
-  @IsByteLength(255, 255, {message: "Your token is invalid"})
+  @IsByteLength(150, undefined, {message: "Your token is invalid"})
   declare token: string;
 }
 

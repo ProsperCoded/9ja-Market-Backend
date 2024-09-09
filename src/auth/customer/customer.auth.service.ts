@@ -21,7 +21,6 @@ import { IVerifyEmailRequest, VerifyEmailRequestByCodeDto, VerifyEmailRequestByT
 import { JsonWebTokenError } from "jsonwebtoken";
 import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
 import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
-import { nanoid } from "nanoid";
 
 
 export class CustomerAuthService implements IAuthService {
@@ -63,7 +62,7 @@ export class CustomerAuthService implements IAuthService {
 
         this.eventEmiter.on(`sendCustomerEmailVerificationEmail`, async (data: { email: string, token: string, verificationCode: number, url: string }) => {
             const { email, token, verificationCode, url } = data;
-            const link = url + `/${token}`;
+            const link = url + `?token=${token}`;
             await this.emailService.sendMail({
                 to: email,
                 subject: "Email Verification",
@@ -91,11 +90,12 @@ export class CustomerAuthService implements IAuthService {
     private getToken(payload: { [key: string]: any }, expiresIn: string = "15m"): string {
         const hash = this.jwtService.signPayload(payload, expiresIn);
         const token = cryptoService.encrypt(hash);
-        return token;
+        return encodeURIComponent(token);
     }
 
     private getPayload(token: string): { [key: string]: any } {
-        const decrypted = cryptoService.decrypt(token);
+        const decoded = decodeURIComponent(token);
+        const decrypted = cryptoService.decrypt(decoded);
         const payload = this.jwtService.verifyToken(decrypted);
         return payload;
     }
@@ -165,7 +165,7 @@ export class CustomerAuthService implements IAuthService {
             this.eventEmiter.emit("sendCustomerWelcomeEmail", { email, firstName, lastName });
 
             // Send email verification code
-            const verificationCode = nanoid(6);
+            const verificationCode = cryptoService.randomInt();
             await this.customerRepository.update(newCustomer.id, { emailVerificationCode: verificationCode });
             const token = this.getToken({ email, verificationCode });
             this.eventEmiter.emit("sendCustomerEmailVerificationEmail", { email, token, verificationCode, url });
@@ -183,7 +183,7 @@ export class CustomerAuthService implements IAuthService {
             this.logger.error(ErrorMessages.CUSTOMER_NOT_FOUND);
             throw new NotFoundException(ErrorMessages.CUSTOMER_NOT_FOUND);
         }
-        const verificationCode = nanoid(6);
+        const verificationCode = cryptoService.randomInt();
         await this.customerRepository.update(customer.id, { emailVerificationCode: verificationCode });
         const token = this.getToken({ email, verificationCode });
         this.eventEmiter.emit("sendCustomerEmailVerificationEmail", { email, token, verificationCode, url});
@@ -224,7 +224,7 @@ export class CustomerAuthService implements IAuthService {
             this.logger.error(ErrorMessages.CUSTOMER_NOT_FOUND);
             throw new NotFoundException(ErrorMessages.CUSTOMER_NOT_FOUND);
         }
-        const resetCode = nanoid(6);
+        const resetCode = cryptoService.randomInt();
         await this.customerRepository.update(customer.id, { passwordResetCode: resetCode });
         // const token = this.getToken({ email, resetCode });
         this.eventEmiter.emit("sendCustomerPasswordResetEmail", { email, resetCode });

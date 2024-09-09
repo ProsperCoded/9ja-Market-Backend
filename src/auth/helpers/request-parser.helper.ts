@@ -10,9 +10,9 @@ export class RequestParserHelper {
      */
 
     getUrl(path?: string): string {
-        let url = `${this.request.protocol}://${this.request.get('host')  + AppEnum.PREFIX}}`;
+        let url = `${this.request.protocol}://${this.request.get('host')  + AppEnum.PREFIX}`;
         if (path) {
-            url += `/${path}`;
+            url += `${path}`;
         }
         return url;
     }

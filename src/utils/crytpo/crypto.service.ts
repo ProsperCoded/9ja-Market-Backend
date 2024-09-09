@@ -1,4 +1,4 @@
-import { createCipheriv, createDecipheriv, createHash, randomBytes } from 'crypto';
+import { createCipheriv, createDecipheriv, createHash, randomBytes, randomInt } from 'crypto';
 import { configService } from '../config/config.service';
 import { CryptoInterface } from './crypto.interface';
 
@@ -25,6 +25,10 @@ class CryptoService implements CryptoInterface {
 
     random(): string {
       return randomBytes(16).toString();
+    }
+
+    randomInt(): string{
+      return randomInt(100000, 1000000).toString();
     }
 
     static getInstance(): CryptoService {

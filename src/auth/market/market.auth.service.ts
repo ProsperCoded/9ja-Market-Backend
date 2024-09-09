@@ -21,7 +21,6 @@ import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
 import { MarketRepository } from "../../repositories/market.repository";
 import { MarketRegisterRequestDto } from "../dtos/market-register-request.dto";
 import { IVerifyEmailRequest, VerifyEmailRequestByCodeDto, VerifyEmailRequestByTokenDto } from "../dtos/verify-email-request.dto";
-import { nanoid } from "nanoid";
 
 
 export class MarketAuthService implements IAuthService {
@@ -50,7 +49,7 @@ export class MarketAuthService implements IAuthService {
     initializeEventHandlers() {
         this.eventEmiter.on(`sendMarketPasswordResetEmail`, async (data: { email: string, token: string, resetCode: string, url: string }) => {
             const { email, token, resetCode, url } = data;
-            const link = url + `/${token}`;
+            const link = url + `?token=${token}`;
             await this.emailService.sendMail({
                 to: email,
                 subject: "Forgot Password",
@@ -91,11 +90,13 @@ export class MarketAuthService implements IAuthService {
     private getToken(payload: { [key: string]: any }, expiresIn: string = "15m"): string {
         const hash = this.jwtService.signPayload(payload, expiresIn);
         const token = cryptoService.encrypt(hash);
-        return token;
+        console.log(`Token: ${token}`);
+        return encodeURIComponent(token);
     }
 
     private getPayload(token: string): { [key: string]: any } {
-        const decrypted = cryptoService.decrypt(token);
+        const decoded = decodeURIComponent(token);
+        const decrypted = cryptoService.decrypt(decoded);
         const payload = this.jwtService.verifyToken(decrypted);
         return payload;
     }
@@ -166,7 +167,7 @@ export class MarketAuthService implements IAuthService {
             this.eventEmiter.emit("sendMarketWelcomeEmail", { email, brandName });
 
             // Send email verification code
-            const verificationCode = nanoid(6);
+            const verificationCode = cryptoService.randomInt();
             await this.marketRepository.update(newMarket.id, { emailVerificationCode: verificationCode });
             const token = this.getToken({ email, verificationCode });
             this.eventEmiter.emit("sendMarketEmailVerificationEmail", { email, token, verificationCode, url });
@@ -184,7 +185,7 @@ export class MarketAuthService implements IAuthService {
             this.logger.error(ErrorMessages.MARKET_NOT_FOUND);
             throw new NotFoundException(ErrorMessages.MARKET_NOT_FOUND);
         }
-        const verificationCode = nanoid(6);
+        const verificationCode = cryptoService.randomInt();
         await this.marketRepository.update(market.id, { emailVerificationCode: verificationCode });
         const token = this.getToken({ email, verificationCode });
         this.eventEmiter.emit("sendMarketEmailVerificationEmail", { email, token, verificationCode, url });
@@ -224,7 +225,7 @@ export class MarketAuthService implements IAuthService {
             this.logger.error(ErrorMessages.MARKET_NOT_FOUND);
             throw new NotFoundException(ErrorMessages.MARKET_NOT_FOUND);
         }
-        const resetCode = nanoid(6);
+        const resetCode = cryptoService.randomInt();
         await this.marketRepository.update(market.id, { passwordResetCode: resetCode });
         // const token = this.getToken({ email, resetCode });
         this.eventEmiter.emit("sendMarketPasswordResetEmail", { email, resetCode });

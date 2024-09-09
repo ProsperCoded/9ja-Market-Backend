@@ -34,7 +34,7 @@ export class MarketAuthController {
      */
     register: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            const url = new RequestParserHelper(request).getUrl('/auth/market/verify-email');
+            const url = new RequestParserHelper(request).getUrl('/auth/market/verify-email-token');
             await this.marketAuthService.register(request.body, url);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.REGISTRATION_SUCCESSFUL);
             return response.status(HttpStatus.CREATED).send(resObj);
@@ -52,7 +52,7 @@ export class MarketAuthController {
      */
     emailVerification: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            const url = new RequestParserHelper(request).getUrl('/auth/market/verify-email');
+            const url = new RequestParserHelper(request).getUrl('/auth/market/verify-email-token');
             await this.marketAuthService.emailVerification(request.body, url);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.VERIFICATION_EMAIL_SENT);
             return response.status(HttpStatus.OK).send(resObj);
@@ -62,14 +62,14 @@ export class MarketAuthController {
     }
 
     /**
-     * Verify Email By Token Param
+     * Verify Email By Token Query
      * @param request {Request}
      * @param response {Response}
      * @param next {NextFunction}
      */
-    verifyEmailByParams: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
+    verifyEmailByQuery: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            await this.marketAuthService.verifyEmail(request.params as { token: string });
+            await this.marketAuthService.verifyEmail(request.query as { token: string });
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.EMAIL_VERIFICATION_SUCCESS);
             return response.status(HttpStatus.OK).send(resObj);
         } catch (e) {

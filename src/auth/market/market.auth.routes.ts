@@ -9,7 +9,7 @@ import { Validator } from "../../utils/middlewares/validator.middleware";
 import { LoginRequestDto } from "../dtos/login-request.dto";
 import { MarketRegisterRequestDto } from "../dtos/market-register-request.dto";
 import { EmailVerificationRequestDto } from "../dtos/email-verification-request.dto";
-import { VerifyEmailRequestDto } from "../dtos/verify-email-request.dto";
+import { VerifyEmailRequestByCodeDto, VerifyEmailRequestByTokenDto } from "../dtos/verify-email-request.dto";
 import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
 import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
 
@@ -38,8 +38,11 @@ router.post('/register', validator.single(MarketRegisterRequestDto), marketAuthC
 // Email Verification Route
 router.post('/email-verification', validator.single(EmailVerificationRequestDto), marketAuthController.emailVerification);
 
+// Verify Email By Token Param Route
+router.post('/verify-email-token', validator.single(VerifyEmailRequestByTokenDto, "query"), marketAuthController.verifyEmailByQuery);
+
 // Verify Email Route
-router.post('/verify-email', validator.single(VerifyEmailRequestDto), marketAuthController.verifyEmail);
+router.post('/verify-email', validator.single(VerifyEmailRequestByCodeDto), marketAuthController.verifyEmail);
 
 // Forgot Password Route
 router.post('/forgot-password', validator.single(ForgotPasswordRequestDto), marketAuthController.forgotPassword);

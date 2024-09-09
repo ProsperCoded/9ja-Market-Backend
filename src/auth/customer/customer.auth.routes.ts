@@ -9,7 +9,7 @@ import { Validator } from "../../utils/middlewares/validator.middleware";
 import { LoginRequestDto } from "../dtos/login-request.dto";
 import { CustomerRegisterRequestDto } from "../dtos/customer-register-request.dto";
 import { EmailVerificationRequestDto } from "../dtos/email-verification-request.dto";
-import { VerifyEmailRequestDto } from "../dtos/verify-email-request.dto";
+import { VerifyEmailRequestByCodeDto, VerifyEmailRequestByTokenDto } from "../dtos/verify-email-request.dto";
 import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
 import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
 
@@ -39,10 +39,10 @@ router.post('/signup', validator.single(CustomerRegisterRequestDto), customerAut
 router.post('/email-verification', validator.single(EmailVerificationRequestDto), customerAuthController.emailVerification);
 
 // Verify Email By Token Param Route
-router.post('/verify-email/:token', validator.single(VerifyEmailRequestDto, "params"), customerAuthController.verifyEmailByParams);
+router.get('/verify-email-token', validator.single(VerifyEmailRequestByTokenDto, "query"), customerAuthController.verifyEmailByQuery);
 
 // Verify Email Route
-router.post('/verify-email', validator.single(VerifyEmailRequestDto), customerAuthController.verifyEmail);
+router.post('/verify-email', validator.single(VerifyEmailRequestByCodeDto), customerAuthController.verifyEmail);
 
 // Forgot Password Route
 router.post('/forgot-password', validator.single(ForgotPasswordRequestDto), customerAuthController.forgotPassword);

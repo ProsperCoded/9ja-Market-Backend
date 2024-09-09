@@ -1,4 +1,4 @@
-import { IsDefined, IsEmail, IsNotEmpty, IsNumber, IsString, IsStrongPassword } from 'class-validator';
+import { IsByteLength, IsDefined, IsEmail, IsNotEmpty, IsString, IsStrongPassword } from 'class-validator';
 
 export class ResetPasswordRequestDto {
     @IsDefined()
@@ -9,7 +9,8 @@ export class ResetPasswordRequestDto {
 
     @IsDefined()
     @IsNotEmpty()
-    @IsNumber()
+    @IsString()
+    @IsByteLength(6, 6, { message: "Your code is invalid" })
     declare resetCode: string;
 
     @IsDefined()
