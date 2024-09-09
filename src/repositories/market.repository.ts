@@ -76,7 +76,7 @@ export class MarketRepository implements IMarketRepository {
         })
     }
 
-    create(data: Prisma.MarketCreateInput, addresses: Prisma.AddressCreateManyMarketInput[], phoneNumbers: Prisma.PhoneNumberCreateManyMarketInput[]): Promise<Market> {
+    create(data: Prisma.MarketCreateInput, addresses: Prisma.AddressCreateManyMarketInput[] = [], phoneNumbers: Prisma.PhoneNumberCreateManyMarketInput[] = []): Promise<Market> {
         return new Promise(async (resolve, reject) => {
             try {
                 const market = await this.marketDelegate.create({

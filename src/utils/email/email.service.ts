@@ -1,4 +1,4 @@
-import { EmailPaths } from '../../constants/email-paths.enum';
+import { EmailPaths } from '../../constants/email.enum';
 import { WinstonLogger } from '../logger/winston.logger';
 import { IEmailService } from './email.service.interface';
 // import { SMTPClient, Message } from 'emailjs';
@@ -52,7 +52,7 @@ import { IEmailService } from './email.service.interface';
 
 export class EmailService implements IEmailService {
     private readonly logger: WinstonLogger;
-    constructor(){
+    constructor() {
         this.logger = new WinstonLogger("EmailService");
     }
 

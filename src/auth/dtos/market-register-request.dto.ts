@@ -36,7 +36,7 @@ export class MarketRegisterRequestDto implements MarketCreateInput {
     @IsString({ each: true })
     declare phoneNumbers: string[];
 
-    @IsDefined()
+    
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => AddressCreateDto)

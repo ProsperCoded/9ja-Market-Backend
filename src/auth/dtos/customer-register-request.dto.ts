@@ -38,7 +38,6 @@ export class CustomerRegisterRequestDto implements CustomerCreateInput {
     @IsString({ each: true })
     declare phoneNumbers: string[];
 
-    @IsDefined()
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => AddressCreateDto)

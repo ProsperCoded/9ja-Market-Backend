@@ -5,7 +5,7 @@ import { JWTService } from "../../utils/jwt/jwt.service";
 import { ILogger } from "../../utils/logger/logger.interface";
 import { IAuthService } from "../interfaces/auth.service.interface";
 import { eventEmmiter } from "../../utils/events";
-import { EmailPaths } from "../../constants/email-paths.enum";
+import { EmailPaths, EmailSubjects } from "../../constants/email.enum";
 import { LoginRequestDto } from "../dtos/login-request.dto";
 import { LoginResponseDto } from "../dtos/login-response.dto";
 import { cryptoService } from "../../utils/crytpo/crypto.service";
@@ -21,6 +21,7 @@ import { IVerifyEmailRequest, VerifyEmailRequestByCodeDto, VerifyEmailRequestByT
 import { JsonWebTokenError } from "jsonwebtoken";
 import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
 import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
+import { DataFormatterHelper } from "../helpers/format.helper";
 
 
 export class CustomerAuthService implements IAuthService {
@@ -48,11 +49,11 @@ export class CustomerAuthService implements IAuthService {
 
     initializeEventHandlers() {
         this.eventEmiter.on(`sendCustomerPasswordResetEmail`, async (data: { email: string, resetCode: string }) => {
-            const { email , resetCode} = data;
+            const { email, resetCode } = data;
             // const link = url + `/${token}`;
             await this.emailService.sendMail({
                 to: email,
-                subject: "Forgot Password",
+                subject: EmailSubjects.PASSWORD_RESET_CUSTOMER,
                 options: {
                     template: EmailPaths.PASSWORD_RESET,
                     data: { resetCode }
@@ -65,7 +66,7 @@ export class CustomerAuthService implements IAuthService {
             const link = url + `?token=${token}`;
             await this.emailService.sendMail({
                 to: email,
-                subject: "Email Verification",
+                subject: EmailSubjects.EMAIL_VERIFICATION_CUSTOMER,
                 options: {
                     template: EmailPaths.EMAIL_VERIFICATION,
                     data: { link, verificationCode }
@@ -77,7 +78,7 @@ export class CustomerAuthService implements IAuthService {
             const { email, firstName, lastName } = data;
             await this.emailService.sendMail({
                 to: email,
-                subject: "Welcome to Buyier",
+                subject: EmailSubjects.WELCOME,
                 options: {
                     template: EmailPaths.WELCOME,
                     data: { firstName, lastName }
@@ -125,7 +126,7 @@ export class CustomerAuthService implements IAuthService {
             this.logger.error(ErrorMessages.INVALID_EMAIL_PASSWORD);
             throw new UnauthorizedException(ErrorMessages.INVALID_EMAIL_PASSWORD);
         }
-        
+
         const payload = { email: customer.email, id: customer.id };
         const accessToken = this.getToken(payload, "10h");
         const _refreshToken = cryptoService.random();
@@ -158,8 +159,8 @@ export class CustomerAuthService implements IAuthService {
 
             // Create customer
             const { addresses, phoneNumbers, ...newCustomerData } = registerData;
-            const mappedPhoneNumbers = phoneNumbers.map(number => ({ number }));
-            const newCustomer = await this.customerRepository.create(newCustomerData, addresses, mappedPhoneNumbers);
+            const formatedPhoneNumbers = DataFormatterHelper.formatPhoneNumbers(phoneNumbers);
+            const newCustomer = await this.customerRepository.create(newCustomerData, addresses, formatedPhoneNumbers);
 
             // Send welcome email
             this.eventEmiter.emit("sendCustomerWelcomeEmail", { email, firstName, lastName });
@@ -186,7 +187,7 @@ export class CustomerAuthService implements IAuthService {
         const verificationCode = cryptoService.randomInt();
         await this.customerRepository.update(customer.id, { emailVerificationCode: verificationCode });
         const token = this.getToken({ email, verificationCode });
-        this.eventEmiter.emit("sendCustomerEmailVerificationEmail", { email, token, verificationCode, url});
+        this.eventEmiter.emit("sendCustomerEmailVerificationEmail", { email, token, verificationCode, url });
         return true;
     }
 

@@ -5,7 +5,7 @@ import { JWTService } from "../../utils/jwt/jwt.service";
 import { ILogger } from "../../utils/logger/logger.interface";
 import { IAuthService } from "../interfaces/auth.service.interface";
 import { eventEmmiter } from "../../utils/events";
-import { EmailPaths } from "../../constants/email-paths.enum";
+import { EmailPaths, EmailSubjects } from "../../constants/email.enum";
 import { LoginRequestDto } from "../dtos/login-request.dto";
 import { LoginResponseDto } from "../dtos/login-response.dto";
 import { cryptoService } from "../../utils/crytpo/crypto.service";
@@ -21,6 +21,7 @@ import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
 import { MarketRepository } from "../../repositories/market.repository";
 import { MarketRegisterRequestDto } from "../dtos/market-register-request.dto";
 import { IVerifyEmailRequest, VerifyEmailRequestByCodeDto, VerifyEmailRequestByTokenDto } from "../dtos/verify-email-request.dto";
+import { DataFormatterHelper } from "../helpers/format.helper";
 
 
 export class MarketAuthService implements IAuthService {
@@ -52,7 +53,7 @@ export class MarketAuthService implements IAuthService {
             const link = url + `?token=${token}`;
             await this.emailService.sendMail({
                 to: email,
-                subject: "Forgot Password",
+                subject: EmailSubjects.PASSWORD_RESET_MARKET,
                 options: {
                     template: EmailPaths.PASSWORD_RESET,
                     data: { link, resetCode }
@@ -65,7 +66,7 @@ export class MarketAuthService implements IAuthService {
             const link = url + `/${token}`;
             await this.emailService.sendMail({
                 to: email,
-                subject: "Email Verification",
+                subject: EmailSubjects.EMAIL_VERIFICATION_MARKET,
                 options: {
                     template: EmailPaths.EMAIL_VERIFICATION,
                     data: { link, verificationCode }
@@ -77,7 +78,7 @@ export class MarketAuthService implements IAuthService {
             const { email, brandName } = data;
             await this.emailService.sendMail({
                 to: email,
-                subject: "Welcome to Buyier",
+                subject: EmailSubjects.WELCOME,
                 options: {
                     template: EmailPaths.WELCOME,
                     data: { brandName }
@@ -160,8 +161,8 @@ export class MarketAuthService implements IAuthService {
 
             // Create new market
             const { addresses, phoneNumbers, ...newMarketData } = registerData;
-            const mappedPhoneNumbers = phoneNumbers.map(number => ({ number }));
-            const newMarket = await this.marketRepository.create(newMarketData, addresses, mappedPhoneNumbers);
+            const formattedPhoneNumbers = DataFormatterHelper.formatPhoneNumbers(phoneNumbers);
+            const newMarket = await this.marketRepository.create(newMarketData, addresses, formattedPhoneNumbers);
 
             // Send welcome email
             this.eventEmiter.emit("sendMarketWelcomeEmail", { email, brandName });

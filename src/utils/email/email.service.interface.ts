@@ -1,4 +1,4 @@
-import { EmailPaths } from "../../constants/email-paths.enum";
+import { EmailPaths } from "../../constants/email.enum";
 
 export interface IEmailService {
     sendMail(

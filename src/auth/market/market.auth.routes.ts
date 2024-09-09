@@ -33,7 +33,7 @@ const marketAuthController = new MarketAuthController(marketAuthService);
 router.post('/login', validator.single(LoginRequestDto), marketAuthController.login);
 
 // Register Route
-router.post('/register', validator.single(MarketRegisterRequestDto), marketAuthController.register);
+router.post('/signup', validator.single(MarketRegisterRequestDto), marketAuthController.register);
 
 // Email Verification Route
 router.post('/email-verification', validator.single(EmailVerificationRequestDto), marketAuthController.emailVerification);
