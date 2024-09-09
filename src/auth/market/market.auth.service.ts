@@ -15,7 +15,6 @@ import { BadRequestException } from '../../utils/exceptions/bad-request.exceptio
 import { InternalServerException } from '../../utils/exceptions/internal-server.exception';
 import { EmailVerificationRequestDto } from "../dtos/email-verification-request.dto";
 import { NotFoundException } from '../../utils/exceptions/not-found.exception';
-import { JsonWebTokenError } from "jsonwebtoken";
 import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
 import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
 import { MarketRepository } from "../../repositories/market.repository";
@@ -208,13 +207,13 @@ export class MarketAuthService implements IAuthService {
             await this.marketRepository.update(market.id, { emailVerifiedAt: new Date(), emailVerificationCode: null });
             return true;
         } catch (e) {
-            if (e instanceof JsonWebTokenError) {
+            // if (e instanceof JsonWebTokenError) {
                 this.logger.error(ErrorMessages.INVALID_VERIFICATION_TOKEN);
                 throw new BadRequestException(ErrorMessages.INVALID_VERIFICATION_TOKEN);
-            } else {
-                this.logger.error(`${ErrorMessages.EMAIL_VERIFICATION_FAILED}: ${e}`);
-                throw new InternalServerException(ErrorMessages.EMAIL_VERIFICATION_FAILED);
-            }
+            // } else {
+            //     this.logger.error(`${ErrorMessages.EMAIL_VERIFICATION_FAILED}: ${e}`);
+            //     throw new InternalServerException(ErrorMessages.EMAIL_VERIFICATION_FAILED);
+            // }
         }
 
     }
@@ -251,14 +250,14 @@ export class MarketAuthService implements IAuthService {
             await this.marketRepository.update(market.id, { password: hashedPassword, passwordResetCode: null });
             return true;
         } catch (e) {
-            if (e instanceof JsonWebTokenError) {
+            // if (e instanceof JsonWebTokenError) {
                 this.logger.error(ErrorMessages.INVALID_VERIFICATION_TOKEN);
                 throw new BadRequestException(ErrorMessages.INVALID_VERIFICATION_TOKEN);
-            } else {
-                this.logger.error(`${ErrorMessages.EMAIL_VERIFICATION_FAILED}: ${e}`);
-                throw new InternalServerException(ErrorMessages.EMAIL_VERIFICATION_FAILED);
-                // throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.EMAIL_VERIFICATION_FAILED);
-            }
+            // } else {
+            //     this.logger.error(`${ErrorMessages.EMAIL_VERIFICATION_FAILED}: ${e}`);
+            //     throw new InternalServerException(ErrorMessages.EMAIL_VERIFICATION_FAILED);
+            //     // throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.EMAIL_VERIFICATION_FAILED);
+            // }
         }
     }
 }

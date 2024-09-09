@@ -18,7 +18,6 @@ import { InternalServerException } from '../../utils/exceptions/internal-server.
 import { EmailVerificationRequestDto } from "../dtos/email-verification-request.dto";
 import { NotFoundException } from '../../utils/exceptions/not-found.exception';
 import { IVerifyEmailRequest, VerifyEmailRequestByCodeDto, VerifyEmailRequestByTokenDto } from "../dtos/verify-email-request.dto";
-import { JsonWebTokenError } from "jsonwebtoken";
 import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
 import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
 import { DataFormatterHelper } from "../helpers/format.helper";
@@ -206,14 +205,14 @@ export class CustomerAuthService implements IAuthService {
             await this.customerRepository.update(customer.id, { emailVerifiedAt: new Date(), emailVerificationCode: null });
             return true;
         } catch (e) {
-            if (e instanceof JsonWebTokenError) {
+            // if (e instanceof JsonWebTokenError) {
                 this.logger.error(ErrorMessages.INVALID_VERIFICATION_TOKEN);
                 throw new BadRequestException(ErrorMessages.INVALID_VERIFICATION_TOKEN);
-            } else {
-                this.logger.error(`${ErrorMessages.EMAIL_VERIFICATION_FAILED}: ${e}`);
-                throw new InternalServerException(ErrorMessages.EMAIL_VERIFICATION_FAILED);
-                // throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.EMAIL_VERIFICATION_FAILED);
-            }
+            // } else {
+            //     this.logger.error(`${ErrorMessages.EMAIL_VERIFICATION_FAILED}: ${e}`);
+            //     throw new InternalServerException(ErrorMessages.EMAIL_VERIFICATION_FAILED);
+            //     // throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.EMAIL_VERIFICATION_FAILED);
+            // }
         }
 
     }
@@ -250,14 +249,14 @@ export class CustomerAuthService implements IAuthService {
             await this.customerRepository.update(customer.id, { password: hashedPassword, passwordResetCode: null });
             return true;
         } catch (e) {
-            if (e instanceof JsonWebTokenError) {
+            // if (e instanceof JsonWebTokenError) {
                 this.logger.error(ErrorMessages.INVALID_VERIFICATION_TOKEN);
                 throw new BadRequestException(ErrorMessages.INVALID_VERIFICATION_TOKEN);
-            } else {
-                this.logger.error(`${ErrorMessages.EMAIL_VERIFICATION_FAILED}: ${e}`);
-                throw new InternalServerException(ErrorMessages.EMAIL_VERIFICATION_FAILED);
-                // throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.EMAIL_VERIFICATION_FAILED);
-            }
+            // } else {
+            //     this.logger.error(`${ErrorMessages.EMAIL_VERIFICATION_FAILED}: ${e}`);
+            //     throw new InternalServerException(ErrorMessages.EMAIL_VERIFICATION_FAILED);
+            //     // throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.EMAIL_VERIFICATION_FAILED);
+            // }
         }
     }
 }

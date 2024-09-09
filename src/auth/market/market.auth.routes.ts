@@ -48,7 +48,7 @@ router.post('/verify-email', validator.single(VerifyEmailRequestByCodeDto), mark
 router.post('/forgot-password', validator.single(ForgotPasswordRequestDto), marketAuthController.forgotPassword);
 
 // Reset Password Route
-router.post('/reset-password', validator.single(ResetPasswordRequestDto), marketAuthController.resetPassword);
+router.put('/reset-password', validator.single(ResetPasswordRequestDto), marketAuthController.resetPassword);
 
 
 export default router;
