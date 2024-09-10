@@ -202,6 +202,9 @@ model Rating {
   deletedAt  DateTime?
   customerId String
   productId  String
+
+  @@unique([customerId, productId])
+  @@index([productId])
 }
 
 model MarketVerification {
