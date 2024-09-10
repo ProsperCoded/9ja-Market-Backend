@@ -22,12 +22,29 @@ export class CartProductRepository {
         })
     }
 
-    update(customerId: string, productId: string, data: Prisma.CartProductCreateInput): Promise<CartProduct[]> {
+
+    create(customerId: string, productId: string, data: Omit<Prisma.CartProductCreateInput, "customer" | "product">): Promise<CartProduct> {
         return new Promise(async (resolve, reject) => {
             try {
-                await this.cartProductDelegate.update({ where: { productId_customerId: { customerId, productId } }, data });
-                const cart = this.getCart(customerId);
-                resolve(cart);
+                const cartProduct = await this.cartProductDelegate.create({
+                    data: {
+                        ...data,
+                        customer: { connect: { id: customerId } },
+                        product: { connect: { id: productId } }
+                    }
+                });
+                resolve(cartProduct);
+            } catch (e) {
+                reject(e)
+            }
+        })
+    }
+
+    update(customerId: string, productId: string, data: Prisma.CartProductUpdateInput): Promise<CartProduct> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const updatedCartProduct = await this.cartProductDelegate.update({ where: { productId_customerId: { customerId, productId } }, data });
+                resolve(updatedCartProduct);
             } catch (e) {
                 reject(e)
             }
@@ -44,4 +61,16 @@ export class CartProductRepository {
             }
         })
     }
+
+    removeAllFromCart(customerId: string): Promise<boolean> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                await this.cartProductDelegate.deleteMany({ where: { customerId } });
+                resolve(true);
+            } catch (e) {
+                reject(e);
+            }
+        })
+    }
+
 }

@@ -77,7 +77,7 @@ export class ProductRepository {
         });
     }
 
-    create(marketId: string, product: Omit<Prisma.ProductCreateInput, "market">): Promise<Product> {
+    create(marketId: string, product: Prisma.ProductCreateWithoutMarketInput): Promise<Product> {
         return new Promise(async (resolve, reject) => {
             try {
                 const newProduct = await this.productDelegate.create({

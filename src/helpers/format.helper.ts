@@ -1,5 +1,3 @@
-import { Customer } from "@prisma/client";
-
 export class DataFormatterHelper {
 
     static formatPhoneNumbers(phoneNumbers: string[], customerId?: string, marketId?: string): { number: string, isPrimary: boolean, customerId?: string, marketId?: string }[] {
@@ -17,14 +15,8 @@ export class DataFormatterHelper {
         return new Date(date);
     }
 
-    static formatCustomer(customer: Customer) {
-        return {
-            id: customer.id,
-            firstName: customer.firstName,
-            lastName: customer.lastName,
-            email: customer.email,
-            emailVerifiedAt: customer.emailVerifiedAt,
-            displayImage: customer.displayImage,
-        }
+    static formatDatabaseObject(data: { [key: string]: any }): void {
+        delete data.createdAt;
+        delete data.updatedAt;
     }
 }

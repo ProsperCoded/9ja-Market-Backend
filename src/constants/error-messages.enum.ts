@@ -27,6 +27,11 @@ export enum ErrorMessages {
     DELETE_PRODUCT_FAILED = 'Unable to Delete Product',
     GET_ALL_PRODUCTS_FAILED = 'Unable to Fetch All Products',
     PRODUCT_NOT_FOUND = 'Product Not Found',
+    CART_GET_FAILED = 'Unable to Fetch Cart',
+    CART_ADD_FAILED = 'Unable to Add to Cart',
+    CART_UPDATE_FAILED = 'Unable to Update Cart',
+    CART_REMOVE_FAILED = 'Unable to Remove from Cart',
+    QUANTITY_NOT_AVAILABLE = 'Quantity Not Available',
     NO_AUTH_ERROR = 'Authorization Header Missing',
     INVALID_AUTH_TOKEN_SUPPLIED = 'Invalid Auth Token Supplied',
     BRAND_NAME_EXISTS = 'Brand Name Exists Already',
@@ -34,4 +39,5 @@ export enum ErrorMessages {
     INVALID_RESET_TOKEN = 'Invalid Reset Code',
     CUSTOMER_EMAIL_NOT_VERIFIED = 'Customer Email Not Verified',
     MARKET_EMAIL_NOT_VERIFIED = 'Market Email Not Verified',
+
   }
