@@ -10,8 +10,6 @@ import { DataFormatterHelper } from "../../helpers/format.helper";
 export class CartController {
     constructor(private readonly cartService: CartService) { }
 
-
-
     /**
  * Get Cart by Customer Id
  * @param request {Request}
@@ -21,6 +19,7 @@ export class CartController {
     getCart: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
             const result = await this.cartService.getCart(request.params.id);
+            result.forEach(item => DataFormatterHelper.formatDatabaseObject(item));
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.GET_CART_SUCCESS, result);
             return response.status(HttpStatus.OK).send(resObj);
         } catch (e) {
@@ -38,6 +37,7 @@ export class CartController {
     updateCart: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
             const result = await this.cartService.updateCart(request.body.customer.id, request.params.productId, request.body);
+            result.forEach(item => DataFormatterHelper.formatDatabaseObject(item));
             DataFormatterHelper.formatDatabaseObject(result);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.UPDATE_CART_SUCCESS, result);
             return response.status(HttpStatus.OK).send(resObj);

@@ -19,7 +19,7 @@ export class CustomerController {
     getCustomerById: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
             const result = await this.customerService.getCustomerById(request.body.customer.id);
-            DataFormatterHelper.formatDatabaseObject(result);
+            DataFormatterHelper.formatDatabaseObject(result, "id");
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.GET_CUSTOMER_SUCCESS, result);
             return response.status(HttpStatus.OK).send(resObj);
         } catch (e) {
@@ -37,7 +37,7 @@ export class CustomerController {
     updateCustomer: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
             const result = await this.customerService.updateCustomer(request.params.id, request.body);
-            DataFormatterHelper.formatDatabaseObject(result);
+            DataFormatterHelper.formatDatabaseObject(result, "id");
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.UPDATE_CUSTOMER_SUCCESS, result);
             return response.status(HttpStatus.OK).send(resObj);
         } catch (e) {

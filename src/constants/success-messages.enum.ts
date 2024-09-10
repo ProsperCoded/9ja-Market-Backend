@@ -20,5 +20,9 @@ export enum SuccessMessages {
   REMOVE_FROM_CART_SUCCESS = 'Product Removed from Cart Successfully',
   CLEAR_CART_SUCCESS = 'Clear Customer Cart Successfully',
   REMOVE_PRODUCT_FROM_CART_SUCCESS = 'Product Removed from Cart Successfully',
+  GET_RATINGS_SUCCESS = 'Fetch All Ratings Successful',
+  CREATE_RATING_SUCCESS = 'Create Rating Successful',
+  UPDATE_RATING_SUCCESS = 'Update Rating Successful',
+  DELETE_RATING_SUCCESS = 'Delete Rating Successful',
   WELCOME_HOME = 'Welcome Home',
 }

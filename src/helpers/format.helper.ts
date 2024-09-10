@@ -15,8 +15,12 @@ export class DataFormatterHelper {
         return new Date(date);
     }
 
-    static formatDatabaseObject(data: { [key: string]: any }): void {
+    static formatDatabaseObject(data: { [key: string]: any }, id?: "id"): void {
         delete data.createdAt;
         delete data.updatedAt;
+        delete data.deletedAt;
+        if (id) {
+            delete data.id;
+        }
     }
 }
