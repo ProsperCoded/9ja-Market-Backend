@@ -124,6 +124,8 @@ model CartProduct {
   orderId    String?
   customerId String
   productId  String
+
+  @@unique([productId, customerId])
 }
 
 model Address {
