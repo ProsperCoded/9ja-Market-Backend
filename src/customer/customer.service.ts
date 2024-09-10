@@ -67,4 +67,14 @@ export class CustomerService {
         }
     }
 
+    async deleteCustomer(customerId: string): Promise<boolean> {
+        try {
+            await this.customerRepository.delete(customerId);
+            return true;
+        } catch (e) {
+            this.logger.error(`Error deleting customer: ${e}`);
+            throw new InternalServerException("Error deleting customer");
+        }
+    }
+
 }

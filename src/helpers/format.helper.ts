@@ -1,3 +1,4 @@
+import { Customer } from "@prisma/client";
 
 export class DataFormatterHelper {
 
@@ -10,5 +11,16 @@ export class DataFormatterHelper {
                 marketId
             }
         });
+    }
+
+    static formatCustomer(customer: Customer) {
+        return {
+            id: customer.id,
+            firstName: customer.firstName,
+            lastName: customer.lastName,
+            email: customer.email,
+            emailVerifiedAt: customer.emailVerifiedAt,
+            displayImage: customer.displayImage,
+        }
     }
 }

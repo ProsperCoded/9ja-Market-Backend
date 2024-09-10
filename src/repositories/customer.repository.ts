@@ -89,4 +89,15 @@ export class CustomerRepository implements ICustomerRepository {
         })
     }
 
+    delete(id: string): Promise<Customer> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const customer = await this.customerDelegate.delete({ where: { id } });
+                resolve(customer)
+            } catch (e) {
+                reject(e);
+            }
+        })
+    }
+
 }
