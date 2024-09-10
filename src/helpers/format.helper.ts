@@ -13,6 +13,10 @@ export class DataFormatterHelper {
         });
     }
 
+    static formatDate(date: string | Date): Date {
+        return new Date(date);
+    }
+
     static formatCustomer(customer: Customer) {
         return {
             id: customer.id,

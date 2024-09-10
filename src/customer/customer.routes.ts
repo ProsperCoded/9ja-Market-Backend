@@ -5,14 +5,16 @@ import { CustomerRepository } from "../repositories/customer.repository";
 import { AddressRepository } from "../repositories/address.repository";
 import { PhoneNumberRepository } from "../repositories/phone-number.repository";
 import { WinstonLogger } from "../utils/logger/winston.logger";
-
-
-import CartRouter from "./cart/cart.routes";
-import RatingRouter from "./rating/rating.routes";
 import { Validator } from "../utils/middlewares/validator.middleware";
 import { IdDto } from "../dtos/id.dto";
 import { CustomerAuthGaurd } from "../utils/middlewares/guards/customer.auth.guard";
 import { JWTService } from "../utils/jwt/jwt.service";
+import { CustomerUpdateDto } from "./dtos/customer-update.dto";
+
+import CartRouter from "./cart/cart.routes";
+import RatingRouter from "./rating/rating.routes";
+
+
 
 
 // Customer Service Dependents
@@ -37,10 +39,13 @@ router.use("/cart", CartRouter);
 router.use("/rating", RatingRouter);
 
 // Customer Routes
-router.get("/profile/:id", customerAuthGaurd.authorise(), validator.single(IdDto, "params"), customerController.getCustomerById);
+router.get("/profile", customerAuthGaurd.authorise(), customerController.getCustomerById);
 
-router.put("/profile/:id", customerAuthGaurd.authorise(), validator.single(IdDto, "params"), customerController.updateCustomer);
+router.put("/profile/:id", validator.multiple([
+    { schema: IdDto, source: "params" },
+    { schema: CustomerUpdateDto, source: "body" }
+]), customerAuthGaurd.authorise(), customerController.updateCustomer);
 
-router.delete("/profile/:id", customerAuthGaurd.authorise(), validator.single(IdDto, "params"), customerController.deleteCustomer);
+router.delete("/profile/:id", validator.single(IdDto, "params"), customerAuthGaurd.authorise(), customerController.deleteCustomer);
 
 export default router;

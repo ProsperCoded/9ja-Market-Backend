@@ -1,4 +1,4 @@
-import { Customer } from "@prisma/client";
+import { Customer, Prisma } from "@prisma/client";
 import { CustomerRepository } from "../repositories/customer.repository";
 import { WinstonLogger } from "../utils/logger/winston.logger";
 import { NotFoundException } from "../utils/exceptions/not-found.exception";
@@ -37,7 +37,15 @@ export class CustomerService {
 
     async updateCustomer(customerId: string, customerUpdateDto: CustomerUpdateDto): Promise<Customer> {
         try {
-            const { phoneNumbers, addresses, ...customer } = customerUpdateDto;
+            const { phoneNumbers, addresses,dateOfBirth, lastName, firstName } = customerUpdateDto;
+            let customer: Prisma.CustomerUpdateInput = {};
+            // Update Date of Birth
+            if (dateOfBirth) {
+                customer.dateOfBirth = DataFormatterHelper.formatDate(dateOfBirth);
+            }
+            // Set firstName and LastName
+            customer.firstName = firstName;
+            customer.lastName = lastName;
 
             // Update Phone Numbers
             if (phoneNumbers) {

@@ -18,7 +18,7 @@ export class CustomerController {
    */
     getCustomerById: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            const _result = await this.customerService.getCustomerById(request.params.id);
+            const _result = await this.customerService.getCustomerById(request.body.customer.id);
             const result = DataFormatterHelper.formatCustomer(_result);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.GET_CUSTOMER_SUCCESS, result);
             return response.status(HttpStatus.OK).send(resObj);

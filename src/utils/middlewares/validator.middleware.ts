@@ -11,11 +11,11 @@ enum ValidationErrorMessages {
 
 interface IValidation {
     schema: any;
-    scope?: keyof typeof ValidationErrorMessages;
+    source?: keyof typeof ValidationErrorMessages;
 }
 
 export class Validator {
-    constructor(public readonly scope: string) { }
+    constructor(public readonly source: string) { }
 
     private getErrors(errors: ValidationError[]): string[] {
         return errors.flatMap(error => {
@@ -30,13 +30,13 @@ export class Validator {
         });
     }
 
-    single(schema: any, scope: IValidation["scope"] = 'body') {
+    single(schema: any, source: IValidation["source"] = 'body') {
         return (request: Request, response: Response, next: NextFunction) => {
-            validate(plainToInstance(schema, request[scope]), { skipMissingProperties: true, whitelist: true, forbidNonWhitelisted: true }).then(errors => {
+            validate(plainToInstance(schema, request[source]), { skipMissingProperties: true, whitelist: true, forbidNonWhitelisted: true }).then(errors => {
                 if (errors.length > 0) {
                     const errorArray = this.getErrors(errors);
                     const errorString = errorArray.join(', ');
-                    next(new ValidationException(ValidationErrorMessages[scope], errorString, errorArray));
+                    next(new ValidationException(ValidationErrorMessages[source], errorString, errorArray));
                 } else {
                     next();
                 }
@@ -46,12 +46,12 @@ export class Validator {
 
     multiple(args: IValidation[]) {
         return (request: Request, response: Response, next: NextFunction) => {
-            args.forEach(({ schema, scope = 'body' }) => {
-                validate(plainToInstance(schema, request[scope]), { skipMissingProperties: true, whitelist: true, forbidNonWhitelisted: true }).then(errors => {
+            args.forEach(({ schema, source = 'body' }) => {
+                validate(plainToInstance(schema, request[source]), { skipMissingProperties: true, whitelist: true, forbidNonWhitelisted: true }).then(errors => {
                     if (errors.length > 0) {
                         const errorArray = this.getErrors(errors);
                         const errorString = errorArray.join(', ');
-                        next(new ValidationException(ValidationErrorMessages[scope], errorString, errorArray));
+                        next(new ValidationException(ValidationErrorMessages[source], errorString, errorArray));
                     }
                 });
             });
