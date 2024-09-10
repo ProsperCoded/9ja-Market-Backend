@@ -32,7 +32,7 @@ export class Validator {
 
     single(schema: any, scope: IValidation["scope"] = 'body') {
         return (request: Request, response: Response, next: NextFunction) => {
-            validate(plainToInstance(schema, request[scope]), { skipMissingProperties: true }).then(errors => {
+            validate(plainToInstance(schema, request[scope]), { skipMissingProperties: true, whitelist: true, forbidNonWhitelisted: true }).then(errors => {
                 if (errors.length > 0) {
                     const errorArray = this.getErrors(errors);
                     const errorString = errorArray.join(', ');
@@ -47,7 +47,7 @@ export class Validator {
     multiple(args: IValidation[]) {
         return (request: Request, response: Response, next: NextFunction) => {
             args.forEach(({ schema, scope = 'body' }) => {
-                validate(plainToInstance(schema, request[scope]), { skipMissingProperties: true }).then(errors => {
+                validate(plainToInstance(schema, request[scope]), { skipMissingProperties: true, whitelist: true, forbidNonWhitelisted: true }).then(errors => {
                     if (errors.length > 0) {
                         const errorArray = this.getErrors(errors);
                         const errorString = errorArray.join(', ');

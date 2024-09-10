@@ -1,6 +1,6 @@
 import { $Enums, Prisma } from "@prisma/client";
 import { Type } from "class-transformer";
-import { IsArray, IsDefined, IsEmail, IsIn, IsNotEmpty, IsString, IsStrongPassword, ValidateNested } from "class-validator";
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsDefined, IsEmail, IsIn, IsNotEmpty, IsString, IsStrongPassword, ValidateNested } from "class-validator";
 import { AddressCreateDto } from "../../dtos/address-create.dto";
 
 interface MarketCreateInput extends Omit<Prisma.MarketCreateInput, "phoneNumbers" | "addresses"> {
@@ -34,6 +34,8 @@ export class MarketRegisterRequestDto implements MarketCreateInput {
     @IsDefined()
     @IsArray()
     @IsString({ each: true })
+    @ArrayMinSize(2, { message: 'phoneNumbers must contain 2 elements' })
+    @ArrayMaxSize(2, { message: 'phoneNumbers must contain 2 elements' })
     declare phoneNumbers: string[];
 
     

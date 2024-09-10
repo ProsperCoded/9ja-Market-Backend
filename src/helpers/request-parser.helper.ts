@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { AppEnum } from "../../constants/app.enum";
+import { AppEnum } from "../constants/app.enum";
 
 export class RequestParserHelper {
     constructor(private readonly request: Request) { }
@@ -10,7 +10,7 @@ export class RequestParserHelper {
      */
 
     getUrl(path?: string): string {
-        let url = `${this.request.protocol}://${this.request.get('host')  + AppEnum.PREFIX}`;
+        let url = `${this.request.protocol}://${this.request.get('host') + AppEnum.PREFIX}`;
         if (path) {
             url += `${path}`;
         }
