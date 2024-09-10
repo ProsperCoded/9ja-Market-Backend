@@ -63,11 +63,13 @@ model Market {
 model Product {
   id             String          @id @default(uuid())
   name           String
+  details        String
   description    String
   price          Float
   prevPrice      Float
   stock          Int
   displayImage   String
+  featuredDate   DateTime?
   images         ProductImage[]
   ratings        Rating[]
   cart           CartProduct[]
@@ -76,7 +78,6 @@ model Product {
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   deletedAt      DateTime?
-  productImageId String
   marketId       String
 
   @@index([name])
