@@ -11,6 +11,8 @@ import CartRouter from "./cart/cart.routes";
 import RatingRouter from "./rating/rating.routes";
 import { Validator } from "../utils/middlewares/validator.middleware";
 import { IdDto } from "../dtos/id.dto";
+import { CustomerAuthGaurd } from "../utils/middlewares/guards/customer.auth.guard";
+import { JWTService } from "../utils/jwt/jwt.service";
 
 
 // Customer Service Dependents
@@ -18,10 +20,12 @@ const customerRepository = new CustomerRepository();
 const addressRepository = new AddressRepository();
 const phoneNumberRepository = new PhoneNumberRepository();
 const logger = new WinstonLogger("CustomerService");
+const jwtService = new JWTService();
 
 const customerService = new CustomerService(customerRepository, addressRepository, phoneNumberRepository, logger);
 const customerController = new CustomerController(customerService);
 
+const customerAuthGaurd = new CustomerAuthGaurd(customerService, logger, jwtService);
 const validator = new Validator("CustomerService");
 
 const router = Router()
@@ -33,10 +37,10 @@ router.use("/cart", CartRouter);
 router.use("/rating", RatingRouter);
 
 // Customer Routes
-router.get("/profile/:id", validator.single(IdDto, "params"), customerController.getCustomerById);
+router.get("/profile/:id", customerAuthGaurd.authorise(), validator.single(IdDto, "params"), customerController.getCustomerById);
 
-router.put("/profile/:id", validator.single(IdDto, "params"), customerController.updateCustomer);
+router.put("/profile/:id", customerAuthGaurd.authorise(), validator.single(IdDto, "params"), customerController.updateCustomer);
 
-router.delete("/profile/:id", validator.single(IdDto, "params"), customerController.deleteCustomer);
+router.delete("/profile/:id", customerAuthGaurd.authorise(), validator.single(IdDto, "params"), customerController.deleteCustomer);
 
 export default router;
