@@ -4,7 +4,7 @@ import { ResponseDto } from "../../dtos/response.dto";
 import { ResponseStatus } from "../../dtos/interfaces/response.interface";
 import { SuccessMessages } from "../../constants/success-messages.enum";
 import { HttpStatus } from "../../constants/http-status.enum";
-import { RequestParserHelper } from "../helpers/request-parser.helper";
+import { RequestParserHelper } from "../../helpers/request-parser.helper";
 
 export class CustomerAuthController {
     constructor(private readonly customerAuthService: CustomerAuthService) { }

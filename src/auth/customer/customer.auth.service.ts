@@ -20,7 +20,7 @@ import { NotFoundException } from '../../utils/exceptions/not-found.exception';
 import { IVerifyEmailRequest, VerifyEmailRequestByCodeDto, VerifyEmailRequestByTokenDto } from "../dtos/verify-email-request.dto";
 import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
 import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
-import { DataFormatterHelper } from "../helpers/format.helper";
+import { DataFormatterHelper } from "../../helpers/format.helper";
 
 
 export class CustomerAuthService implements IAuthService {
@@ -206,8 +206,8 @@ export class CustomerAuthService implements IAuthService {
             return true;
         } catch (e) {
             // if (e instanceof JsonWebTokenError) {
-                this.logger.error(ErrorMessages.INVALID_VERIFICATION_TOKEN);
-                throw new BadRequestException(ErrorMessages.INVALID_VERIFICATION_TOKEN);
+            this.logger.error(ErrorMessages.INVALID_VERIFICATION_TOKEN);
+            throw new BadRequestException(ErrorMessages.INVALID_VERIFICATION_TOKEN);
             // } else {
             //     this.logger.error(`${ErrorMessages.EMAIL_VERIFICATION_FAILED}: ${e}`);
             //     throw new InternalServerException(ErrorMessages.EMAIL_VERIFICATION_FAILED);
@@ -250,8 +250,8 @@ export class CustomerAuthService implements IAuthService {
             return true;
         } catch (e) {
             // if (e instanceof JsonWebTokenError) {
-                this.logger.error(ErrorMessages.INVALID_VERIFICATION_TOKEN);
-                throw new BadRequestException(ErrorMessages.INVALID_VERIFICATION_TOKEN);
+            this.logger.error(ErrorMessages.INVALID_VERIFICATION_TOKEN);
+            throw new BadRequestException(ErrorMessages.INVALID_VERIFICATION_TOKEN);
             // } else {
             //     this.logger.error(`${ErrorMessages.EMAIL_VERIFICATION_FAILED}: ${e}`);
             //     throw new InternalServerException(ErrorMessages.EMAIL_VERIFICATION_FAILED);

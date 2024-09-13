@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import { IsArray, IsDateString, IsDefined, IsEmail, IsNotEmpty, IsString, IsStrongPassword, ValidateNested } from "class-validator";
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsDateString, IsDefined, IsEmail, IsNotEmpty, IsString, IsStrongPassword, ValidateNested } from "class-validator";
 import { AddressCreateDto } from "../../dtos/address-create.dto";
 import { Type } from "class-transformer";
 
@@ -36,6 +36,8 @@ export class CustomerRegisterRequestDto implements CustomerCreateInput {
     @IsDefined()
     @IsArray()
     @IsString({ each: true })
+    @ArrayMinSize(2, { message: 'phoneNumbers must contain 2 elements' })
+    @ArrayMaxSize(2, { message: 'phoneNumbers must contain 2 elements' })
     declare phoneNumbers: string[];
 
     @IsArray()

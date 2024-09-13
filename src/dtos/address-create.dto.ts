@@ -2,6 +2,11 @@ import { Prisma } from "@prisma/client";
 import { IsDefined, IsString } from "class-validator";
 
 export class AddressCreateDto implements Prisma.AddressCreateManyCustomerInput{
+
+    @IsDefined()
+    @IsString()
+    declare name: string;
+
     @IsDefined()
     @IsString()
     declare address: string;
