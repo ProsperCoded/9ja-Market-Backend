@@ -2,9 +2,6 @@ import { Router } from "express";
 import { WinstonLogger } from "../../utils/logger/winston.logger";
 import { JWTService } from "../../utils/jwt/jwt.service";
 import { CustomerRepository } from "../../repositories/customer.repository";
-import { AddressRepository } from "../../repositories/address.repository";
-import { PhoneNumberRepository } from "../../repositories/phone-number.repository";
-import { CustomerService } from "../customer.service";
 import { CustomerAuthGaurd } from "../../utils/middlewares/guards/customer.auth.guard";
 import { Validator } from "../../utils/middlewares/validator.middleware";
 import { RatingController } from "./rating.controller";
@@ -20,13 +17,10 @@ const logger = new WinstonLogger("RatingService");
 const jwtService = new JWTService();
 const ratingRepository = new RatingRepository();
 const customerRepository = new CustomerRepository();
-const addressRepository = new AddressRepository();
-const phoneNumberRepository = new PhoneNumberRepository();
-const customerService = new CustomerService(customerRepository, addressRepository, phoneNumberRepository, logger);
 const ratingService = new RatingService(ratingRepository, logger);
 const ratingController = new RatingController(ratingService)
 const validator = new Validator("RatingService");
-const customerAuthGaurd = new CustomerAuthGaurd(customerService, logger, jwtService)
+const customerAuthGaurd = new CustomerAuthGaurd(customerRepository, logger, jwtService)
 
 
 

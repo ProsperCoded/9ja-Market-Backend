@@ -1,18 +1,19 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
-import { CustomerService } from "../../../customer/customer.service";
 import { JWTService } from "../../jwt/jwt.service";
 import { WinstonLogger } from "../../logger/winston.logger";
 import { Customer } from "@prisma/client";
 import { ErrorMessages } from "../../../constants/error-messages.enum";
 import { UnauthorizedException } from '../../exceptions/unauthorized.exception';
 import { cryptoService } from "../../crytpo/crypto.service";
+import { CustomerRepository } from "../../../repositories/customer.repository";
+import { NotFoundException } from "../../exceptions/not-found.exception";
 
 
 export class CustomerAuthGaurd {
     private strict?: boolean;
     private id?: boolean;
     constructor(
-        private readonly customerService: CustomerService,
+        private readonly customerRepository: CustomerRepository,
         private readonly logger: WinstonLogger,
         private readonly jwtService: JWTService
     ) { }
@@ -51,7 +52,12 @@ export class CustomerAuthGaurd {
         const token = auth.split(' ')[1];
         try {
             const { id } = this.getPayload(token);
-            const customer = await this.customerService.getCustomerById(id);
+            const customer = await this.customerRepository.getCustomerById(id);
+
+            if (!customer) {
+                this.logger.error(ErrorMessages.CUSTOMER_NOT_FOUND);
+                throw new NotFoundException(ErrorMessages.CUSTOMER_NOT_FOUND);
+            }
 
             // Check for Email Verification on Strict Level
             if (this.strict && !customer.emailVerifiedAt) {

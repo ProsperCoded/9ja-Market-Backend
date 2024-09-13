@@ -27,7 +27,7 @@ const jwtService = new JWTService();
 const customerService = new CustomerService(customerRepository, addressRepository, phoneNumberRepository, logger);
 const customerController = new CustomerController(customerService);
 
-const customerAuthGaurd = new CustomerAuthGaurd(customerService, logger, jwtService);
+const customerAuthGaurd = new CustomerAuthGaurd(customerRepository, logger, jwtService);
 const validator = new Validator("CustomerService");
 
 const router = Router()

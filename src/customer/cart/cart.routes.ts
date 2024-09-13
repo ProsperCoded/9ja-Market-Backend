@@ -7,10 +7,7 @@ import { CartController } from "./cart.controller";
 import { Validator } from "../../utils/middlewares/validator.middleware";
 import { CustomerAuthGaurd } from "../../utils/middlewares/guards/customer.auth.guard";
 import { JWTService } from "../../utils/jwt/jwt.service";
-import { CustomerService } from "../customer.service";
 import { CustomerRepository } from "../../repositories/customer.repository";
-import { AddressRepository } from "../../repositories/address.repository";
-import { PhoneNumberRepository } from "../../repositories/phone-number.repository";
 import { IdDto } from "../../dtos/id.dto";
 import { AddToCartDto } from "../dtos/add-to-cart.dto";
 
@@ -20,13 +17,10 @@ const jwtService = new JWTService();
 const cartProductRepository = new CartProductRepository();
 const productRepository = new ProductRepository();
 const customerRepository = new CustomerRepository();
-const addressRepository = new AddressRepository();
-const phoneNumberRepository = new PhoneNumberRepository();
-const customerService = new CustomerService(customerRepository, addressRepository, phoneNumberRepository, logger);
 const cartService = new CartService(cartProductRepository, productRepository, logger);
 const cartController = new CartController(cartService)
 const validator = new Validator("CartService");
-const customerAuthGaurd = new CustomerAuthGaurd(customerService, logger, jwtService)
+const customerAuthGaurd = new CustomerAuthGaurd(customerRepository, logger, jwtService)
 
 
 // Get Cart by Customer Id

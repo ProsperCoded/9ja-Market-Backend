@@ -6,11 +6,17 @@ import { ProductController } from "./product.controller";
 import { Validator } from "../utils/middlewares/validator.middleware";
 import { IdDto } from "../dtos/id.dto";
 import { ProductUpdateDto } from "./dtos/product-update.dto";
+import { MarketAuthGaurd } from "../utils/middlewares/guards/market.auth.guard";
+import { JWTService } from "../utils/jwt/jwt.service";
+import { MarketRepository } from "../repositories/market.repository";
 
 const logger = new WinstonLogger("ProductService");
 const productRepository = new ProductRepository();
 const productService = new ProductService(productRepository, logger);
 const productController = new ProductController(productService);
+const jwtService = new JWTService();
+const marketRepository = new MarketRepository();
+const marketAuthGaurd = new MarketAuthGaurd(marketRepository, logger, jwtService);
 
 const validator = new Validator("Product");
 
@@ -22,13 +28,13 @@ router.get("/:id", validator.single(IdDto, "params"), productController.getProdu
 
 
 // Update Product
-router.put("/:id", validator.multiple([
+router.put("/:id", marketAuthGaurd.authorise(), validator.multiple([
     { schema: IdDto, source: "params" },
     { schema: ProductUpdateDto, source: "body" }
 ]), productController.updateProduct);
 
 
 // Delete Product
-router.delete("/:id", validator.single(IdDto, "params"), productController.deleteProduct);
+router.delete("/:id", marketAuthGaurd.authorise(), validator.single(IdDto, "params"), productController.deleteProduct);
 
 export default router;
