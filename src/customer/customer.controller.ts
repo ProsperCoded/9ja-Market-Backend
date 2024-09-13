@@ -5,21 +5,29 @@ import { ResponseStatus } from "../dtos/interfaces/response.interface";
 import { SuccessMessages } from "../constants/success-messages.enum";
 import { HttpStatus } from "../constants/http-status.enum";
 import { DataFormatterHelper } from "../helpers/format.helper";
+import { Customer } from "@prisma/client";
 
 
 export class CustomerController {
     constructor(private readonly customerService: CustomerService) { }
 
-     /**
-   * Get Customer profile
-   * @param request {Request}
-   * @param response (Response}
-   * @param next {NextFunction}
-   */
+
+    private formatCustomerData(customerData: Customer): void {
+        DataFormatterHelper.formatDatabaseObject<Customer>(customerData, ["refreshToken", "emailVerificationCode", "password", "passwordResetCode", "refreshToken"], "id");
+    }
+
+    /**
+  * Get Customer profile
+  * @param request {Request}
+  * @param response (Response}
+  * @param next {NextFunction}
+  */
     getCustomerById: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
             const result = await this.customerService.getCustomerById(request.body.customer.id);
-            DataFormatterHelper.formatDatabaseObject(result, "id");
+            console.log(result);
+            this.formatCustomerData(result);
+            // console.log(result);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.GET_CUSTOMER_SUCCESS, result);
             return response.status(HttpStatus.OK).send(resObj);
         } catch (e) {
@@ -27,17 +35,17 @@ export class CustomerController {
         }
     }
 
-     /**
-   * Update Customer profile
-   * @param request {Request}
-   * @param response (Response}
-   * @param next {NextFunction}
-   */
+    /**
+  * Update Customer profile
+  * @param request {Request}
+  * @param response (Response}
+  * @param next {NextFunction}
+  */
 
     updateCustomer: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
             const result = await this.customerService.updateCustomer(request.params.id, request.body);
-            DataFormatterHelper.formatDatabaseObject(result, "id");
+            this.formatCustomerData(result);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.UPDATE_CUSTOMER_SUCCESS, result);
             return response.status(HttpStatus.OK).send(resObj);
         } catch (e) {
@@ -45,12 +53,12 @@ export class CustomerController {
         }
     }
 
-     /**
-   * Delete Customer profile
-   * @param request {Request}
-   * @param response (Response}
-   * @param next {NextFunction}
-   */
+    /**
+  * Delete Customer profile
+  * @param request {Request}
+  * @param response (Response}
+  * @param next {NextFunction}
+  */
 
     deleteCustomer: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {

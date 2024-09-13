@@ -5,10 +5,15 @@ import { ResponseStatus } from "../../dtos/interfaces/response.interface";
 import { SuccessMessages } from "../../constants/success-messages.enum";
 import { HttpStatus } from "../../constants/http-status.enum";
 import { DataFormatterHelper } from "../../helpers/format.helper";
+import { CartProduct } from "@prisma/client";
 
 
 export class CartController {
     constructor(private readonly cartService: CartService) { }
+
+    private formatCartData(cart: CartProduct[]): void {
+        cart.forEach(item => DataFormatterHelper.formatDatabaseObject<CartProduct>(item, ["orderId"]));
+    }
 
     /**
  * Get Cart by Customer Id
@@ -19,7 +24,7 @@ export class CartController {
     getCart: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
             const result = await this.cartService.getCart(request.params.id);
-            result.forEach(item => DataFormatterHelper.formatDatabaseObject(item));
+            this.formatCartData(result);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.GET_CART_SUCCESS, result);
             return response.status(HttpStatus.OK).send(resObj);
         } catch (e) {
@@ -37,7 +42,7 @@ export class CartController {
     updateCart: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
             const result = await this.cartService.updateCart(request.body.customer.id, request.params.productId, request.body);
-            result.forEach(item => DataFormatterHelper.formatDatabaseObject(item));
+            this.formatCartData(result);
             DataFormatterHelper.formatDatabaseObject(result);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.UPDATE_CART_SUCCESS, result);
             return response.status(HttpStatus.OK).send(resObj);

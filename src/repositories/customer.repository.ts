@@ -21,10 +21,17 @@ export class CustomerRepository implements ICustomerRepository {
         })
     }
 
-    getCustomerById(id: string): Promise<Customer | null> {
+    getCustomerById(id: string, options: {cart: boolean} = {cart: false}): Promise<Customer | null> {
         return new Promise(async (resolve, reject) => {
             try {
-                const customer = await this.customerDelegate.findUnique({ where: { id } });
+                const customer = await this.customerDelegate.findUnique({ 
+                    where: { id },
+                    include: {
+                        addresses: true,
+                        phoneNumbers: true,
+                        cart: options.cart
+                    }
+                 });
                 resolve(customer)
             } catch (e) {
                 reject(e);
@@ -32,10 +39,17 @@ export class CustomerRepository implements ICustomerRepository {
         })
     }
 
-    getCustomerByEmail(email: string): Promise<Customer | null> {
+    getCustomerByEmail(email: string, options: {cart: boolean} = {cart: false}): Promise<Customer | null> {
         return new Promise(async (resolve, reject) => {
             try {
-                const customer = await this.customerDelegate.findUnique({ where: { email } });
+                const customer = await this.customerDelegate.findUnique({ 
+                    where: { email },
+                    include: {
+                        addresses: true,
+                        phoneNumbers: true,
+                        cart: options.cart
+                    }
+                });
                 resolve(customer)
             } catch (e) {
                 reject(e);

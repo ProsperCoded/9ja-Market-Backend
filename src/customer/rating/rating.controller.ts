@@ -5,9 +5,17 @@ import { ResponseStatus } from "../../dtos/interfaces/response.interface";
 import { SuccessMessages } from "../../constants/success-messages.enum";
 import { HttpStatus } from "../../constants/http-status.enum";
 import { DataFormatterHelper } from "../../helpers/format.helper";
+import { Rating } from "@prisma/client";
 
 export class RatingController {
     constructor(private readonly ratingService: RatingService) { }
+
+    private formatRatingData(ratingData: Rating[]): void {
+        ratingData.forEach((item: any) => {
+            DataFormatterHelper.formatDatabaseObject<Rating>(item);
+        }
+        );
+    }
 
     /**
 * Get Ratings for a Product
@@ -18,7 +26,7 @@ export class RatingController {
     getRatings: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
             const result = await this.ratingService.getAllRatings(request.params.productId);
-            result.forEach(item => DataFormatterHelper.formatDatabaseObject(item));
+            this.formatRatingData(result);  
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.GET_RATINGS_SUCCESS, result);
             return response.status(HttpStatus.OK).send(resObj);
         } catch (e) {
@@ -35,7 +43,7 @@ export class RatingController {
     createRating: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
             const result = await this.ratingService.createRating(request.body.customer.id, request.params.productId, request.body);
-            result.forEach(item => DataFormatterHelper.formatDatabaseObject(item));
+            this.formatRatingData(result)
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.CREATE_RATING_SUCCESS, result);
             return response.status(HttpStatus.CREATED).send(resObj);
         } catch (e) {
@@ -53,7 +61,7 @@ export class RatingController {
     updateRating: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
             const result = await this.ratingService.updateRating(request.body.customer.id, request.params.productId, request.body);
-            result.forEach(item => DataFormatterHelper.formatDatabaseObject(item));
+            this.formatRatingData(result)
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.UPDATE_RATING_SUCCESS, result);
             return response.status(HttpStatus.OK).send(resObj);
         } catch (e) {
