@@ -9,6 +9,7 @@ import { ProductUpdateDto } from "./dtos/product-update.dto";
 import { MarketAuthGaurd } from "../utils/middlewares/guards/market.auth.guard";
 import { JWTService } from "../utils/jwt/jwt.service";
 import { MarketRepository } from "../repositories/market.repository";
+import { ProductCreateDto } from "./dtos/product-create.dto";
 
 const logger = new WinstonLogger("ProductService");
 const productRepository = new ProductRepository();
@@ -26,6 +27,8 @@ const router = Router();
 // Get Product by Id
 router.get("/:id", validator.single(IdDto, "params"), productController.getProductById);
 
+// Create a Product
+router.post("/", marketAuthGaurd.authorise(), validator.single(ProductCreateDto, "body"), productController.createProduct);
 
 // Update Product
 router.put("/:id", marketAuthGaurd.authorise(), validator.multiple([

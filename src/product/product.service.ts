@@ -7,6 +7,7 @@ import { ProductCreateDto } from "./dtos/product-create.dto";
 import { ErrorMessages } from "../constants/error-messages.enum";
 import { DefaultValues } from "../constants/default.enum";
 import { ProductUpdateDto } from "./dtos/product-update.dto";
+import { UnauthorizedException } from "../utils/exceptions/unauthorized.exception";
 
 
 export class ProductService {
@@ -41,12 +42,19 @@ export class ProductService {
         }
     }
 
-    async updateProduct(id: string, productData: ProductUpdateDto): Promise<Product> {
+    async updateProduct(id: string, productData: ProductUpdateDto, marketId: string): Promise<Product> {
         try {
             const product = await this.productRepository.getById(id);
             if (!product) {
                 throw new NotFoundException(ErrorMessages.PRODUCT_NOT_FOUND);
             }
+
+            // Ensure Market is Authorized to Update Product
+            if (product.marketId !== marketId) {
+                this.logger.error(ErrorMessages.MARKET_UNAUTHORIZED);
+                throw new UnauthorizedException(ErrorMessages.MARKET_UNAUTHORIZED);
+            }
+
             const updatedProduct = await this.productRepository.update(id, productData);
             return updatedProduct;
         } catch (e) {

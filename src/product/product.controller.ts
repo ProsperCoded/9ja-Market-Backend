@@ -31,6 +31,23 @@ export class ProductController {
         }
     }
 
+      /**
+ * Create New Product
+ * @param request {Request}
+ * @param response (Response}
+ * @param next {NextFunction}
+ */
+    createProduct: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
+        try {
+            const result = await this.productService.createProduct(request.body.market.id,request.body);
+            this.formatProductData(result);
+            const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.CREATE_PRODUCT_SUCCESS, result);
+            return response.status(HttpStatus.CREATED).send(resObj);
+        } catch (e) {
+            next(e);
+        }
+    }
+
     /**
  * Update Product
  * @param request {Request}
@@ -40,7 +57,7 @@ export class ProductController {
 
     updateProduct: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            const result = await this.productService.updateProduct(request.params.id, request.body);
+            const result = await this.productService.updateProduct(request.params.id, request.body, request.body.market.id);
             this.formatProductData(result);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.UPDATE_PRODUCT_SUCCESS, result);
             return response.status(HttpStatus.OK).send(resObj);

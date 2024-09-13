@@ -12,6 +12,7 @@ export enum SuccessMessages {
   UPDATE_MARKET_SUCCESS = 'Update Market Successful',
   DELETE_MARKET_SUCCESS = 'Delete Market Successful',
   GET_PRODUCT_SUCCESS = 'Get Product Successful',
+  CREATE_PRODUCT_SUCCESS = 'Create Product Successful',
   UPDATE_PRODUCT_SUCCESS = 'Update Product Successful',
   DELETE_PRODUCT_SUCCESS = 'Delete Product Successful',
   ADD_TO_CART_SUCCESS = 'Product Added to Cart Successfully',
