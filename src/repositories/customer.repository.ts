@@ -21,17 +21,17 @@ export class CustomerRepository implements ICustomerRepository {
         })
     }
 
-    getCustomerById(id: string, options: {cart: boolean} = {cart: false}): Promise<Customer | null> {
+    getCustomerById(id: string, options: { cart: boolean } = { cart: false }): Promise<Customer | null> {
         return new Promise(async (resolve, reject) => {
             try {
-                const customer = await this.customerDelegate.findUnique({ 
+                const customer = await this.customerDelegate.findUnique({
                     where: { id },
                     include: {
                         addresses: true,
                         phoneNumbers: true,
                         cart: options.cart
                     }
-                 });
+                });
                 resolve(customer)
             } catch (e) {
                 reject(e);
@@ -39,10 +39,10 @@ export class CustomerRepository implements ICustomerRepository {
         })
     }
 
-    getCustomerByEmail(email: string, options: {cart: boolean} = {cart: false}): Promise<Customer | null> {
+    getCustomerByEmail(email: string, options: { cart: boolean } = { cart: false }): Promise<Customer | null> {
         return new Promise(async (resolve, reject) => {
             try {
-                const customer = await this.customerDelegate.findUnique({ 
+                const customer = await this.customerDelegate.findUnique({
                     where: { email },
                     include: {
                         addresses: true,
@@ -57,11 +57,11 @@ export class CustomerRepository implements ICustomerRepository {
         })
     }
     isEmailVerified(id: string): Promise<boolean> {
-        return new Promise(async (resolve, reject)=>{
-            try{
-                const customer = await this.customerDelegate.findUnique({where: {id}});
+        return new Promise(async (resolve, reject) => {
+            try {
+                const customer = await this.customerDelegate.findUnique({ where: { id } });
                 resolve(!!customer?.emailVerifiedAt);
-            }catch(e){
+            } catch (e) {
                 reject(e);
             }
         })
@@ -70,7 +70,13 @@ export class CustomerRepository implements ICustomerRepository {
     update(id: string, data: Prisma.CustomerUpdateInput): Promise<Customer> {
         return new Promise(async (resolve, reject) => {
             try {
-                const customer = await this.customerDelegate.update({ where: { id }, data });
+                const customer = await this.customerDelegate.update({
+                    where: { id }, data,
+                    include: {
+                        addresses: true,
+                        phoneNumbers: true
+                    }
+                });
                 resolve(customer)
             } catch (e) {
                 reject(e);
@@ -81,7 +87,7 @@ export class CustomerRepository implements ICustomerRepository {
     create(data: Prisma.CustomerCreateInput, addresses: Prisma.AddressCreateManyCustomerInput[] = [], phoneNumbers: Prisma.PhoneNumberCreateManyCustomerInput[] = []): Promise<Customer> {
         return new Promise(async (resolve, reject) => {
             try {
-                const customer = await this.customerDelegate.create({ 
+                const customer = await this.customerDelegate.create({
                     data: {
                         ...data,
                         addresses: {
@@ -90,12 +96,16 @@ export class CustomerRepository implements ICustomerRepository {
                             }
                         },
                         phoneNumbers: {
-                            createMany : {
+                            createMany: {
                                 data: phoneNumbers
                             }
                         }
+                    },
+                    include: {
+                        addresses: true,
+                        phoneNumbers: true
                     }
-                 });
+                });
                 resolve(customer)
             } catch (e) {
                 reject(e);

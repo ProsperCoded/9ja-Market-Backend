@@ -1,8 +1,9 @@
 import { ErrorMessages } from "../../constants/error-messages.enum";
-import { ProductService } from "../../product/product.service";
 import { CartProductRepository } from "../../repositories/cart-product.repository";
+import { ProductRepository } from "../../repositories/product.repository";
 import { BadRequestException } from "../../utils/exceptions/bad-request.exception";
 import { InternalServerException } from "../../utils/exceptions/internal-server.exception";
+import { NotFoundException } from "../../utils/exceptions/not-found.exception";
 import { WinstonLogger } from "../../utils/logger/winston.logger";
 import { AddToCartDto } from "../dtos/add-to-cart.dto";
 
@@ -10,7 +11,7 @@ import { AddToCartDto } from "../dtos/add-to-cart.dto";
 export class CartService {
     constructor(
         private readonly cartProductRepository: CartProductRepository,
-        private readonly productService: ProductService,
+        private readonly productRepository: ProductRepository,
         private readonly logger: WinstonLogger
     ) { }
 
@@ -36,7 +37,11 @@ export class CartService {
             const cart = await this.getCart(customerId);
 
             // Get Product
-            const product = await this.productService.getProductById(productId);
+            const product = await this.productRepository.getById(productId);
+            if (!product) {
+                this.logger.error(ErrorMessages.PRODUCT_NOT_FOUND);
+                throw new NotFoundException(ErrorMessages.PRODUCT_NOT_FOUND);
+            }
 
             if (product.stock < quantity) {
                 this.logger.error(ErrorMessages.QUANTITY_NOT_AVAILABLE);

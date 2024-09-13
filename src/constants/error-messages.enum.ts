@@ -20,6 +20,8 @@ export enum ErrorMessages {
     GET_MARKET_BY_ID_FAILED = 'Unable to Fetch Market by ID',
     GET_MARKET_EMAIL_FAILED = 'Unable to Fetch Market by Email',
     GET_MARKET_PRODUCTS_FAILED = 'Unable to Fetch Market Products',
+    UPDATE_MARKET_FAILED = 'Unable to Update Market',
+    DELETE_MARKET_FAILED = 'Unable to Delete Market',
     GET_FEATURED_PRODUCTS_FAILED = 'Unable to Fetch Featured Products',
     GET_PRODUCT_BY_ID_FAILED = 'Unable to Fetch Product by ID',
     CREATE_PRODUCT_FAILED = 'Unable to Create Product',

@@ -21,10 +21,17 @@ export class MarketRepository implements IMarketRepository {
         })
     }
 
-    getMarketById(id: string): Promise<Market | null> {
+    getMarketById(id: string, options: { products: boolean } = { products: false }): Promise<Market | null> {
         return new Promise(async (resolve, reject) => {
             try {
-                const market = await this.marketDelegate.findUnique({ where: { id } });
+                const market = await this.marketDelegate.findUnique({
+                    where: { id },
+                    include: {
+                        addresses: true,
+                        phoneNumbers: true,
+                        products: options.products
+                    }
+                });
                 resolve(market)
             } catch (e) {
                 reject(e);
@@ -32,10 +39,17 @@ export class MarketRepository implements IMarketRepository {
         })
     }
 
-    getMarketByEmail(email: string): Promise<Market | null> {
+    getMarketByEmail(email: string, options: { products: boolean } = { products: false }): Promise<Market | null> {
         return new Promise(async (resolve, reject) => {
             try {
-                const market = await this.marketDelegate.findUnique({ where: { email } });
+                const market = await this.marketDelegate.findUnique({
+                    where: { email },
+                    include: {
+                        addresses: true,
+                        phoneNumbers: true,
+                        products: options.products
+                    }
+                });
                 resolve(market)
             } catch (e) {
                 reject(e);
@@ -43,10 +57,17 @@ export class MarketRepository implements IMarketRepository {
         })
     }
 
-    getMarketByBrandName(brandName: string): Promise<Market | null> {
+    getMarketByBrandName(brandName: string, options: { products: boolean } = { products: false }): Promise<Market | null> {
         return new Promise(async (resolve, reject) => {
             try {
-                const market = await this.marketDelegate.findUnique({ where: { brandName } });
+                const market = await this.marketDelegate.findUnique({
+                    where: { brandName },
+                    include: {
+                        addresses: true,
+                        phoneNumbers: true,
+                        products: options.products
+                    }
+                });
                 resolve(market)
             } catch (e) {
                 reject(e);
@@ -68,7 +89,13 @@ export class MarketRepository implements IMarketRepository {
     update(id: string, data: Prisma.MarketUpdateInput): Promise<Market> {
         return new Promise(async (resolve, reject) => {
             try {
-                const market = await this.marketDelegate.update({ where: { id }, data });
+                const market = await this.marketDelegate.update({
+                    where: { id }, data,
+                    include: {
+                        addresses: true,
+                        phoneNumbers: true
+                    }
+                });
                 resolve(market)
             } catch (e) {
                 reject(e);
@@ -92,6 +119,10 @@ export class MarketRepository implements IMarketRepository {
                                 data: phoneNumbers
                             }
                         }
+                    },
+                    include: {
+                        addresses: true,
+                        phoneNumbers: true
                     }
                 });
                 resolve(market)
@@ -101,4 +132,15 @@ export class MarketRepository implements IMarketRepository {
         })
     }
 
+
+    delete(id: string): Promise<boolean> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                await this.marketDelegate.delete({ where: { id } });
+                resolve(true)
+            } catch (e) {
+                reject(e);
+            }
+        })
+    }
 }

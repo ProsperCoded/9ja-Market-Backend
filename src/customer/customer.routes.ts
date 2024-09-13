@@ -39,13 +39,13 @@ router.use("/cart", CartRouter);
 router.use("/rating", RatingRouter);
 
 // Customer Routes
-router.get("/profile", customerAuthGaurd.authorise(), customerController.getCustomerById);
+router.get("/profile/:customerId", customerAuthGaurd.authorise({ id: true }), customerController.getCustomerById);
 
-router.put("/profile/:id", validator.multiple([
+router.put("/profile/:customerId", validator.multiple([
     { schema: IdDto, source: "params" },
     { schema: CustomerUpdateDto, source: "body" }
-]), customerAuthGaurd.authorise(), customerController.updateCustomer);
+]), customerAuthGaurd.authorise({ id: true }), customerController.updateCustomer);
 
-router.delete("/profile/:id", validator.single(IdDto, "params"), customerAuthGaurd.authorise(), customerController.deleteCustomer);
+router.delete("/profile/:customerId", validator.single(IdDto, "params"), customerAuthGaurd.authorise({ id: true }), customerController.deleteCustomer);
 
 export default router;

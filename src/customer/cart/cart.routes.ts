@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { CartService } from "./cart.service";
-import { ProductService } from "../../product/product.service";
 import { ProductRepository } from "../../repositories/product.repository";
 import { CartProductRepository } from "../../repositories/cart-product.repository";
 import { WinstonLogger } from "../../utils/logger/winston.logger";
@@ -24,15 +23,14 @@ const customerRepository = new CustomerRepository();
 const addressRepository = new AddressRepository();
 const phoneNumberRepository = new PhoneNumberRepository();
 const customerService = new CustomerService(customerRepository, addressRepository, phoneNumberRepository, logger);
-const productService = new ProductService(productRepository, logger);
-const cartService = new CartService(cartProductRepository, productService, logger);
+const cartService = new CartService(cartProductRepository, productRepository, logger);
 const cartController = new CartController(cartService)
 const validator = new Validator("CartService");
 const customerAuthGaurd = new CustomerAuthGaurd(customerService, logger, jwtService)
 
 
 // Get Cart by Customer Id
-router.get("/:id", customerAuthGaurd.authorise(), validator.single(IdDto, "params"), cartController.getCart);
+router.get("/:id", customerAuthGaurd.authorise({id: true}), validator.single(IdDto, "params"), cartController.getCart);
 
 // Update Cart
 router.put("/:productId", customerAuthGaurd.authorise(), validator.multiple([
