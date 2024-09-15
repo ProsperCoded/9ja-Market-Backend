@@ -20,7 +20,7 @@ const jwtService = new JWTService();
 const marketService = new MarketService(marketRepository, addressRepository, phoneNumberRepository, logger);
 const marketController = new MarketController(marketService);
 const validator = new Validator("MarketService");
-const marketAuthGaurd = new MarketAuthGaurd(marketService, logger, jwtService);
+const marketAuthGaurd = new MarketAuthGaurd(marketRepository, logger, jwtService);
 
 
 router.get("/:marketId", marketAuthGaurd.authorise({ id: true }), validator.single(IdDto, "params"), marketController.getMarketById);
