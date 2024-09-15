@@ -19,7 +19,7 @@ const logger = new WinstonLogger("MarketService");
 const jwtService = new JWTService();
 const marketService = new MarketService(marketRepository, addressRepository, phoneNumberRepository, logger);
 const marketController = new MarketController(marketService);
-const validator = new Validator("MarketService");
+const validator = new Validator();
 const marketAuthGaurd = new MarketAuthGaurd(marketRepository, logger, jwtService);
 
 

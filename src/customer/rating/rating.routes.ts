@@ -19,7 +19,7 @@ const ratingRepository = new RatingRepository();
 const customerRepository = new CustomerRepository();
 const ratingService = new RatingService(ratingRepository, logger);
 const ratingController = new RatingController(ratingService)
-const validator = new Validator("RatingService");
+const validator = new Validator();
 const customerAuthGaurd = new CustomerAuthGaurd(customerRepository, logger, jwtService)
 
 

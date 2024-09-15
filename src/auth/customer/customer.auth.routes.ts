@@ -14,7 +14,7 @@ import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
 import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
 
 const router = Router();
-const validator = new Validator('Customer Authentication');
+const validator = new Validator();
 
 // Customer Auth Service Dependencies
 const logger = new WinstonLogger('CustomerAuthService');

@@ -15,7 +15,7 @@ interface IValidation {
 }
 
 export class Validator {
-    constructor(private readonly source: string) { }
+    constructor() { }
 
     private getErrors(errors: ValidationError[]): string[] {
         return errors.flatMap(error => {

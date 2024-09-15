@@ -19,7 +19,7 @@ const productRepository = new ProductRepository();
 const customerRepository = new CustomerRepository();
 const cartService = new CartService(cartProductRepository, productRepository, logger);
 const cartController = new CartController(cartService)
-const validator = new Validator("CartService");
+const validator = new Validator();
 const customerAuthGaurd = new CustomerAuthGaurd(customerRepository, logger, jwtService)
 
 

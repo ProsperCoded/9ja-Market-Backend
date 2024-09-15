@@ -14,7 +14,7 @@ import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
 import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
 
 const router = Router();
-const validator = new Validator('Market Authentication');
+const validator = new Validator();
 
 // Market Auth Service Dependencies
 const logger = new WinstonLogger('MarketAuthService');
