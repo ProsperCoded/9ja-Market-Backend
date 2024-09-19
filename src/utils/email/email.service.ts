@@ -1,67 +1,44 @@
+import path from 'path';
 import { EmailPaths } from '../../constants/email.enum';
 import { WinstonLogger } from '../logger/winston.logger';
 import { IEmailService } from './email.service.interface';
-// import { SMTPClient, Message } from 'emailjs';
-// import { configService } from '../config/config.service';
-// import { CompanyDetails } from '../../constants/company-details.enum';
-
-// /**
-//  * @summary contains email related logic
-//  */
-// export class EmailService implements IEmailService {
-//   private readonly client: SMTPClient;
-
-//   /**
-//    * @constructor
-//    */
-//   constructor() {
-//     this.client = new SMTPClient({
-//       user: configService.get<string>('MAIL_USER'),
-//       password: configService.get<string>('MAIL_PASS'),
-//       host: configService.get<string>('MAIL_HOST'),
-//       ssl: true,
-//     });
-//   }
-
-//   /**
-//    * Sends Email Notification
-//    * @param to
-//    * @param subject
-//    * @param message
-//    */
-//   sendMail(to: string, subject: string, message: string): Promise<boolean> {
-//     return new Promise((resolve, reject) => {
-//       this.client.send(
-//         new Message({
-//           from: CompanyDetails.SUPPORT_EMAIL,
-//           to,
-//           subject,
-//           text: message,
-//         }),
-//         (err) => {
-//           if (err) {
-//             console.log(err);
-//             return reject(false);
-//           }
-//           resolve(true);
-//         }
-//       );
-//     });
-//   }
-// }
+import { readdirSync } from 'fs';
 
 export class EmailService implements IEmailService {
     private readonly logger: WinstonLogger;
+    private providers: IEmailService[] = [];
     constructor() {
         this.logger = new WinstonLogger("EmailService");
+        this.loadProviders();
     }
 
+    private async loadProviders(): Promise<void> {
+        // Load all providers
+        const providerPath = path.join(__dirname, 'providers');
+        const providerFiles = readdirSync(providerPath);
 
-    sendMail({ to, subject, options }: { to: string; subject: string; options: { template: EmailPaths; data: { [key: string]: any; }; }; }): Promise<boolean> {
-        return new Promise((resolve, reject) => {
-            // Send email logic
-            this.logger.info(`Email sent to ${to} with subject ${subject} and template ${options.template}`, options.data);
-            resolve(true);
-        });
+        // Iterate over all files in the providers directory
+        for (const file of providerFiles) {
+            if (file.endsWith('.provider.ts') || file.endsWith('.provider.js')) {
+                const provider = await import(path.join(providerPath, file));
+                if (provider.default) {
+                    this.providers.push(new provider.default(this.logger));
+                }
+            }
+        }
+    }
+
+    async sendMail({ to, subject, options }: { to: string; subject: string; options: { template: EmailPaths; data: { [key: string]: any; }; }; }): Promise<boolean> {
+        for (const provider of this.providers) {
+            try {
+                await provider.sendMail({ to, subject, options });
+                return true; // Success, return immediately
+            } catch (error) {
+                this.logger.error(`Error sending email to ${to} with ${provider.constructor.name}`, error);
+            }
+        }
+        // If no provider succeeded
+        this.logger.error(`All providers failed to send email to ${to} with subject ${subject}`);
+        return false; // Failure
     }
 }
