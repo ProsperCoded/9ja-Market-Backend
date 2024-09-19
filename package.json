@@ -6,7 +6,7 @@
     "start": "node dist/src/server.js",
     "start:dev": "concurrently \"npm run watch-ts\" \"nodemon dist/src/server.js\"",
     "prestart": "npm run build",
-    "build": "npm run clean && tsc",
+    "build": "npm run clean && tsc && npm run db:migrate",
     "clean": "rimraf dist/",
     "clean:logs": "rimraf logs/",
     "watch-ts": "tsc -w",
