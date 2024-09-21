@@ -6,9 +6,11 @@ import { HomeController } from './home/home.controller';
 import { AppEnum } from './constants/app.enum';
 import errorHandler from './utils/middlewares/error-handler.middleware';
 import "reflect-metadata"; 
+import "./auth/passport.config";
 
 // Import Index Router
 import IndexRouter from './routes';
+import passport from 'passport';
 
 // Create App
 const app: express.Express = express();
@@ -22,6 +24,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.use(helmet());
+app.use(passport.initialize());
 
 
 // Use Index Router

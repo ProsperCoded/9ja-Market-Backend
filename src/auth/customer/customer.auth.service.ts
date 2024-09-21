@@ -21,6 +21,7 @@ import { IVerifyEmailRequest, VerifyEmailRequestByCodeDto, VerifyEmailRequestByT
 import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
 import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
 import { DataFormatterHelper } from "../../helpers/format.helper";
+import { Prisma } from "@prisma/client";
 
 
 export class CustomerAuthService implements IAuthService {
@@ -90,12 +91,11 @@ export class CustomerAuthService implements IAuthService {
     private getToken(payload: { [key: string]: any }, expiresIn: string = "15m"): string {
         const hash = this.jwtService.signPayload(payload, expiresIn);
         const token = cryptoService.encrypt(hash);
-        return encodeURIComponent(token);
+        return token;
     }
 
     private getPayload(token: string): { [key: string]: any } {
-        const decoded = decodeURIComponent(token);
-        const decrypted = cryptoService.decrypt(decoded);
+        const decrypted = cryptoService.decrypt(token);
         const payload = this.jwtService.verifyToken(decrypted);
         return payload;
     }
@@ -105,7 +105,8 @@ export class CustomerAuthService implements IAuthService {
         if ("code" in data) {
             result = { email: data.email, verificationCode: data.code };
         } else {
-            result = <IVerifyEmailRequest>this.getPayload(data.token);
+            const token = decodeURIComponent(data.token)
+            result = <IVerifyEmailRequest>this.getPayload(token);
         }
         return result;
     }
@@ -120,7 +121,7 @@ export class CustomerAuthService implements IAuthService {
             throw new UnauthorizedException(ErrorMessages.INVALID_EMAIL_PASSWORD);
         }
 
-        const isPasswordMatch = await this.bcryptService.comparePassword(password, customer.password);
+        const isPasswordMatch = await this.bcryptService.comparePassword(password, customer.password!);
         if (!isPasswordMatch) {
             this.logger.error(ErrorMessages.INVALID_EMAIL_PASSWORD);
             throw new UnauthorizedException(ErrorMessages.INVALID_EMAIL_PASSWORD);
@@ -130,7 +131,7 @@ export class CustomerAuthService implements IAuthService {
         const accessToken = this.getToken(payload, "10h");
         const _refreshToken = cryptoService.random();
         const refreshToken = this.getToken({ email: customer.email, refreshToken: _refreshToken }, "7d");
-        await this.customerRepository.update(customer.id, { refreshToken });
+        await this.customerRepository.update(customer.id, { refreshToken: _refreshToken });
         const response = new LoginResponseDto();
         response.id = customer.id;
         response.accessToken = accessToken;
@@ -168,7 +169,8 @@ export class CustomerAuthService implements IAuthService {
             // Send email verification code
             const verificationCode = cryptoService.randomInt();
             await this.customerRepository.update(newCustomer.id, { emailVerificationCode: verificationCode });
-            const token = this.getToken({ email, verificationCode });
+            const _token = this.getToken({ email, verificationCode });
+            const token = encodeURIComponent(_token);
             this.eventEmiter.emit("sendCustomerEmailVerificationEmail", { email, token, verificationCode, url });
             return true;
         } catch (e) {
@@ -186,7 +188,8 @@ export class CustomerAuthService implements IAuthService {
         }
         const verificationCode = cryptoService.randomInt();
         await this.customerRepository.update(customer.id, { emailVerificationCode: verificationCode });
-        const token = this.getToken({ email, verificationCode });
+        const _token = this.getToken({ email, verificationCode });
+        const token = encodeURIComponent(_token)
         this.eventEmiter.emit("sendCustomerEmailVerificationEmail", { email, token, verificationCode, url });
         return true;
     }
@@ -258,6 +261,95 @@ export class CustomerAuthService implements IAuthService {
             //     throw new InternalServerException(ErrorMessages.EMAIL_VERIFICATION_FAILED);
             //     // throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.EMAIL_VERIFICATION_FAILED);
             // }
+        }
+    }
+
+    async refreshToken(refreshToken: string): Promise<LoginResponseDto> {
+        const payload = this.getPayload(refreshToken);
+        const { email, irefreshToken: _refreshToken } = payload;
+        const customer = await this.customerRepository.getCustomerByEmail(email);
+        if (!customer) {
+            this.logger.error(ErrorMessages.CUSTOMER_NOT_FOUND);
+            throw new NotFoundException(ErrorMessages.CUSTOMER_NOT_FOUND);
+        }
+        if (customer.refreshToken !== _refreshToken) {
+            this.logger.error(ErrorMessages.INVALID_REFRESH_TOKEN);
+            throw new UnauthorizedException(ErrorMessages.INVALID_REFRESH_TOKEN);
+        }
+        const newAccessToken = this.getToken({ email, id: customer.id }, "10h");
+        const response = new LoginResponseDto();
+        response.id = customer.id;
+        response.accessToken = newAccessToken;
+        response.refreshToken = refreshToken;
+        return response;
+    }
+
+    async logout(refreshToken: string): Promise<boolean> {
+        const payload = this.getPayload(refreshToken);
+        const { email } = payload;
+        const customer = await this.customerRepository.getCustomerByEmail(email);
+        if (!customer) {
+            this.logger.error(ErrorMessages.CUSTOMER_NOT_FOUND);
+            throw new NotFoundException(ErrorMessages.CUSTOMER_NOT_FOUND);
+        }
+        await this.customerRepository.update(customer.id, { refreshToken: null });
+        return true;
+    }
+
+    async googleCreateOrLogin(profile: any): Promise<string> {
+        const { emails: [{ value, verified }], id, name: { familyName, givenName }, photos } = profile;
+        try {
+            const customer = await this.customerRepository.getByGoogleId(id);
+            if (!customer) {
+                let customerData: Prisma.CustomerCreateInput = {
+                    email: value,
+                    googleId: id,
+                    firstName: givenName,
+                    lastName: familyName,
+                    emailVerifiedAt: verified ? new Date() : null,
+                    displayImage: photos[0].value
+                }
+                const newCustomer = await this.customerRepository.create(customerData);
+                console.log(newCustomer)
+                const payload = { email: newCustomer.email, id: newCustomer.id };
+                const accessToken = this.getToken(payload, "10h");
+                const _refreshToken = cryptoService.random();
+                const refreshToken = this.getToken({ email: newCustomer.email, refreshToken: _refreshToken }, "7d");
+                await this.customerRepository.update(newCustomer.id, { refreshToken });
+                const result = this.getToken({id: newCustomer.id, accessToken, refreshToken}, "7m");
+                return decodeURIComponent(result);
+            } else {
+                const payload = { email: customer.email, id: customer.id };
+                const accessToken = this.getToken(payload, "10h");
+                const _refreshToken = cryptoService.random();
+                const refreshToken = this.getToken({ email: customer.email, refreshToken: _refreshToken }, "7d");
+                await this.customerRepository.update(customer.id, { refreshToken });
+                const result = this.getToken({id: customer.id, accessToken, refreshToken}, "7m");
+                return decodeURIComponent(result);
+            }
+        } catch (e) {
+            this.logger.error(`${ErrorMessages.GOOGLE_AUTH_FAILED}: ${e}`);
+            throw new InternalServerException(ErrorMessages.GOOGLE_AUTH_FAILED);
+        }
+    }
+
+    async exchangeToken(token: string): Promise<LoginResponseDto> {
+        try {
+            token = decodeURIComponent(token)
+            const { id, accessToken, refreshToken } = this.getPayload(token);
+            console.log({id, accessToken, refreshToken })
+            if (!id || !accessToken || !refreshToken) {
+                this.logger.error(ErrorMessages.INVALID_EXCHANGE_TOKEN);
+                throw new BadRequestException(ErrorMessages.INVALID_EXCHANGE_TOKEN);
+            };
+            const response = new LoginResponseDto();
+            response.id = id;
+            response.accessToken = accessToken;
+            response.refreshToken = refreshToken;
+            return response;
+        } catch (e) {
+            this.logger.error(`${ErrorMessages.INVALID_EXCHANGE_TOKEN}: ${e}`);
+            throw new BadRequestException(ErrorMessages.INVALID_EXCHANGE_TOKEN);
         }
     }
 }

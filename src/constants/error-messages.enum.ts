@@ -10,6 +10,7 @@ export enum ErrorMessages {
     INVALID_VERIFICATION_TOKEN = 'Invalid Verification Token',
     INVALID_RESET_HASH = 'Invalid Reset Hash',
     INVALID_CONFIRM_PASSWORD = 'Invalid Confirm Password',
+    GOOGLE_AUTH_FAILED= 'Google Authentication Failed',
     CUSTOMER_UNAUTHORIZED = 'Customer Unauthorized',
     MARKET_UNAUTHORIZED = 'Market Unauthorized',
     USER_UNAUTHORIZED = 'User Unauthorized',
@@ -45,5 +46,6 @@ export enum ErrorMessages {
     INVALID_RESET_TOKEN = 'Invalid Reset Code',
     CUSTOMER_EMAIL_NOT_VERIFIED = 'Customer Email Not Verified',
     MARKET_EMAIL_NOT_VERIFIED = 'Market Email Not Verified',
-
+    INVALID_REFRESH_TOKEN = 'Invalid Refresh Token',
+    INVALID_EXCHANGE_TOKEN= 'Invalid Exchange Token',
   }

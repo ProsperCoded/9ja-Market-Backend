@@ -21,6 +21,7 @@ import { MarketRepository } from "../../repositories/market.repository";
 import { MarketRegisterRequestDto } from "../dtos/market-register-request.dto";
 import { IVerifyEmailRequest, VerifyEmailRequestByCodeDto, VerifyEmailRequestByTokenDto } from "../dtos/verify-email-request.dto";
 import { DataFormatterHelper } from "../../helpers/format.helper";
+import { Prisma } from "@prisma/client";
 
 
 export class MarketAuthService implements IAuthService {
@@ -119,7 +120,7 @@ export class MarketAuthService implements IAuthService {
             throw new UnauthorizedException(ErrorMessages.INVALID_EMAIL_PASSWORD);
         }
 
-        const isPasswordMatch = await this.bcryptService.comparePassword(password, market.password);
+        const isPasswordMatch = await this.bcryptService.comparePassword(password, market.password!);
         if (!isPasswordMatch) {
             this.logger.error(ErrorMessages.INVALID_EMAIL_PASSWORD);
             throw new UnauthorizedException(ErrorMessages.INVALID_EMAIL_PASSWORD);
@@ -258,6 +259,92 @@ export class MarketAuthService implements IAuthService {
             //     throw new InternalServerException(ErrorMessages.EMAIL_VERIFICATION_FAILED);
             //     // throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.EMAIL_VERIFICATION_FAILED);
             // }
+        }
+    }
+
+    async refreshToken(refreshToken: string): Promise<LoginResponseDto> {
+        const payload = this.getPayload(refreshToken);
+        const { email, refreshToken: _refreshToken } = payload;
+        const market = await this.marketRepository.getMarketByEmail(email);
+        if (!market) {
+            this.logger.error(ErrorMessages.MARKET_NOT_FOUND);
+            throw new NotFoundException(ErrorMessages.MARKET_NOT_FOUND);
+        }
+        if (market.refreshToken !== _refreshToken) {
+            this.logger.error(ErrorMessages.INVALID_REFRESH_TOKEN);
+            throw new UnauthorizedException(ErrorMessages.INVALID_REFRESH_TOKEN);
+        }
+        const newAccessToken = this.getToken({ email, id: market.id }, "10h");
+        const response = new LoginResponseDto();
+        response.id = market.id;
+        response.accessToken = newAccessToken;
+        response.refreshToken = refreshToken;
+        return response;
+    }
+
+    async logout(refreshToken: string): Promise<boolean> {
+        const payload = this.getPayload(refreshToken);
+        const { email } = payload;
+        const market = await this.marketRepository.getMarketByEmail(email);
+        if (!market) {
+            this.logger.error(ErrorMessages.MARKET_NOT_FOUND);
+            throw new NotFoundException(ErrorMessages.MARKET_NOT_FOUND);
+        }
+        await this.marketRepository.update(market.id, { refreshToken: null });
+        return true;
+    }
+
+    async googleCreateOrLogin(profile: any): Promise<string> {
+        const {emails: {value, verified}, id, name: {givenName}, photos} = profile;
+        const market = await this.marketRepository.getMarketByGoogleId(id);
+        if (!market) {
+            let marketData: Prisma.MarketCreateInput = {
+                email: value,
+                googleId: id,
+                brandName: `${givenName}'s Store`,
+                emailVerifiedAt: verified ? new Date() : null,
+                displayImage: photos[0].value
+            }
+            const newMarket = await this.marketRepository.create(marketData);
+            const payload = { email: newMarket.email, id: newMarket.id };
+            const accessToken = this.getToken(payload, "10h");
+            const _refreshToken = cryptoService.random();
+            const refreshToken = this.getToken({ email: newMarket.email, refreshToken: _refreshToken }, "7d");
+            await this.marketRepository.update(newMarket.id, { refreshToken });
+            const response = new LoginResponseDto();
+            response.id = newMarket.id;
+            response.accessToken = accessToken;
+            response.refreshToken = refreshToken;
+            return this.getToken(response);
+        } else {
+            const payload = { email: market.email, id: market.id };
+            const accessToken = this.getToken(payload, "10h");
+            const _refreshToken = cryptoService.random();
+            const refreshToken = this.getToken({ email: market.email, refreshToken: _refreshToken }, "7d");
+            await this.marketRepository.update(market.id, { refreshToken });
+            const response = new LoginResponseDto();
+            response.id = market.id;
+            response.accessToken = accessToken;
+            response.refreshToken = refreshToken;
+            return this.getToken(response);
+        }
+    }
+
+    async exchangeToken(token: string): Promise<LoginResponseDto> {
+        try {
+            const {id, accessToken, refreshToken} = this.getPayload(token);
+            if (!id || !accessToken || !refreshToken) {
+                this.logger.error(ErrorMessages.INVALID_EXCHANGE_TOKEN);
+                throw new BadRequestException(ErrorMessages.INVALID_EXCHANGE_TOKEN);
+            };
+            const response = new LoginResponseDto();
+            response.id = id;
+            response.accessToken = accessToken;
+            response.refreshToken = refreshToken;
+            return response;
+        } catch (e) {
+            this.logger.error(`${ErrorMessages.INVALID_EXCHANGE_TOKEN}: ${e}`);
+            throw new BadRequestException(ErrorMessages.INVALID_EXCHANGE_TOKEN);
         }
     }
 }
