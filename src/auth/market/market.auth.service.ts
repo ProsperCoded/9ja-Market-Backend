@@ -90,7 +90,6 @@ export class MarketAuthService implements IAuthService {
     private getToken(payload: { [key: string]: any }, expiresIn: string = "15m"): string {
         const hash = this.jwtService.signPayload(payload, expiresIn);
         const token = cryptoService.encrypt(hash);
-        console.log(`Token: ${token}`);
         return encodeURIComponent(token);
     }
 
@@ -132,6 +131,7 @@ export class MarketAuthService implements IAuthService {
         const refreshToken = this.getToken({ email: market.email, refreshToken: _refreshToken }, "7d");
         await this.marketRepository.update(market.id, { refreshToken });
         const response = new LoginResponseDto();
+        response.id = market.id;
         response.accessToken = accessToken;
         response.refreshToken = refreshToken;
         return response;

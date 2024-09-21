@@ -132,6 +132,7 @@ export class CustomerAuthService implements IAuthService {
         const refreshToken = this.getToken({ email: customer.email, refreshToken: _refreshToken }, "7d");
         await this.customerRepository.update(customer.id, { refreshToken });
         const response = new LoginResponseDto();
+        response.id = customer.id;
         response.accessToken = accessToken;
         response.refreshToken = refreshToken;
         return response;
