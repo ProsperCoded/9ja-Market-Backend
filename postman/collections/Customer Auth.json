@@ -29,7 +29,8 @@
 								"customer",
 								"google"
 							]
-						}
+						},
+						"description": "This should be opened in a window so the user can be properly redirected.  \nNote: This endpoint is for Customer Google OAuthentication\n\nThe user will be redirected to a designated frontend Url with a token as a query parameter."
 					},
 					"response": []
 				},
@@ -59,12 +60,14 @@
 									"type": "text"
 								}
 							]
-						}
+						},
+						"description": "The token in the query parameter is exchanged for actual Login response as stated above."
 					},
 					"response": []
 				}
 			],
-			"id": "caf10f05-b395-43c2-8820-92e99ed59c8c"
+			"id": "caf10f05-b395-43c2-8820-92e99ed59c8c",
+			"description": "### Google Authentication Flow\n\n1. **Initiation (Frontend)**:  \n    The authentication process begins when the frontend triggers the Google Auth initiation by opening a designated endpoint in a new window. This redirects the user to Google's login page.\n2. **Google Authentication (Google)**:  \n    Once the user logs in through Google, The backed processes Google's response and redirects the user to a pre-configured **Frontend URL**, passing along an authorization token as a query parameter.\n3. **Token Exchange (Backend)**:  \n    The frontend then takes the token from the query parameter and sends it to the backend to exchange it for a complete **login response**. The login response includes the following:\n    - **ID**: A unique identifier for the authenticated user.\n    - **Access Token**: A token for accessing secure resources or APIs.\n    - **Refresh Token**: A token used to obtain new access tokens when the current one expires."
 		},
 		{
 			"name": "Login",
@@ -121,11 +124,15 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/auth/customer/login",
+							"raw": "diplomatic-kial-obiken-bec52db3.koyeb.app/api/v1/auth/customer/login",
 							"host": [
-								"{{baseUrl}}"
+								"diplomatic-kial-obiken-bec52db3",
+								"koyeb",
+								"app"
 							],
 							"path": [
+								"api",
+								"v1",
 								"auth",
 								"customer",
 								"login"
@@ -400,11 +407,15 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/auth/customer/email-verification",
+							"raw": "diplomatic-kial-obiken-bec52db3.koyeb.app/api/v1/auth/customer/email-verification",
 							"host": [
-								"{{baseUrl}}"
+								"diplomatic-kial-obiken-bec52db3",
+								"koyeb",
+								"app"
 							],
 							"path": [
+								"api",
+								"v1",
 								"auth",
 								"customer",
 								"email-verification"
@@ -667,17 +678,21 @@
 							"urlencoded": [
 								{
 									"key": "refreshToken",
-									"value": "{{refreshToken}}",
+									"value": "•••••••",
 									"type": "text"
 								}
 							]
 						},
 						"url": {
-							"raw": "{{baseUrl}}/auth/customer/logout",
+							"raw": "diplomatic-kial-obiken-bec52db3.koyeb.app/api/v1/auth/customer/logout",
 							"host": [
-								"{{baseUrl}}"
+								"diplomatic-kial-obiken-bec52db3",
+								"koyeb",
+								"app"
 							],
 							"path": [
+								"api",
+								"v1",
 								"auth",
 								"customer",
 								"logout"
@@ -825,11 +840,15 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/auth/customer/forgot-password",
+							"raw": "diplomatic-kial-obiken-bec52db3.koyeb.app/api/v1/auth/customer/forgot-password",
 							"host": [
-								"{{baseUrl}}"
+								"diplomatic-kial-obiken-bec52db3",
+								"koyeb",
+								"app"
 							],
 							"path": [
+								"api",
+								"v1",
 								"auth",
 								"customer",
 								"forgot-password"
@@ -1104,11 +1123,15 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/auth/customer/reset-password",
+							"raw": "diplomatic-kial-obiken-bec52db3.koyeb.app/api/v1/auth/customer/reset-password",
 							"host": [
-								"{{baseUrl}}"
+								"diplomatic-kial-obiken-bec52db3",
+								"koyeb",
+								"app"
 							],
 							"path": [
+								"api",
+								"v1",
 								"auth",
 								"customer",
 								"reset-password"
@@ -1541,11 +1564,15 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/auth/customer/verify-email",
+							"raw": "diplomatic-kial-obiken-bec52db3.koyeb.app/api/v1/auth/customer/verify-email",
 							"host": [
-								"{{baseUrl}}"
+								"diplomatic-kial-obiken-bec52db3",
+								"koyeb",
+								"app"
 							],
 							"path": [
+								"api",
+								"v1",
 								"auth",
 								"customer",
 								"verify-email"
@@ -1820,11 +1847,15 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/auth/customer/signup",
+							"raw": "diplomatic-kial-obiken-bec52db3.koyeb.app/api/v1/auth/customer/signup",
 							"host": [
-								"{{baseUrl}}"
+								"diplomatic-kial-obiken-bec52db3",
+								"koyeb",
+								"app"
 							],
 							"path": [
+								"api",
+								"v1",
 								"auth",
 								"customer",
 								"signup"
@@ -2206,17 +2237,21 @@
 							"urlencoded": [
 								{
 									"key": "refreshToken",
-									"value": "{{refreshToken}}",
+									"value": "•••••••",
 									"type": "text"
 								}
 							]
 						},
 						"url": {
-							"raw": "{{baseUrl}}/auth/customer/refresh-token",
+							"raw": "diplomatic-kial-obiken-bec52db3.koyeb.app/api/v1/auth/customer/refresh-token",
 							"host": [
-								"{{baseUrl}}"
+								"diplomatic-kial-obiken-bec52db3",
+								"koyeb",
+								"app"
 							],
 							"path": [
+								"api",
+								"v1",
 								"auth",
 								"customer",
 								"refresh-token"
