@@ -1,7 +1,7 @@
 {
 	"info": {
 		"_postman_id": "1b5cdd6a-06aa-492d-8969-6fe8269c1996",
-		"name": "User Service",
+		"name": "Customer Service",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_uid": "27498181-1b5cdd6a-06aa-492d-8969-6fe8269c1996"
 	},
@@ -16,118 +16,24 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{baseUrl}}/customer/profile",
+					"raw": "{{baseUrl}}/customer/profile/:customerId",
 					"host": [
 						"{{baseUrl}}"
 					],
 					"path": [
 						"customer",
-						"profile"
+						"profile",
+						":customerId"
+					],
+					"variable": [
+						{
+							"key": "customerId",
+							"value": "{{customerId}}"
+						}
 					]
 				}
 			},
 			"response": [
-				{
-					"id": "7233ba06-5405-4fa6-88c7-22bd29bb0b01",
-					"name": "Success - Profile - Get",
-					"originalRequest": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/customer/profile",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"customer",
-								"profile"
-							]
-						}
-					},
-					"status": "OK",
-					"code": 200,
-					"_postman_previewlanguage": "json",
-					"header": [
-						{
-							"key": "Access-Control-Allow-Origin",
-							"value": "*"
-						},
-						{
-							"key": "Content-Security-Policy",
-							"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
-						},
-						{
-							"key": "Cross-Origin-Opener-Policy",
-							"value": "same-origin"
-						},
-						{
-							"key": "Cross-Origin-Resource-Policy",
-							"value": "same-origin"
-						},
-						{
-							"key": "Origin-Agent-Cluster",
-							"value": "?1"
-						},
-						{
-							"key": "Referrer-Policy",
-							"value": "no-referrer"
-						},
-						{
-							"key": "Strict-Transport-Security",
-							"value": "max-age=15552000; includeSubDomains"
-						},
-						{
-							"key": "X-Content-Type-Options",
-							"value": "nosniff"
-						},
-						{
-							"key": "X-DNS-Prefetch-Control",
-							"value": "off"
-						},
-						{
-							"key": "X-Download-Options",
-							"value": "noopen"
-						},
-						{
-							"key": "X-Frame-Options",
-							"value": "SAMEORIGIN"
-						},
-						{
-							"key": "X-Permitted-Cross-Domain-Policies",
-							"value": "none"
-						},
-						{
-							"key": "X-XSS-Protection",
-							"value": "0"
-						},
-						{
-							"key": "Content-Type",
-							"value": "application/json; charset=utf-8"
-						},
-						{
-							"key": "Content-Length",
-							"value": "219"
-						},
-						{
-							"key": "ETag",
-							"value": "W/\"db-WGL6DbcBvs7+cifjuDePBBUub0k\""
-						},
-						{
-							"key": "Date",
-							"value": "Tue, 10 Sep 2024 02:17:19 GMT"
-						},
-						{
-							"key": "Connection",
-							"value": "keep-alive"
-						},
-						{
-							"key": "Keep-Alive",
-							"value": "timeout=5"
-						}
-					],
-					"cookie": [],
-					"body": "{\n    \"status\": \"success\",\n    \"message\": \"Get Customer Successful\",\n    \"data\": {\n        \"id\": \"1df1873f-9ca6-4515-8456-9349dfba84ab\",\n        \"firstName\": \"John\",\n        \"lastName\": \"Doe\",\n        \"email\": \"example3@example.com\",\n        \"emailVerifiedAt\": null,\n        \"displayImage\": null\n    }\n}"
-				},
 				{
 					"id": "cd5ef96d-599b-48cb-b4e8-e3f320e99ea2",
 					"name": "Error - Profile - Get: Unauthorized",
@@ -228,6 +134,107 @@
 					],
 					"cookie": [],
 					"body": "{\n    \"status\": \"error\",\n    \"message\": \"User Unauthorized\",\n    \"data\": {\n        \"status\": 401,\n        \"reason\": \"Unauthorized\"\n    }\n}"
+				},
+				{
+					"id": "18bbf09c-6b5e-4a05-9adc-8c599a803382",
+					"name": "Success - Profile - Get",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/customer/profile",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customer",
+								"profile"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Access-Control-Allow-Origin",
+							"value": "*"
+						},
+						{
+							"key": "Content-Security-Policy",
+							"value": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests"
+						},
+						{
+							"key": "Cross-Origin-Opener-Policy",
+							"value": "same-origin"
+						},
+						{
+							"key": "Cross-Origin-Resource-Policy",
+							"value": "same-origin"
+						},
+						{
+							"key": "Origin-Agent-Cluster",
+							"value": "?1"
+						},
+						{
+							"key": "Referrer-Policy",
+							"value": "no-referrer"
+						},
+						{
+							"key": "Strict-Transport-Security",
+							"value": "max-age=15552000; includeSubDomains"
+						},
+						{
+							"key": "X-Content-Type-Options",
+							"value": "nosniff"
+						},
+						{
+							"key": "X-DNS-Prefetch-Control",
+							"value": "off"
+						},
+						{
+							"key": "X-Download-Options",
+							"value": "noopen"
+						},
+						{
+							"key": "X-Frame-Options",
+							"value": "SAMEORIGIN"
+						},
+						{
+							"key": "X-Permitted-Cross-Domain-Policies",
+							"value": "none"
+						},
+						{
+							"key": "X-XSS-Protection",
+							"value": "0"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "293"
+						},
+						{
+							"key": "ETag",
+							"value": "W/\"125-h2iCj6eC7VTzb9t6ChQj7ir6r98\""
+						},
+						{
+							"key": "Date",
+							"value": "Thu, 12 Sep 2024 06:52:41 GMT"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"success\",\n    \"message\": \"Get Customer Successful\",\n    \"data\": {\n        \"id\": \"2a31b0cf-6b0b-476c-823e-c945bd18c599\",\n        \"email\": \"example6@example.com\",\n        \"firstName\": \"John\",\n        \"lastName\": \"Doe\",\n        \"dateOfBirth\": \"1990-01-01T00:00:00.000Z\",\n        \"emailVerifiedAt\": null,\n        \"displayImage\": null,\n        \"addresses\": [],\n        \"phoneNumbers\": []\n    }\n}"
 				}
 			]
 		},
@@ -526,7 +533,7 @@
 					"variable": [
 						{
 							"key": "id",
-							"value": "{{customerId}}"
+							"value": ""
 						}
 					]
 				}
@@ -740,6 +747,35 @@
 					"cookie": []
 				}
 			]
+		},
+		{
+			"name": "Cart - Get",
+			"id": "161d6c1a-5dec-4e11-96c6-404997bb39f8",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/customer/cart/:id",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"customer",
+						"cart",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "{{customerId}}"
+						}
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"auth": {
