@@ -60,7 +60,10 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 // Google Auth Callback Route
 router.get('/google/callback', marketAuthController.googleAuth);
 
+// Exchange Google token
+router.get("/exchange-token", marketAuthController.exchangeToken)
+
 // Logout Route
-router.post('/logout', marketAuthController.logout);
+router.delete('/logout', marketAuthController.logout);
 
 export default router;

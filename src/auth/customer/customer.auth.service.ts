@@ -266,7 +266,7 @@ export class CustomerAuthService implements IAuthService {
 
     async refreshToken(refreshToken: string): Promise<LoginResponseDto> {
         const payload = this.getPayload(refreshToken);
-        const { email, irefreshToken: _refreshToken } = payload;
+        const { email, refreshToken: _refreshToken } = payload;
         const customer = await this.customerRepository.getCustomerByEmail(email);
         if (!customer) {
             this.logger.error(ErrorMessages.CUSTOMER_NOT_FOUND);
@@ -310,22 +310,21 @@ export class CustomerAuthService implements IAuthService {
                     displayImage: photos[0].value
                 }
                 const newCustomer = await this.customerRepository.create(customerData);
-                console.log(newCustomer)
                 const payload = { email: newCustomer.email, id: newCustomer.id };
                 const accessToken = this.getToken(payload, "10h");
                 const _refreshToken = cryptoService.random();
                 const refreshToken = this.getToken({ email: newCustomer.email, refreshToken: _refreshToken }, "7d");
-                await this.customerRepository.update(newCustomer.id, { refreshToken });
+                await this.customerRepository.update(newCustomer.id, { refreshToken: _refreshToken });
                 const result = this.getToken({id: newCustomer.id, accessToken, refreshToken}, "7m");
-                return decodeURIComponent(result);
+                return encodeURIComponent(result);
             } else {
                 const payload = { email: customer.email, id: customer.id };
                 const accessToken = this.getToken(payload, "10h");
                 const _refreshToken = cryptoService.random();
                 const refreshToken = this.getToken({ email: customer.email, refreshToken: _refreshToken }, "7d");
-                await this.customerRepository.update(customer.id, { refreshToken });
+                await this.customerRepository.update(customer.id, { refreshToken: _refreshToken });
                 const result = this.getToken({id: customer.id, accessToken, refreshToken}, "7m");
-                return decodeURIComponent(result);
+                return encodeURIComponent(result);
             }
         } catch (e) {
             this.logger.error(`${ErrorMessages.GOOGLE_AUTH_FAILED}: ${e}`);
@@ -337,7 +336,6 @@ export class CustomerAuthService implements IAuthService {
         try {
             token = decodeURIComponent(token)
             const { id, accessToken, refreshToken } = this.getPayload(token);
-            console.log({id, accessToken, refreshToken })
             if (!id || !accessToken || !refreshToken) {
                 this.logger.error(ErrorMessages.INVALID_EXCHANGE_TOKEN);
                 throw new BadRequestException(ErrorMessages.INVALID_EXCHANGE_TOKEN);

@@ -167,7 +167,7 @@ export class MarketAuthController {
     */
     exchangeToken: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            const result = await this.marketAuthService.exchangeToken(request.body);
+            const result = await this.marketAuthService.exchangeToken(request.query.token as string);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.LOGIN_SUCCESSFUL, result);
             return response.status(HttpStatus.OK).send(resObj);
         } catch (e) {

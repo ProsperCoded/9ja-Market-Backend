@@ -167,7 +167,7 @@ export class CustomerAuthController {
     */
     exchangeToken: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            const result = await this.customerAuthService.exchangeToken(request.query.exchangeToken as string);
+            const result = await this.customerAuthService.exchangeToken(request.query.token as string);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.LOGIN_SUCCESSFUL, result);
             return response.status(HttpStatus.OK).send(resObj);
         } catch (e) {

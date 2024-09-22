@@ -64,6 +64,6 @@ router.get('/google/callback', customerAuthController.googleAuth);
 router.get("/exchange-token", customerAuthController.exchangeToken)
 
 // Logout Route
-router.post('/logout', customerAuthController.logout);
+router.delete('/logout', customerAuthController.logout);
 
 export default router;
