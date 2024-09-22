@@ -272,6 +272,10 @@ export class MarketAuthService implements IAuthService {
             this.logger.error(ErrorMessages.MARKET_NOT_FOUND);
             throw new NotFoundException(ErrorMessages.MARKET_NOT_FOUND);
         }
+        if(!market.refreshToken) {
+            this.logger.error(ErrorMessages.REFRESH_TOKEN_NOT_EXISTS);
+            throw new UnauthorizedException(ErrorMessages.REFRESH_TOKEN_NOT_EXISTS);
+        }
         if (market.refreshToken !== _refreshToken) {
             this.logger.error(ErrorMessages.INVALID_REFRESH_TOKEN);
             throw new UnauthorizedException(ErrorMessages.INVALID_REFRESH_TOKEN);

@@ -48,4 +48,5 @@ export enum ErrorMessages {
     MARKET_EMAIL_NOT_VERIFIED = 'Market Email Not Verified',
     INVALID_REFRESH_TOKEN = 'Invalid Refresh Token',
     INVALID_EXCHANGE_TOKEN= 'Invalid Exchange Token',
+    REFRESH_TOKEN_NOT_EXISTS = 'Refresh Token Does Not Exist, Login Again',
   }

@@ -272,6 +272,10 @@ export class CustomerAuthService implements IAuthService {
             this.logger.error(ErrorMessages.CUSTOMER_NOT_FOUND);
             throw new NotFoundException(ErrorMessages.CUSTOMER_NOT_FOUND);
         }
+        if(!customer.refreshToken) {
+            this.logger.error(ErrorMessages.REFRESH_TOKEN_NOT_EXISTS);
+            throw new UnauthorizedException(ErrorMessages.REFRESH_TOKEN_NOT_EXISTS);
+        }
         if (customer.refreshToken !== _refreshToken) {
             this.logger.error(ErrorMessages.INVALID_REFRESH_TOKEN);
             throw new UnauthorizedException(ErrorMessages.INVALID_REFRESH_TOKEN);
