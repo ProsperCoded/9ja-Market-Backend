@@ -9,16 +9,17 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
 }
 
 model Customer {
   id                    String        @id @default(uuid())
+  googleId              String?       @unique
   email                 String        @unique
   firstName             String
   lastName              String
-  password              String
+  password              String?
   dateOfBirth           DateTime?
   emailVerifiedAt       DateTime?
   emailVerificationCode String?
@@ -40,9 +41,10 @@ model Customer {
 
 model Market {
   id                    String               @id @default(uuid())
+  googleId              String?              @unique
   email                 String               @unique
   brandName             String               @unique
-  password              String
+  password              String?
   emailVerifiedAt       DateTime?
   emailVerificationCode String?
   passwordResetCode     String?
@@ -61,24 +63,24 @@ model Market {
 }
 
 model Product {
-  id             String          @id @default(uuid())
-  name           String
-  details        String
-  description    String
-  price          Float
-  prevPrice      Float
-  stock          Int
-  displayImage   String
-  featuredDate   DateTime?
-  images         ProductImage[]
-  ratings        Rating[]
-  cart           CartProduct[]
-  category       ProductCategory
-  market         Market          @relation(fields: [marketId], references: [id])
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  deletedAt      DateTime?
-  marketId       String
+  id           String          @id @default(uuid())
+  name         String
+  details      String
+  description  String
+  price        Float
+  prevPrice    Float
+  stock        Int
+  displayImage String
+  featuredDate DateTime?
+  images       ProductImage[]
+  ratings      Rating[]
+  cart         CartProduct[]
+  category     ProductCategory
+  market       Market          @relation(fields: [marketId], references: [id])
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  deletedAt    DateTime?
+  marketId     String
 
   @@index([name])
 }

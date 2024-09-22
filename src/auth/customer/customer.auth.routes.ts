@@ -12,9 +12,10 @@ import { EmailVerificationRequestDto } from "../dtos/email-verification-request.
 import { VerifyEmailRequestByCodeDto, VerifyEmailRequestByTokenDto } from "../dtos/verify-email-request.dto";
 import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
 import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
+import passport from "passport";
 
 const router = Router();
-const validator = new Validator('Customer Authentication');
+const validator = new Validator();
 
 // Customer Auth Service Dependencies
 const logger = new WinstonLogger('CustomerAuthService');
@@ -50,5 +51,19 @@ router.post('/forgot-password', validator.single(ForgotPasswordRequestDto), cust
 // Reset Password Route
 router.put('/reset-password', validator.single(ResetPasswordRequestDto), customerAuthController.resetPassword);
 
+// Refresh Access Token Route
+router.post('/refresh-token', customerAuthController.refreshToken);
+
+// Google Auth Initiator Route
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], session: false, state: 'customer' }));
+
+// Google Auth Callback Route
+router.get('/google/callback', customerAuthController.googleAuth);
+
+// Exchange Google token
+router.get("/exchange-token", customerAuthController.exchangeToken)
+
+// Logout Route
+router.delete('/logout', customerAuthController.logout);
 
 export default router;

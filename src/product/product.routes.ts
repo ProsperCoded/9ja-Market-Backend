@@ -19,7 +19,7 @@ const jwtService = new JWTService();
 const marketRepository = new MarketRepository();
 const marketAuthGaurd = new MarketAuthGaurd(marketRepository, logger, jwtService);
 
-const validator = new Validator("Product");
+const validator = new Validator();
 
 const router = Router();
 

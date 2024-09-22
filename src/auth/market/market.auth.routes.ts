@@ -12,9 +12,10 @@ import { EmailVerificationRequestDto } from "../dtos/email-verification-request.
 import { VerifyEmailRequestByCodeDto, VerifyEmailRequestByTokenDto } from "../dtos/verify-email-request.dto";
 import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
 import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
+import passport from "passport";
 
 const router = Router();
-const validator = new Validator('Market Authentication');
+const validator = new Validator();
 
 // Market Auth Service Dependencies
 const logger = new WinstonLogger('MarketAuthService');
@@ -50,5 +51,19 @@ router.post('/forgot-password', validator.single(ForgotPasswordRequestDto), mark
 // Reset Password Route
 router.put('/reset-password', validator.single(ResetPasswordRequestDto), marketAuthController.resetPassword);
 
+// Refresh Access Token Route
+router.post('/refresh-token', marketAuthController.refreshToken);
+
+// Google Auth Initiator Route
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], session: false, state: 'market' }));
+
+// Google Auth Callback Route
+router.get('/google/callback', marketAuthController.googleAuth);
+
+// Exchange Google token
+router.get("/exchange-token", marketAuthController.exchangeToken)
+
+// Logout Route
+router.delete('/logout', marketAuthController.logout);
 
 export default router;

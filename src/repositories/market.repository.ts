@@ -75,6 +75,23 @@ export class MarketRepository implements IMarketRepository {
         })
     }
 
+    getMarketByGoogleId(googleId: string): Promise<Market | null>{
+        return new Promise(async (resolve, reject) => {
+            try {
+                const market = await this.marketDelegate.findUnique({
+                    where: { googleId },
+                    include: {
+                        addresses: true,
+                        phoneNumbers: true,
+                    }
+                });
+                resolve(market)
+            } catch (e) {
+                reject(e);
+            }
+        })
+    }
+
     isEmailVerified(id: string): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
             try {

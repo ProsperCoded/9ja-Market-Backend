@@ -5,6 +5,8 @@ export enum SuccessMessages {
   VERIFICATION_EMAIL_SENT = 'Email Verification Email Sent',
   FORGOT_PASSWORD_SUCCESS = 'Resent Link Sent Successfully',
   RESET_PASSWORD_SUCCESS = 'Password Reset Successful',
+  REFRESH_TOKEN_SUCCESS= 'Token Refreshed Successfully',
+  LOGOUT_SUCCESS = 'Logout Successful',
   GET_CUSTOMER_SUCCESS = 'Get Customer Successful',
   UPDATE_CUSTOMER_SUCCESS = 'Update Customer Successful',
   DELETE_CUSTOMER_SUCCESS = 'Delete Customer Successful',

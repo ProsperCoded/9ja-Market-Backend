@@ -56,6 +56,23 @@ export class CustomerRepository implements ICustomerRepository {
             }
         })
     }
+
+    getByGoogleId(googleId: string): Promise<Customer | null> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const customer = await this.customerDelegate.findUnique({
+                    where: { googleId },
+                    include: {
+                        addresses: true,
+                        phoneNumbers: true,
+                    }
+                });
+                resolve(customer)
+            } catch (e) {
+                reject(e);
+            }
+        })
+    }
     isEmailVerified(id: string): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
             try {
