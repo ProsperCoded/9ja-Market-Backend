@@ -26,7 +26,6 @@ app.use(cors());
 app.use(helmet());
 app.use(passport.initialize());
 
-
 // Use Index Router
 app.use(AppEnum.PREFIX, IndexRouter);
 

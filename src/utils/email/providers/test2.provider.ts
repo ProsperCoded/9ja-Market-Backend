@@ -12,7 +12,7 @@ export default class TestEmailProvider implements IEmailService {
     sendMail({ to, subject, options }: { to: string; subject: string; options: { template: EmailPaths; data: { [key: string]: any; }; }; }): Promise<boolean> {
         return new Promise((resolve, reject) => {
             // Send email logic
-            this.logger.info(`1Email sent to ${to} with subject ${subject} and template ${options.template}`, options.data);
+            this.logger.info(`2Email sent to ${to} with subject ${subject} and template ${options.template}`, options.data);
             resolve(true);
         });
     }
