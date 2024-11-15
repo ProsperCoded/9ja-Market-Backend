@@ -1,19 +1,19 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import { JWTService } from "../../jwt/jwt.service";
 import { WinstonLogger } from "../../logger/winston.logger";
-import { Market } from "@prisma/client";
+import { Merchant } from "@prisma/client";
 import { ErrorMessages } from "../../../constants/error-messages.enum";
 import { UnauthorizedException } from '../../exceptions/unauthorized.exception';
 import { cryptoService } from "../../crytpo/crypto.service";
-import { MarketRepository } from "../../../repositories/market.repository";
+import { MerchantRepository } from "../../../repositories/merchant.repository";
 import { NotFoundException } from "../../exceptions/not-found.exception";
 
 
-export class MarketAuthGaurd {
+export class MerchantAuthGaurd {
     private strict?: boolean;
     private id?: boolean;
     constructor(
-        private readonly marketRepository: MarketRepository,
+        private readonly merchantRepository: MerchantRepository,
         private readonly logger: WinstonLogger,
         private readonly jwtService: JWTService
     ) { }
@@ -23,8 +23,8 @@ export class MarketAuthGaurd {
             this.strict = options?.strict || false;
             this.id = options?.id || false;
             try {
-                const market = await this.validateRequest(request as unknown as { headers: { authorization: any }, params: { marketId: string } });
-                request.body.market = market;
+                const merchant = await this.validateRequest(request as unknown as { headers: { authorization: any }, params: { merchantId: string } });
+                request.body.merchant = merchant;
                 next();
             } catch (error) {
                 next(error);
@@ -39,7 +39,7 @@ export class MarketAuthGaurd {
     }
 
 
-    private async validateRequest(request: { headers: { authorization: any }, params: {marketId: string} }): Promise<Market> {
+    private async validateRequest(request: { headers: { authorization: any }, params: { merchantId: string } }): Promise<Merchant> {
         if (!request.headers.authorization) {
             this.logger.error(ErrorMessages.NO_AUTH_ERROR);
             throw new UnauthorizedException(ErrorMessages.NO_AUTH_ERROR);
@@ -52,26 +52,26 @@ export class MarketAuthGaurd {
         const token = auth.split(' ')[1];
         try {
             const { id } = this.getPayload(token);
-            const market = await this.marketRepository.getMarketById(id);
+            const merchant = await this.merchantRepository.getMerchantById(id);
 
-            if (!market) {
-                this.logger.error(ErrorMessages.MARKET_NOT_FOUND);
-                throw new NotFoundException(ErrorMessages.MARKET_NOT_FOUND);
+            if (!merchant) {
+                this.logger.error(ErrorMessages.MERCHANT_NOT_FOUND);
+                throw new NotFoundException(ErrorMessages.MERCHANT_NOT_FOUND);
             }
 
             // Check for Email Verification on Strict Level
-            if (this.strict && !market.emailVerifiedAt) {
-                this.logger.error(ErrorMessages.MARKET_EMAIL_NOT_VERIFIED);
-                throw new UnauthorizedException(ErrorMessages.MARKET_EMAIL_NOT_VERIFIED);
+            if (this.strict && !merchant.emailVerifiedAt) {
+                this.logger.error(ErrorMessages.MERCHANT_EMAIL_NOT_VERIFIED);
+                throw new UnauthorizedException(ErrorMessages.MERCHANT_EMAIL_NOT_VERIFIED);
             }
 
             // Check for ID Compatibility on ID Level
-            if (this.id && market.id !== request.params.marketId) {
+            if (this.id && merchant.id !== request.params.merchantId) {
                 this.logger.error(ErrorMessages.USER_UNAUTHORIZED);
                 throw new UnauthorizedException(ErrorMessages.USER_UNAUTHORIZED);
             }
 
-            return market;
+            return merchant;
         } catch (error) {
             this.logger.error(`${ErrorMessages.USER_UNAUTHORIZED}: ${error}`);
             throw new UnauthorizedException(ErrorMessages.USER_UNAUTHORIZED);

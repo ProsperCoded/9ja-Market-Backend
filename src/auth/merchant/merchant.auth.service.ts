@@ -17,43 +17,43 @@ import { EmailVerificationRequestDto } from "../dtos/email-verification-request.
 import { NotFoundException } from '../../utils/exceptions/not-found.exception';
 import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
 import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
-import { MarketRepository } from "../../repositories/market.repository";
-import { MarketRegisterRequestDto } from "../dtos/market-register-request.dto";
+import { MerchantRepository } from "../../repositories/merchant.repository";
+import { MerchantRegisterRequestDto } from "../dtos/merchant-register-request.dto";
 import { IVerifyEmailRequest, VerifyEmailRequestByCodeDto, VerifyEmailRequestByTokenDto } from "../dtos/verify-email-request.dto";
 import { DataFormatterHelper } from "../../helpers/format.helper";
 import { Prisma } from "@prisma/client";
 
 
-export class MarketAuthService implements IAuthService {
+export class MerchantAuthService implements IAuthService {
     private readonly logger: ILogger;
     private readonly bcryptService: BcryptService;
     private readonly jwtService: JWTService;
     private readonly emailService: EmailService;
     private readonly eventEmiter: EventEmitter;
-    private readonly marketRepository: MarketRepository;
+    private readonly merchantRepository: MerchantRepository;
 
     constructor(
         logger: ILogger,
         bcryptService: BcryptService,
         jwtService: JWTService,
-        marketRepository: MarketRepository
+        merchantRepository: MerchantRepository
     ) {
         this.logger = logger;
         this.bcryptService = bcryptService;
         this.jwtService = jwtService;
         this.emailService = new EmailService();
         this.eventEmiter = eventEmmiter;
-        this.marketRepository = marketRepository;
+        this.merchantRepository = merchantRepository;
         this.initializeEventHandlers();
     }
 
     initializeEventHandlers() {
-        this.eventEmiter.on(`sendMarketPasswordResetEmail`, async (data: { email: string, token: string, resetCode: string, url: string }) => {
+        this.eventEmiter.on(`sendMerchantPasswordResetEmail`, async (data: { email: string, token: string, resetCode: string, url: string }) => {
             const { email, token, resetCode, url } = data;
             const link = url + `?token=${token}`;
             await this.emailService.sendMail({
                 to: email,
-                subject: EmailSubjects.PASSWORD_RESET_MARKET,
+                subject: EmailSubjects.PASSWORD_RESET_MERCHANT,
                 options: {
                     template: EmailPaths.PASSWORD_RESET,
                     data: { link, resetCode }
@@ -61,12 +61,12 @@ export class MarketAuthService implements IAuthService {
             })
         });
 
-        this.eventEmiter.on(`sendMarketEmailVerificationEmail`, async (data: { email: string, token: string, verificationCode: number, url: string }) => {
+        this.eventEmiter.on(`sendMerchantEmailVerificationEmail`, async (data: { email: string, token: string, verificationCode: number, url: string }) => {
             const { email, token, verificationCode, url } = data;
             const link = url + `/${token}`;
             await this.emailService.sendMail({
                 to: email,
-                subject: EmailSubjects.EMAIL_VERIFICATION_MARKET,
+                subject: EmailSubjects.EMAIL_VERIFICATION_MERCHANT,
                 options: {
                     template: EmailPaths.EMAIL_VERIFICATION,
                     data: { link, verificationCode }
@@ -74,7 +74,7 @@ export class MarketAuthService implements IAuthService {
             })
         });
 
-        this.eventEmiter.on(`sendMarketWelcomeEmail`, async (data: { email: string, brandName: string, }) => {
+        this.eventEmiter.on(`sendMerchantWelcomeEmail`, async (data: { email: string, brandName: string, }) => {
             const { email, brandName } = data;
             await this.emailService.sendMail({
                 to: email,
@@ -114,43 +114,43 @@ export class MarketAuthService implements IAuthService {
     async login(loginData: LoginRequestDto): Promise<LoginResponseDto> {
         const { email, password } = loginData;
 
-        const market = await this.marketRepository.getMarketByEmail(email);
-        if (!market) {
+        const merchant = await this.merchantRepository.getMerchantByEmail(email);
+        if (!merchant) {
             this.logger.error(ErrorMessages.INVALID_EMAIL_PASSWORD);
             throw new UnauthorizedException(ErrorMessages.INVALID_EMAIL_PASSWORD);
         }
 
-        const isPasswordMatch = await this.bcryptService.comparePassword(password, market.password!);
+        const isPasswordMatch = await this.bcryptService.comparePassword(password, merchant.password!);
         if (!isPasswordMatch) {
             this.logger.error(ErrorMessages.INVALID_EMAIL_PASSWORD);
             throw new UnauthorizedException(ErrorMessages.INVALID_EMAIL_PASSWORD);
         }
 
-        const payload = { email: market.email, id: market.id };
+        const payload = { email: merchant.email, id: merchant.id };
         const accessToken = this.getToken(payload, "10h");
         const _refreshToken = cryptoService.random();
-        const refreshToken = this.getToken({ email: market.email, refreshToken: _refreshToken }, "7d");
-        await this.marketRepository.update(market.id, { refreshToken: _refreshToken });
+        const refreshToken = this.getToken({ email: merchant.email, refreshToken: _refreshToken }, "7d");
+        await this.merchantRepository.update(merchant.id, { refreshToken: _refreshToken });
         const response = new LoginResponseDto();
-        response.id = market.id;
+        response.id = merchant.id;
         response.accessToken = accessToken;
         response.refreshToken = refreshToken;
         return response;
     }
 
-    async register(registerData: MarketRegisterRequestDto, url: string): Promise<boolean> {
+    async register(registerData: MerchantRegisterRequestDto, url: string): Promise<boolean> {
         const { email, brandName, password } = registerData;
 
         // Check if email is already registered
-        const market = await this.marketRepository.getMarketByEmail(email);
-        if (market) {
+        const merchant = await this.merchantRepository.getMerchantByEmail(email);
+        if (merchant) {
             this.logger.error(ErrorMessages.EMAIL_EXISTS);
             throw new BadRequestException(ErrorMessages.EMAIL_EXISTS);
         }
 
         // Check if BrandName already exists
-        const marketBrand = await this.marketRepository.getMarketByBrandName(brandName);
-        if (marketBrand) {
+        const merchantBrand = await this.merchantRepository.getMerchantByBrandName(brandName);
+        if (merchantBrand) {
             this.logger.error(ErrorMessages.BRAND_NAME_EXISTS);
             throw new BadRequestException(ErrorMessages.BRAND_NAME_EXISTS);
         }
@@ -159,55 +159,55 @@ export class MarketAuthService implements IAuthService {
             const hashedPassword = await this.bcryptService.hashPassword(password);
             registerData.password = hashedPassword;
 
-            // Create new market
-            const { addresses, phoneNumbers, ...newMarketData } = registerData;
+            // Create new merchant
+            const { addresses, phoneNumbers, ...newMerchantData } = registerData;
             const formattedPhoneNumbers = DataFormatterHelper.formatPhoneNumbers(phoneNumbers);
-            const newMarket = await this.marketRepository.create(newMarketData, addresses, formattedPhoneNumbers);
+            const newMerchant = await this.merchantRepository.create(newMerchantData, addresses, formattedPhoneNumbers);
 
             // Send welcome email
-            this.eventEmiter.emit("sendMarketWelcomeEmail", { email, brandName });
+            this.eventEmiter.emit("sendMerchantWelcomeEmail", { email, brandName });
 
             // Send email verification code
             const verificationCode = cryptoService.randomInt();
-            await this.marketRepository.update(newMarket.id, { emailVerificationCode: verificationCode });
+            await this.merchantRepository.update(newMerchant.id, { emailVerificationCode: verificationCode });
             const _token = this.getToken({ email, verificationCode });
             const token = encodeURIComponent(_token);
-            this.eventEmiter.emit("sendMarketEmailVerificationEmail", { email, token, verificationCode, url });
+            this.eventEmiter.emit("sendMerchantEmailVerificationEmail", { email, token, verificationCode, url });
             return true;
         } catch (e) {
-            this.logger.error(`${ErrorMessages.REGISTER_MARKET_FAILED}: ${e}`);
-            throw new InternalServerException(ErrorMessages.REGISTER_MARKET_FAILED);
+            this.logger.error(`${ErrorMessages.REGISTER_MERCHANT_FAILED}: ${e}`);
+            throw new InternalServerException(ErrorMessages.REGISTER_MERCHANT_FAILED);
         }
     }
 
     async emailVerification(emailVerificationData: EmailVerificationRequestDto, url: string): Promise<boolean> {
         const { email } = emailVerificationData;
-        const market = await this.marketRepository.getMarketByEmail(email);
-        if (!market) {
-            this.logger.error(ErrorMessages.MARKET_NOT_FOUND);
-            throw new NotFoundException(ErrorMessages.MARKET_NOT_FOUND);
+        const merchant = await this.merchantRepository.getMerchantByEmail(email);
+        if (!merchant) {
+            this.logger.error(ErrorMessages.MERCHANT_NOT_FOUND);
+            throw new NotFoundException(ErrorMessages.MERCHANT_NOT_FOUND);
         }
         const verificationCode = cryptoService.randomInt();
-        await this.marketRepository.update(market.id, { emailVerificationCode: verificationCode });
+        await this.merchantRepository.update(merchant.id, { emailVerificationCode: verificationCode });
         const _token = this.getToken({ email, verificationCode });
         const token = encodeURIComponent(_token)
-        this.eventEmiter.emit("sendMarketEmailVerificationEmail", { email, token, verificationCode, url });
+        this.eventEmiter.emit("sendMerchantEmailVerificationEmail", { email, token, verificationCode, url });
         return true;
     }
 
     async verifyEmail(verifyEmailData: VerifyEmailRequestByCodeDto | VerifyEmailRequestByTokenDto): Promise<boolean> {
         try {
             const { email, verificationCode } = this.getVerifyEmailData(verifyEmailData);
-            const market = await this.marketRepository.getMarketByEmail(email);
-            if (!market) {
-                this.logger.error(ErrorMessages.MARKET_NOT_FOUND);
-                throw new NotFoundException(ErrorMessages.MARKET_NOT_FOUND);
+            const merchant = await this.merchantRepository.getMerchantByEmail(email);
+            if (!merchant) {
+                this.logger.error(ErrorMessages.MERCHANT_NOT_FOUND);
+                throw new NotFoundException(ErrorMessages.MERCHANT_NOT_FOUND);
             }
-            if (market.emailVerificationCode !== verificationCode) {
+            if (merchant.emailVerificationCode !== verificationCode) {
                 this.logger.error(ErrorMessages.INVALID_VERIFICATION_TOKEN);
                 throw new BadRequestException(ErrorMessages.INVALID_VERIFICATION_TOKEN);
             }
-            await this.marketRepository.update(market.id, { emailVerifiedAt: new Date(), emailVerificationCode: null });
+            await this.merchantRepository.update(merchant.id, { emailVerifiedAt: new Date(), emailVerificationCode: null });
             return true;
         } catch (e) {
             // if (e instanceof JsonWebTokenError) {
@@ -223,15 +223,15 @@ export class MarketAuthService implements IAuthService {
 
     async forgotPassword(forgotPasswordData: ForgotPasswordRequestDto): Promise<boolean> {
         const { email } = forgotPasswordData;
-        const market = await this.marketRepository.getMarketByEmail(email);
-        if (!market) {
-            this.logger.error(ErrorMessages.MARKET_NOT_FOUND);
-            throw new NotFoundException(ErrorMessages.MARKET_NOT_FOUND);
+        const merchant = await this.merchantRepository.getMerchantByEmail(email);
+        if (!merchant) {
+            this.logger.error(ErrorMessages.MERCHANT_NOT_FOUND);
+            throw new NotFoundException(ErrorMessages.MERCHANT_NOT_FOUND);
         }
         const resetCode = cryptoService.randomInt();
-        await this.marketRepository.update(market.id, { passwordResetCode: resetCode });
+        await this.merchantRepository.update(merchant.id, { passwordResetCode: resetCode });
         // const token = this.getToken({ email, resetCode });
-        this.eventEmiter.emit("sendMarketPasswordResetEmail", { email, resetCode });
+        this.eventEmiter.emit("sendMerchantPasswordResetEmail", { email, resetCode });
         return true;
     }
 
@@ -240,17 +240,17 @@ export class MarketAuthService implements IAuthService {
             const { resetCode, email, newPassword } = resetPasswordData;
             // const decrypted = cryptoService.decrypt(token);
             // const { email, resetCode } = this.jwtService.verifyToken(decrypted);
-            const market = await this.marketRepository.getMarketByEmail(email);
-            if (!market) {
-                this.logger.error(ErrorMessages.MARKET_NOT_FOUND);
-                throw new NotFoundException(ErrorMessages.MARKET_NOT_FOUND);
+            const merchant = await this.merchantRepository.getMerchantByEmail(email);
+            if (!merchant) {
+                this.logger.error(ErrorMessages.MERCHANT_NOT_FOUND);
+                throw new NotFoundException(ErrorMessages.MERCHANT_NOT_FOUND);
             }
-            if (market.passwordResetCode !== resetCode) {
+            if (merchant.passwordResetCode !== resetCode) {
                 this.logger.error(ErrorMessages.INVALID_RESET_TOKEN);
                 throw new BadRequestException(ErrorMessages.INVALID_RESET_TOKEN);
             }
             const hashedPassword = await this.bcryptService.hashPassword(newPassword);
-            await this.marketRepository.update(market.id, { password: hashedPassword, passwordResetCode: null });
+            await this.merchantRepository.update(merchant.id, { password: hashedPassword, passwordResetCode: null });
             return true;
         } catch (e) {
             // if (e instanceof JsonWebTokenError) {
@@ -267,22 +267,22 @@ export class MarketAuthService implements IAuthService {
     async refreshToken(refreshToken: string): Promise<LoginResponseDto> {
         const payload = this.getPayload(refreshToken);
         const { email, refreshToken: _refreshToken } = payload;
-        const market = await this.marketRepository.getMarketByEmail(email);
-        if (!market) {
-            this.logger.error(ErrorMessages.MARKET_NOT_FOUND);
-            throw new NotFoundException(ErrorMessages.MARKET_NOT_FOUND);
+        const merchant = await this.merchantRepository.getMerchantByEmail(email);
+        if (!merchant) {
+            this.logger.error(ErrorMessages.MERCHANT_NOT_FOUND);
+            throw new NotFoundException(ErrorMessages.MERCHANT_NOT_FOUND);
         }
-        if(!market.refreshToken) {
+        if (!merchant.refreshToken) {
             this.logger.error(ErrorMessages.REFRESH_TOKEN_NOT_EXISTS);
             throw new UnauthorizedException(ErrorMessages.REFRESH_TOKEN_NOT_EXISTS);
         }
-        if (market.refreshToken !== _refreshToken) {
+        if (merchant.refreshToken !== _refreshToken) {
             this.logger.error(ErrorMessages.INVALID_REFRESH_TOKEN);
             throw new UnauthorizedException(ErrorMessages.INVALID_REFRESH_TOKEN);
         }
-        const newAccessToken = this.getToken({ email, id: market.id }, "10h");
+        const newAccessToken = this.getToken({ email, id: merchant.id }, "10h");
         const response = new LoginResponseDto();
-        response.id = market.id;
+        response.id = merchant.id;
         response.accessToken = newAccessToken;
         response.refreshToken = refreshToken;
         return response;
@@ -291,42 +291,42 @@ export class MarketAuthService implements IAuthService {
     async logout(refreshToken: string): Promise<boolean> {
         const payload = this.getPayload(refreshToken);
         const { email } = payload;
-        const market = await this.marketRepository.getMarketByEmail(email);
-        if (!market) {
-            this.logger.error(ErrorMessages.MARKET_NOT_FOUND);
-            throw new NotFoundException(ErrorMessages.MARKET_NOT_FOUND);
+        const merchant = await this.merchantRepository.getMerchantByEmail(email);
+        if (!merchant) {
+            this.logger.error(ErrorMessages.MERCHANT_NOT_FOUND);
+            throw new NotFoundException(ErrorMessages.MERCHANT_NOT_FOUND);
         }
-        await this.marketRepository.update(market.id, { refreshToken: null });
+        await this.merchantRepository.update(merchant.id, { refreshToken: null });
         return true;
     }
 
     async googleCreateOrLogin(profile: any): Promise<string> {
         const { emails: [{ value, verified }], id, name: { givenName }, photos } = profile;
         try {
-            const market = await this.marketRepository.getMarketByGoogleId(id);
-            if (!market) {
-                let marketData: Prisma.MarketCreateInput = {
+            const merchant = await this.merchantRepository.getMerchantByGoogleId(id);
+            if (!merchant) {
+                let merchantData: Prisma.MerchantCreateInput = {
                     email: value,
                     googleId: id,
                     brandName: `${givenName}'s Store`,
                     emailVerifiedAt: verified ? new Date() : null,
                     displayImage: photos[0].value
                 }
-                const newMarket = await this.marketRepository.create(marketData);
-                const payload = { email: newMarket.email, id: newMarket.id };
+                const newMerchant = await this.merchantRepository.create(merchantData);
+                const payload = { email: newMerchant.email, id: newMerchant.id };
                 const accessToken = this.getToken(payload, "10h");
                 const _refreshToken = cryptoService.random();
-                const refreshToken = this.getToken({ email: newMarket.email, refreshToken: _refreshToken }, "7d");
-                await this.marketRepository.update(newMarket.id, { refreshToken: _refreshToken });
-                const result = this.getToken({ id: newMarket.id, accessToken, refreshToken }, "7m");
+                const refreshToken = this.getToken({ email: newMerchant.email, refreshToken: _refreshToken }, "7d");
+                await this.merchantRepository.update(newMerchant.id, { refreshToken: _refreshToken });
+                const result = this.getToken({ id: newMerchant.id, accessToken, refreshToken }, "7m");
                 return encodeURIComponent(result);
             } else {
-                const payload = { email: market.email, id: market.id };
+                const payload = { email: merchant.email, id: merchant.id };
                 const accessToken = this.getToken(payload, "10h");
                 const _refreshToken = cryptoService.random();
-                const refreshToken = this.getToken({ email: market.email, refreshToken: _refreshToken }, "7d");
-                await this.marketRepository.update(market.id, { refreshToken: _refreshToken });
-                const result = this.getToken({ id: market.id, accessToken, refreshToken }, "7m");
+                const refreshToken = this.getToken({ email: merchant.email, refreshToken: _refreshToken }, "7d");
+                await this.merchantRepository.update(merchant.id, { refreshToken: _refreshToken });
+                const result = this.getToken({ id: merchant.id, accessToken, refreshToken }, "7m");
                 return encodeURIComponent(result);
             }
         } catch (e) {

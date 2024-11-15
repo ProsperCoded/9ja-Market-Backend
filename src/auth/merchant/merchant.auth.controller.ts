@@ -1,5 +1,5 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
-import { MarketAuthService } from "./market.auth.service";
+import { MerchantAuthService } from "./merchant.auth.service";
 import { ResponseDto } from "../../dtos/response.dto";
 import { ResponseStatus } from "../../dtos/interfaces/response.interface";
 import { SuccessMessages } from "../../constants/success-messages.enum";
@@ -7,11 +7,11 @@ import { HttpStatus } from "../../constants/http-status.enum";
 import { RequestParserHelper } from "../../helpers/request-parser.helper";
 import { AppEnum } from "../../constants/app.enum";
 
-export class MarketAuthController {
-    constructor(private readonly marketAuthService: MarketAuthService) { }
+export class MerchantAuthController {
+    constructor(private readonly merchantAuthService: MerchantAuthService) { }
 
     /**
-   * Authenticates Market
+   * Authenticates Merchant
    * @param request {Request}
    * @param response (Response}
    * @param next {NextFunction}
@@ -19,7 +19,7 @@ export class MarketAuthController {
 
     login: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            const result = await this.marketAuthService.login(request.body);
+            const result = await this.merchantAuthService.login(request.body);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.LOGIN_SUCCESSFUL, result);
             return response.status(HttpStatus.OK).send(resObj);
         } catch (e) {
@@ -28,15 +28,15 @@ export class MarketAuthController {
     }
 
     /**
-     * Registers Market
+     * Registers Merchant
      * @param request {Request}
      * @param response {Response}
      * @param next {NextFunction}
      */
     register: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            const url = new RequestParserHelper(request).getUrl('/auth/market/verify-email-token');
-            await this.marketAuthService.register(request.body, url);
+            const url = new RequestParserHelper(request).getUrl('/auth/merchant/verify-email-token');
+            await this.merchantAuthService.register(request.body, url);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.REGISTRATION_SUCCESSFUL);
             return response.status(HttpStatus.CREATED).send(resObj);
         } catch (e) {
@@ -53,8 +53,8 @@ export class MarketAuthController {
      */
     emailVerification: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            const url = new RequestParserHelper(request).getUrl('/auth/market/verify-email-token');
-            await this.marketAuthService.emailVerification(request.body, url);
+            const url = new RequestParserHelper(request).getUrl('/auth/merchant/verify-email-token');
+            await this.merchantAuthService.emailVerification(request.body, url);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.VERIFICATION_EMAIL_SENT);
             return response.status(HttpStatus.OK).send(resObj);
         } catch (e) {
@@ -70,7 +70,7 @@ export class MarketAuthController {
      */
     verifyEmailByQuery: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            await this.marketAuthService.verifyEmail(request.query as { token: string });
+            await this.merchantAuthService.verifyEmail(request.query as { token: string });
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.EMAIL_VERIFICATION_SUCCESS);
             return response.status(HttpStatus.OK).send(resObj);
         } catch (e) {
@@ -86,7 +86,7 @@ export class MarketAuthController {
      */
     verifyEmail: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            await this.marketAuthService.verifyEmail(request.body);
+            await this.merchantAuthService.verifyEmail(request.body);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.EMAIL_VERIFICATION_SUCCESS);
             return response.status(HttpStatus.OK).send(resObj);
         } catch (e) {
@@ -102,8 +102,8 @@ export class MarketAuthController {
      */
     forgotPassword: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            // const url = new RequestParserHelper(request).getUrl('/auth/market/reset-password');
-            await this.marketAuthService.forgotPassword(request.body);
+            // const url = new RequestParserHelper(request).getUrl('/auth/merchant/reset-password');
+            await this.merchantAuthService.forgotPassword(request.body);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.FORGOT_PASSWORD_SUCCESS);
             return response.status(HttpStatus.OK).send(resObj);
         } catch (e) {
@@ -119,7 +119,7 @@ export class MarketAuthController {
      */
     resetPassword: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            await this.marketAuthService.resetPassword(request.body);
+            await this.merchantAuthService.resetPassword(request.body);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.RESET_PASSWORD_SUCCESS);
             return response.status(HttpStatus.OK).send(resObj);
         } catch (e) {
@@ -135,7 +135,7 @@ export class MarketAuthController {
    */
       refreshToken: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            const result = await this.marketAuthService.refreshToken(request.body.refreshToken);
+            const result = await this.merchantAuthService.refreshToken(request.body.refreshToken);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.REFRESH_TOKEN_SUCCESS, result);
             return response.status(HttpStatus.OK).send(resObj);
         } catch (e) {
@@ -152,7 +152,7 @@ export class MarketAuthController {
     googleAuth: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
             const profile = JSON.parse(request.query.profile as string);
-            const result = await this.marketAuthService.googleCreateOrLogin(profile);
+            const result = await this.merchantAuthService.googleCreateOrLogin(profile);
             return response.redirect(`${AppEnum.CLIENT_URL}/auth?token=${result}`);
         } catch (e) {
             next(e);
@@ -167,7 +167,7 @@ export class MarketAuthController {
     */
     exchangeToken: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            const result = await this.marketAuthService.exchangeToken(request.query.token as string);
+            const result = await this.merchantAuthService.exchangeToken(request.query.token as string);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.LOGIN_SUCCESSFUL, result);
             return response.status(HttpStatus.OK).send(resObj);
         } catch (e) {
@@ -184,7 +184,7 @@ export class MarketAuthController {
 
       logout: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            await this.marketAuthService.logout(request.body.refreshToken);
+            await this.merchantAuthService.logout(request.body.refreshToken);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.LOGOUT_SUCCESS);
             return response.status(HttpStatus.OK).send(resObj);
         } catch (e) {

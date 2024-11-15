@@ -1,30 +1,30 @@
-import { Market, Prisma } from "@prisma/client";
-import { IMarketRepository } from "./interfaces/market.repository.interface";
+import { Merchant, Prisma } from "@prisma/client";
+import { IMerchantRepository } from "./interfaces/merchant.repository.interface";
 import { databaseService } from "../utils/database";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 
-export class MarketRepository implements IMarketRepository {
-    private readonly marketDelegate: Prisma.MarketDelegate<DefaultArgs>;
+export class MerchantRepository implements IMerchantRepository {
+    private readonly merchantDelegate: Prisma.MerchantDelegate<DefaultArgs>;
 
     constructor() {
-        this.marketDelegate = databaseService.market;
+        this.merchantDelegate = databaseService.merchant;
     }
 
-    findAll(): Promise<Market[]> {
+    findAll(): Promise<Merchant[]> {
         return new Promise(async (resolve, reject) => {
             try {
-                const markets = await this.marketDelegate.findMany();
-                resolve(markets)
+                const merchants = await this.merchantDelegate.findMany();
+                resolve(merchants)
             } catch (e) {
                 reject(e)
             }
         })
     }
 
-    getMarketById(id: string, options: { products: boolean } = { products: false }): Promise<Market | null> {
+    getMerchantById(id: string, options: { products: boolean } = { products: false }): Promise<Merchant | null> {
         return new Promise(async (resolve, reject) => {
             try {
-                const market = await this.marketDelegate.findUnique({
+                const merchant = await this.merchantDelegate.findUnique({
                     where: { id },
                     include: {
                         addresses: true,
@@ -32,17 +32,17 @@ export class MarketRepository implements IMarketRepository {
                         products: options.products
                     }
                 });
-                resolve(market)
+                resolve(merchant)
             } catch (e) {
                 reject(e);
             }
         })
     }
 
-    getMarketByEmail(email: string, options: { products: boolean } = { products: false }): Promise<Market | null> {
+    getMerchantByEmail(email: string, options: { products: boolean } = { products: false }): Promise<Merchant | null> {
         return new Promise(async (resolve, reject) => {
             try {
-                const market = await this.marketDelegate.findUnique({
+                const merchant = await this.merchantDelegate.findUnique({
                     where: { email },
                     include: {
                         addresses: true,
@@ -50,17 +50,17 @@ export class MarketRepository implements IMarketRepository {
                         products: options.products
                     }
                 });
-                resolve(market)
+                resolve(merchant)
             } catch (e) {
                 reject(e);
             }
         })
     }
 
-    getMarketByBrandName(brandName: string, options: { products: boolean } = { products: false }): Promise<Market | null> {
+    getMerchantByBrandName(brandName: string, options: { products: boolean } = { products: false }): Promise<Merchant | null> {
         return new Promise(async (resolve, reject) => {
             try {
-                const market = await this.marketDelegate.findUnique({
+                const merchant = await this.merchantDelegate.findUnique({
                     where: { brandName },
                     include: {
                         addresses: true,
@@ -68,24 +68,24 @@ export class MarketRepository implements IMarketRepository {
                         products: options.products
                     }
                 });
-                resolve(market)
+                resolve(merchant)
             } catch (e) {
                 reject(e);
             }
         })
     }
 
-    getMarketByGoogleId(googleId: string): Promise<Market | null>{
+    getMerchantByGoogleId(googleId: string): Promise<Merchant | null>{
         return new Promise(async (resolve, reject) => {
             try {
-                const market = await this.marketDelegate.findUnique({
+                const merchant = await this.merchantDelegate.findUnique({
                     where: { googleId },
                     include: {
                         addresses: true,
                         phoneNumbers: true,
                     }
                 });
-                resolve(market)
+                resolve(merchant)
             } catch (e) {
                 reject(e);
             }
@@ -95,35 +95,35 @@ export class MarketRepository implements IMarketRepository {
     isEmailVerified(id: string): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
             try {
-                const market = await this.marketDelegate.findUnique({ where: { id } });
-                resolve(!!market?.emailVerifiedAt);
+                const merchant = await this.merchantDelegate.findUnique({ where: { id } });
+                resolve(!!merchant?.emailVerifiedAt);
             } catch (e) {
                 reject(e);
             }
         })
     }
 
-    update(id: string, data: Prisma.MarketUpdateInput): Promise<Market> {
+    update(id: string, data: Prisma.MerchantUpdateInput): Promise<Merchant> {
         return new Promise(async (resolve, reject) => {
             try {
-                const market = await this.marketDelegate.update({
+                const merchant = await this.merchantDelegate.update({
                     where: { id }, data,
                     include: {
                         addresses: true,
                         phoneNumbers: true
                     }
                 });
-                resolve(market)
+                resolve(merchant)
             } catch (e) {
                 reject(e);
             }
         })
     }
 
-    create(data: Prisma.MarketCreateInput, addresses: Prisma.AddressCreateManyMarketInput[] = [], phoneNumbers: Prisma.PhoneNumberCreateManyMarketInput[] = []): Promise<Market> {
+    create(data: Prisma.MerchantCreateInput, addresses: Prisma.AddressCreateManyMerchantInput[] = [], phoneNumbers: Prisma.PhoneNumberCreateManyMerchantInput[] = []): Promise<Merchant> {
         return new Promise(async (resolve, reject) => {
             try {
-                const market = await this.marketDelegate.create({
+                const merchant = await this.merchantDelegate.create({
                     data: {
                         ...data,
                         addresses: {
@@ -142,7 +142,7 @@ export class MarketRepository implements IMarketRepository {
                         phoneNumbers: true
                     }
                 });
-                resolve(market)
+                resolve(merchant)
             } catch (e) {
                 reject(e);
             }
@@ -153,7 +153,7 @@ export class MarketRepository implements IMarketRepository {
     delete(id: string): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
             try {
-                await this.marketDelegate.delete({ where: { id } });
+                await this.merchantDelegate.delete({ where: { id } });
                 resolve(true)
             } catch (e) {
                 reject(e);

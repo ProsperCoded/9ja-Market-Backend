@@ -30,15 +30,15 @@ export class AddressRepository implements IAddressRepository {
         });
     }
 
-    createMarketAddress(marketId: string, address: Prisma.AddressCreateInput): Promise<Address> {
+    createMerchantAddress(merchantId: string, address: Prisma.AddressCreateInput): Promise<Address> {
         return new Promise(async (resolve, reject) => {
             try {
                 const createdAddress = await this.addressDelegate.create({
                     data: {
                         ...address,
-                        market: {
+                        merchant: {
                             connect: {
-                                id: marketId
+                                id: merchantId
                             }
                         }
                     }
@@ -62,10 +62,10 @@ export class AddressRepository implements IAddressRepository {
         });
     }
 
-    getUniqueByMarketId(name: string, marketId: string): Promise<Address | null> {
+    getUniqueByMerchantId(name: string, merchantId: string): Promise<Address | null> {
         return new Promise(async (resolve, reject) => {
             try {
-                const address = await this.addressDelegate.findUnique({ where: { name_marketId: { name, marketId } } });
+                const address = await this.addressDelegate.findUnique({ where: { name_merchantId: { name, merchantId } } });
                 resolve(address)
             } catch (e) {
                 reject(e)
@@ -84,10 +84,10 @@ export class AddressRepository implements IAddressRepository {
         });
     }
 
-    updateByMarketId(name: string, marketId: string, data: Prisma.AddressUpdateInput): Promise<Address> {
+    updateByMerchantId(name: string, merchantId: string, data: Prisma.AddressUpdateInput): Promise<Address> {
         return new Promise(async (resolve, reject) => {
             try {
-                const updatedAddress = await this.addressDelegate.update({ where: { name_marketId: { name, marketId } }, data });
+                const updatedAddress = await this.addressDelegate.update({ where: { name_merchantId: { name, merchantId } }, data });
                 resolve(updatedAddress);
             } catch (e) {
                 reject(e)
@@ -106,10 +106,10 @@ export class AddressRepository implements IAddressRepository {
         });
     }
 
-    deleteMarketAddress(name: string, marketId: string): Promise<Address> {
+    deleteMerchantAddress(name: string, merchantId: string): Promise<Address> {
         return new Promise(async (resolve, reject) => {
             try {
-                const deletedAddress = await this.addressDelegate.delete({ where: { name_marketId: { name, marketId } } });
+                const deletedAddress = await this.addressDelegate.delete({ where: { name_merchantId: { name, merchantId } } });
                 resolve(deletedAddress);
             } catch (e) {
                 reject(e);
@@ -128,10 +128,10 @@ export class AddressRepository implements IAddressRepository {
         });
     }
 
-    getMarketAddress(marketId: string): Promise<Address[]> {
+    getMerchantAddress(merchantId: string): Promise<Address[]> {
         return new Promise(async (resolve, reject) => {
             try {
-                const addresses = await this.addressDelegate.findMany({ where: { marketId } });
+                const addresses = await this.addressDelegate.findMany({ where: { merchantId } });
                 resolve(addresses);
             } catch (e) {
                 reject(e);

@@ -3,12 +3,12 @@ import { AddressCreateDto } from "../../dtos/address-create.dto";
 import { ArrayMaxSize, ArrayMinSize, IsArray, IsNotEmpty, IsString, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 
-interface MarketUpdateInput extends Omit<Prisma.MarketUpdateInput, "phoneNumbers" | "addresses"> {
+interface MerchantUpdateInput extends Omit<Prisma.MerchantUpdateInput, "phoneNumbers" | "addresses"> {
     phoneNumbers?: string[];
     addresses?: AddressCreateDto[];
 }
 
-export class MarketUpdateDto implements MarketUpdateInput{
+export class MerchantUpdateDto implements MerchantUpdateInput{
     @IsString()
     @IsNotEmpty()
     brandName?: string | Prisma.StringFieldUpdateOperationsInput | undefined;

@@ -21,10 +21,10 @@ export class PhoneNumberRepository {
         })
     }
 
-    findMarketPhoneNumbers(marketId: string): Promise<PhoneNumber[]> {
+    findMerchantPhoneNumbers(merchantId: string): Promise<PhoneNumber[]> {
         return new Promise(async (resolve, reject) => {
             try {
-                const numbers = await this.phoneNumberDelegate.findMany({ where: { marketId } });
+                const numbers = await this.phoneNumberDelegate.findMany({ where: { merchantId } });
                 resolve(numbers)
             } catch (e) {
                 reject(e)
@@ -54,10 +54,10 @@ export class PhoneNumberRepository {
         })
     }
 
-    deleteMarketNumbers(marketId: string): Promise<boolean> {
+    deleteMerchantNumbers(merchantId: string): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
             try {
-                await this.phoneNumberDelegate.deleteMany({ where: { marketId } });
+                await this.phoneNumberDelegate.deleteMany({ where: { merchantId } });
                 resolve(true);
             } catch (e) {
                 reject(e)
