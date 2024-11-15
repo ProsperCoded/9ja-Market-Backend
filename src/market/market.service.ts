@@ -1,25 +1,40 @@
-import { Prisma } from "@prisma/client";
 import { ErrorMessages } from "../constants/error-messages.enum";
-import { DataFormatterHelper } from "../helpers/format.helper";
-import { AddressRepository } from "../repositories/address.repository";
 import { MarketRepository } from "../repositories/market.repository";
-import { PhoneNumberRepository } from "../repositories/phone-number.repository";
 import { InternalServerException } from "../utils/exceptions/internal-server.exception";
 import { NotFoundException } from "../utils/exceptions/not-found.exception";
 import { WinstonLogger } from "../utils/logger/winston.logger";
+import { MarketCreateDto } from "./dtos/market-create.dto";
 import { MarketUpdateDto } from "./dtos/market-update.dto";
 
 export class MarketService {
     constructor(
         private readonly marketRepository: MarketRepository,
-        private readonly addressRepository: AddressRepository,
-        private readonly phoneNumberRepository: PhoneNumberRepository,
         private readonly logger: WinstonLogger
     ) { }
 
+    async createMarket(market: MarketCreateDto) {
+        try {
+            const createdMarket = await this.marketRepository.createMarket(market);
+            return createdMarket;
+        } catch (e) {
+            this.logger.error(`${ErrorMessages.CREATE_MARKET_FAILED}: ${e}`);
+            throw new InternalServerException(ErrorMessages.CREATE_MARKET_FAILED);
+        }
+    }
+
+    async findMarketNames() {
+        try {
+            const names = await this.marketRepository.findNames();
+            return names;
+        } catch (e) {
+            this.logger.error(`${ErrorMessages.GET_MARKET_NAMES_FAILED}: ${e}`);
+            throw new InternalServerException(ErrorMessages.GET_MARKET_NAMES_FAILED);
+        }
+    }
+
     async getMarketById(id: string) {
         try {
-            const market = await this.marketRepository.getMarketById(id);
+            const market = await this.marketRepository.findById(id);
             if (!market) {
                 throw new NotFoundException(ErrorMessages.MARKET_NOT_FOUND);
             }
@@ -30,35 +45,22 @@ export class MarketService {
         }
     }
 
+    async getMarketByName(name: string) {
+        try {
+            const market = await this.marketRepository.findByName(name);
+            if (!market) {
+                throw new NotFoundException(ErrorMessages.MARKET_NOT_FOUND);
+            }
+            return market;
+        } catch (e) {
+            this.logger.error(`${ErrorMessages.GET_MARKET_BY_NAME_FAILED}: ${e}`);
+            throw new InternalServerException(ErrorMessages.GET_MARKET_BY_NAME_FAILED);
+        }
+    }
+
     async updateMarket(marketId: string, marketUpdateDto: MarketUpdateDto) {
         try {
-            const { phoneNumbers, addresses, brandName } = marketUpdateDto;
-            let market: Prisma.MarketUpdateInput = {};
-            // Update Brand Name
-            if (brandName) {
-                market.brandName = brandName;
-            }
-
-            // Update Phone Numbers
-            if (phoneNumbers) {
-                const mappedPhoneNumbers = DataFormatterHelper.formatPhoneNumbers(phoneNumbers);
-                await this.phoneNumberRepository.deleteMarketNumbers(marketId);
-                await this.phoneNumberRepository.createPhoneNumbers(mappedPhoneNumbers);
-            }
-
-            // Update Addresses
-            if (addresses) {
-                addresses.map(async (address) => {
-                    const addressInstance = await this.addressRepository.getUniqueByMarketId(address.name, marketId);
-                    if (addressInstance) {
-                        await this.addressRepository.updateByMarketId(address.name, marketId, address);
-                    } else {
-                        await this.addressRepository.createMarketAddress(marketId, address);
-                    }
-                })
-            }
-
-            const updatedMarket = await this.marketRepository.update(marketId, market);
+            const updatedMarket = await this.marketRepository.updateMarket(marketId, marketUpdateDto);
             return updatedMarket;
         } catch (e) {
             this.logger.error(`${ErrorMessages.UPDATE_MARKET_FAILED}: ${e}`);
@@ -68,7 +70,7 @@ export class MarketService {
 
     async deleteMarket(marketId: string) {
         try {
-            await this.marketRepository.delete(marketId);
+            await this.marketRepository.deleteMarket(marketId);
             return true;
         } catch (e) {
             this.logger.error(`${ErrorMessages.DELETE_MARKET_FAILED}: ${e}`);

@@ -1,163 +1,78 @@
 import { Market, Prisma } from "@prisma/client";
-import { IMarketRepository } from "./interfaces/market.repository.interface";
-import { databaseService } from "../utils/database";
 import { DefaultArgs } from "@prisma/client/runtime/library";
+import { databaseService } from "../utils/database";
 
-export class MarketRepository implements IMarketRepository {
+
+export class MarketRepository {
     private readonly marketDelegate: Prisma.MarketDelegate<DefaultArgs>;
-
     constructor() {
         this.marketDelegate = databaseService.market;
     }
 
-    findAll(): Promise<Market[]> {
+    findNames(): Promise<string[]> {
         return new Promise(async (resolve, reject) => {
             try {
-                const markets = await this.marketDelegate.findMany();
-                resolve(markets)
-            } catch (e) {
-                reject(e)
+                const names = await this.marketDelegate.findMany({ select: { name: true } });
+                resolve(names.map(n => n.name));
+            } catch (error) {
+                reject(error);
             }
-        })
+        });
     }
 
-    getMarketById(id: string, options: { products: boolean } = { products: false }): Promise<Market | null> {
+    findByName(name: string): Promise<Market | null> {
         return new Promise(async (resolve, reject) => {
             try {
-                const market = await this.marketDelegate.findUnique({
-                    where: { id },
-                    include: {
-                        addresses: true,
-                        phoneNumbers: true,
-                        products: options.products
-                    }
-                });
-                resolve(market)
-            } catch (e) {
-                reject(e);
+                const market = await this.marketDelegate.findUnique({ where: { name } });
+                resolve(market);
+            } catch (error) {
+                reject(error);
             }
-        })
+        });
     }
 
-    getMarketByEmail(email: string, options: { products: boolean } = { products: false }): Promise<Market | null> {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const market = await this.marketDelegate.findUnique({
-                    where: { email },
-                    include: {
-                        addresses: true,
-                        phoneNumbers: true,
-                        products: options.products
-                    }
-                });
-                resolve(market)
-            } catch (e) {
-                reject(e);
-            }
-        })
-    }
-
-    getMarketByBrandName(brandName: string, options: { products: boolean } = { products: false }): Promise<Market | null> {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const market = await this.marketDelegate.findUnique({
-                    where: { brandName },
-                    include: {
-                        addresses: true,
-                        phoneNumbers: true,
-                        products: options.products
-                    }
-                });
-                resolve(market)
-            } catch (e) {
-                reject(e);
-            }
-        })
-    }
-
-    getMarketByGoogleId(googleId: string): Promise<Market | null>{
-        return new Promise(async (resolve, reject) => {
-            try {
-                const market = await this.marketDelegate.findUnique({
-                    where: { googleId },
-                    include: {
-                        addresses: true,
-                        phoneNumbers: true,
-                    }
-                });
-                resolve(market)
-            } catch (e) {
-                reject(e);
-            }
-        })
-    }
-
-    isEmailVerified(id: string): Promise<boolean> {
+    findById(id: string): Promise<Market | null> {
         return new Promise(async (resolve, reject) => {
             try {
                 const market = await this.marketDelegate.findUnique({ where: { id } });
-                resolve(!!market?.emailVerifiedAt);
-            } catch (e) {
-                reject(e);
+                resolve(market);
+            } catch (error) {
+                reject(error);
             }
-        })
+        });
     }
 
-    update(id: string, data: Prisma.MarketUpdateInput): Promise<Market> {
+    createMarket(market: Prisma.MarketCreateInput): Promise<Market> {
         return new Promise(async (resolve, reject) => {
             try {
-                const market = await this.marketDelegate.update({
-                    where: { id }, data,
-                    include: {
-                        addresses: true,
-                        phoneNumbers: true
-                    }
-                });
-                resolve(market)
-            } catch (e) {
-                reject(e);
+                const createdMarket = await this.marketDelegate.create({ data: market });
+                resolve(createdMarket);
+            } catch (error) {
+                reject(error);
             }
-        })
+        });
     }
 
-    create(data: Prisma.MarketCreateInput, addresses: Prisma.AddressCreateManyMarketInput[] = [], phoneNumbers: Prisma.PhoneNumberCreateManyMarketInput[] = []): Promise<Market> {
+    updateMarket(id: string, market: Prisma.MarketUpdateInput): Promise<Market> {
         return new Promise(async (resolve, reject) => {
             try {
-                const market = await this.marketDelegate.create({
-                    data: {
-                        ...data,
-                        addresses: {
-                            createMany: {
-                                data: addresses
-                            }
-                        },
-                        phoneNumbers: {
-                            createMany: {
-                                data: phoneNumbers
-                            }
-                        }
-                    },
-                    include: {
-                        addresses: true,
-                        phoneNumbers: true
-                    }
-                });
-                resolve(market)
-            } catch (e) {
-                reject(e);
+                const updatedMarket = await this.marketDelegate.update({ where: { id }, data: market });
+                resolve(updatedMarket);
+            } catch (error) {
+                reject(error);
             }
-        })
+        });
     }
 
-
-    delete(id: string): Promise<boolean> {
+    deleteMarket(id: string): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
             try {
                 await this.marketDelegate.delete({ where: { id } });
-                resolve(true)
-            } catch (e) {
-                reject(e);
+                resolve(true);
+            } catch (error) {
+                reject(error);
             }
-        })
+        });
     }
+    
 }

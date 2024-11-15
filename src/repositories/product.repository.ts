@@ -33,10 +33,10 @@ export class ProductRepository {
         });
     }
 
-    getMarketProducts(marketId: string): Promise<Product[]> {
+    getMerchantProducts(merchantId: string): Promise<Product[]> {
         return new Promise(async (resolve, reject) => {
             try {
-                const products = await this.productDelegate.findMany({ where: { marketId } });
+                const products = await this.productDelegate.findMany({ where: { merchantId } });
                 resolve(products);
             } catch (error) {
                 reject(error);
@@ -44,12 +44,12 @@ export class ProductRepository {
         });
     }
 
-    getFeaturedProducts(marketId: string): Promise<Product[]> {
+    getFeaturedProducts(merchantId: string): Promise<Product[]> {
         return new Promise(async (resolve, reject) => {
             try {
                 const products = await this.productDelegate.findMany({
                     where: {
-                        marketId,
+                        merchantId,
                         NOT: { featuredDate: null }
                     },
                     orderBy: {
@@ -77,15 +77,15 @@ export class ProductRepository {
         });
     }
 
-    create(marketId: string, product: Prisma.ProductCreateWithoutMarketInput): Promise<Product> {
+    create(merchantId: string, product: Prisma.ProductCreateWithoutMerchantInput): Promise<Product> {
         return new Promise(async (resolve, reject) => {
             try {
                 const newProduct = await this.productDelegate.create({
                     data: {
                         ...product,
-                        market: {
+                        merchant: {
                             connect: {
-                                id: marketId
+                                id: merchantId
                             }
                         }
                     }

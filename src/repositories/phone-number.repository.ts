@@ -21,10 +21,10 @@ export class PhoneNumberRepository {
         })
     }
 
-    findMarketPhoneNumbers(marketId: string): Promise<PhoneNumber[]> {
+    findMerchantPhoneNumbers(merchantId: string): Promise<PhoneNumber[]> {
         return new Promise(async (resolve, reject) => {
             try {
-                const numbers = await this.phoneNumberDelegate.findMany({ where: { marketId } });
+                const numbers = await this.phoneNumberDelegate.findMany({ where: { merchantId } });
                 resolve(numbers)
             } catch (e) {
                 reject(e)
@@ -32,17 +32,29 @@ export class PhoneNumberRepository {
         })
     }
 
-    createPhoneNumbers(phoneNumbers: Prisma.PhoneNumberCreateInput[]): Promise<boolean> {
+    createCustomerPhoneNumbers(customerId: string, phoneNumbers: Prisma.PhoneNumberCreateInput[]): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
             try {
-                await this.phoneNumberDelegate.createMany({ data: phoneNumbers });
+                const data = phoneNumbers.map(phoneNumber => ({ ...phoneNumber, customerId }));
+                await this.phoneNumberDelegate.createMany({ data });
                 resolve(true);
             } catch (e) {
                 reject(e);
             }
-        })
+        });
     }
 
+    createMerchantPhoneNumbers(merchantId: string, phoneNumbers: Prisma.PhoneNumberCreateInput[]): Promise<boolean> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const data = phoneNumbers.map(phoneNumber => ({ ...phoneNumber, merchantId }));
+                await this.phoneNumberDelegate.createMany({ data });
+                resolve(true);
+            } catch (e) {
+                reject(e);
+            }
+        });
+    }
     deleteCustomerNumbers(customerId: string): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
             try {
@@ -54,10 +66,10 @@ export class PhoneNumberRepository {
         })
     }
 
-    deleteMarketNumbers(marketId: string): Promise<boolean> {
+    deleteMerchantNumbers(merchantId: string): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
             try {
-                await this.phoneNumberDelegate.deleteMany({ where: { marketId } });
+                await this.phoneNumberDelegate.deleteMany({ where: { merchantId } });
                 resolve(true);
             } catch (e) {
                 reject(e)

@@ -12,7 +12,7 @@ export class ProductController {
     constructor(private readonly productService: ProductService) { }
 
     private formatProductData(productData: Product): void {
-        DataFormatterHelper.formatDatabaseObject<Product>(productData, ["marketId"]);
+        DataFormatterHelper.formatDatabaseObject<Product>(productData, ["merchantId"]);
     }
     /**
  * Get Product by Id
@@ -39,7 +39,7 @@ export class ProductController {
  */
     createProduct: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            const result = await this.productService.createProduct(request.body.market.id,request.body);
+            const result = await this.productService.createProduct(request.body.merchant.id,request.body);
             this.formatProductData(result);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.CREATE_PRODUCT_SUCCESS, result);
             return response.status(HttpStatus.CREATED).send(resObj);
@@ -57,7 +57,7 @@ export class ProductController {
 
     updateProduct: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            const result = await this.productService.updateProduct(request.params.id, request.body, request.body.market.id);
+            const result = await this.productService.updateProduct(request.params.id, request.body, request.body.merchant.id);
             this.formatProductData(result);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.UPDATE_PRODUCT_SUCCESS, result);
             return response.status(HttpStatus.OK).send(resObj);

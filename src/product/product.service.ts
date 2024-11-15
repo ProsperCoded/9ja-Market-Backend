@@ -30,11 +30,11 @@ export class ProductService {
         }
     }
 
-    async createProduct(marketId: string, productData: ProductCreateDto): Promise<Product> {
+    async createProduct(merchantId: string, productData: ProductCreateDto): Promise<Product> {
         try {
             const displayImage = DefaultValues.PRODUCT_DISPLAY_IMAGE;
             const productCreateData = { ...productData, displayImage };
-            const product = await this.productRepository.create(marketId, productCreateData);
+            const product = await this.productRepository.create(merchantId, productCreateData);
             return product;
         } catch (e) {
             this.logger.error(`${ErrorMessages.CREATE_PRODUCT_FAILED}: ${e}`);
@@ -42,17 +42,17 @@ export class ProductService {
         }
     }
 
-    async updateProduct(id: string, productData: ProductUpdateDto, marketId: string): Promise<Product> {
+    async updateProduct(id: string, productData: ProductUpdateDto, merchantId: string): Promise<Product> {
         try {
             const product = await this.productRepository.getById(id);
             if (!product) {
                 throw new NotFoundException(ErrorMessages.PRODUCT_NOT_FOUND);
             }
 
-            // Ensure Market is Authorized to Update Product
-            if (product.marketId !== marketId) {
-                this.logger.error(ErrorMessages.MARKET_UNAUTHORIZED);
-                throw new UnauthorizedException(ErrorMessages.MARKET_UNAUTHORIZED);
+            // Ensure MerMerchantchant is Authorized to Update Product
+            if (product.merchantId !== merchantId) {
+                this.logger.error(ErrorMessages.MERCHANT_UNAUTHORIZED);
+                throw new UnauthorizedException(ErrorMessages.MERCHANT_UNAUTHORIZED);
             }
 
             const updatedProduct = await this.productRepository.update(id, productData);

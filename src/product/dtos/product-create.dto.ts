@@ -1,7 +1,7 @@
 import { $Enums, Prisma } from "@prisma/client";
 import { IsArray, IsDefined, IsIn, IsNumber, IsString } from "class-validator";
 
-interface IProductCreateDto extends Omit<Prisma.ProductCreateInput, "displayImages" | "displayImage" | "market"> {}
+interface IProductCreateDto extends Omit<Prisma.ProductCreateInput, "displayImages" | "displayImage" | "merchant"> {}
 
 export class ProductCreateDto implements IProductCreateDto {
     @IsDefined()

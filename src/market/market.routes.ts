@@ -2,35 +2,34 @@ import { Router } from "express";
 import { MarketController } from "./market.controller";
 import { MarketService } from "./market.service";
 import { MarketRepository } from "../repositories/market.repository";
-import { AddressRepository } from "../repositories/address.repository";
-import { PhoneNumberRepository } from "../repositories/phone-number.repository";
 import { WinstonLogger } from "../utils/logger/winston.logger";
 import { Validator } from "../utils/middlewares/validator.middleware";
-import { MarketAuthGaurd } from "../utils/middlewares/guards/market.auth.guard";
-import { JWTService } from "../utils/jwt/jwt.service";
 import { IdDto } from "../dtos/id.dto";
 import { MarketUpdateDto } from "./dtos/market-update.dto";
+import { MarketCreateDto } from "./dtos/market-create.dto";
+import { GetByNameDto } from "./dtos/get-by-name.dto";
 
 const router = Router();
-const addressRepository = new AddressRepository();
-const phoneNumberRepository = new PhoneNumberRepository();
 const marketRepository = new MarketRepository();
 const logger = new WinstonLogger("MarketService");
-const jwtService = new JWTService();
-const marketService = new MarketService(marketRepository, addressRepository, phoneNumberRepository, logger);
+const marketService = new MarketService(marketRepository, logger);
 const marketController = new MarketController(marketService);
 const validator = new Validator();
-const marketAuthGaurd = new MarketAuthGaurd(marketRepository, logger, jwtService);
+
+router.get("/names", marketController.getMarketNames);
+
+router.get("/", validator.single(GetByNameDto, "body"), marketController.getMarketByName);
+
+router.get("/:marketId", validator.single(IdDto, "params"), marketController.getMarketById);
 
 
-router.get("/:marketId", marketAuthGaurd.authorise({ id: true }), validator.single(IdDto, "params"), marketController.getMarketById);
+router.post("/", validator.single(MarketCreateDto, "body"), marketController.createMarket);
 
-router.put("/:marketId", marketAuthGaurd.authorise({ id: true }), validator.multiple([
+router.put("/:marketId", validator.multiple([
     { schema: IdDto, source: "params" },
     { schema: MarketUpdateDto, source: "body" }
 ]), marketController.updateMarket);
 
-router.delete("/:marketId", marketAuthGaurd.authorise({ id: true }), validator.single(IdDto, "params"), marketController.deleteMarket);
-
+router.delete("/:marketId", validator.single(IdDto, "params"), marketController.deleteMarket);
 
 export default router;

@@ -9,8 +9,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Customer {
@@ -30,8 +30,6 @@ model Customer {
   addresses             Address[]
   cart                  CartProduct[]
   phoneNumbers          PhoneNumber[]
-  deliveries            Delivery[]
-  transactions          Transaction[]
   ratings               Rating[]
   createdAt             DateTime      @default(now())
   updatedAt             DateTime      @updatedAt
@@ -39,27 +37,42 @@ model Customer {
   @@index([email])
 }
 
-model Market {
-  id                    String               @id @default(uuid())
-  googleId              String?              @unique
-  email                 String               @unique
-  brandName             String               @unique
+model Merchant {
+  id                    String                 @id @default(uuid())
+  googleId              String?                @unique
+  email                 String                 @unique
+  brandName             String                 @unique
   password              String?
   emailVerifiedAt       DateTime?
   emailVerificationCode String?
   passwordResetCode     String?
   displayImage          String?
   refreshToken          String?
-  marketCategories      MarketCategory[]
+  market                Market?                 @relation(fields: [marketId], references: [id])
+  merchantCategories    MerchantCategory[]
   addresses             Address[]
   phoneNumbers          PhoneNumber[]
   products              Product[]
-  verification          MarketVerification[]
-  createdAt             DateTime             @default(now())
-  updatedAt             DateTime             @updatedAt
+  verification          MerchantVerification[]
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
   transactions          Transaction[]
+  marketId              String?
 
   @@index([email, brandName])
+}
+
+model Market {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  description String?
+  address     String
+  city        String?
+  state       String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  deletedAt   DateTime?
+  merchants   Merchant[]
 }
 
 model Product {
@@ -76,11 +89,11 @@ model Product {
   ratings      Rating[]
   cart         CartProduct[]
   category     ProductCategory
-  market       Market          @relation(fields: [marketId], references: [id])
+  merchant     Merchant        @relation(fields: [merchantId], references: [id])
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt
   deletedAt    DateTime?
-  marketId     String
+  merchantId   String
 
   @@index([name])
 }
@@ -89,7 +102,6 @@ model Order {
   id            String        @id @default(uuid())
   customer      Customer      @relation(fields: [customerId], references: [id])
   products      CartProduct[]
-  delivery      Delivery?
   transaction   Transaction   @relation(fields: [transactionId], references: [id])
   status        OrderStatus
   createdAt     DateTime      @default(now())
@@ -102,8 +114,7 @@ model Order {
 
 model Transaction {
   id         String    @id @default(uuid())
-  customer   Customer  @relation(fields: [customerId], references: [id])
-  market     Market    @relation(fields: [marketId], references: [id])
+  merchant   Merchant  @relation(fields: [merchantId], references: [id])
   order      Order?
   amount     Float
   status     String
@@ -111,7 +122,7 @@ model Transaction {
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
   customerId String
-  marketId   String
+  merchantId String
 }
 
 model CartProduct {
@@ -132,9 +143,9 @@ model CartProduct {
 }
 
 model Address {
-  id         String     @id @default(uuid())
-  customer   Customer?  @relation(fields: [customerId], references: [id])
-  market     Market?    @relation(fields: [marketId], references: [id])
+  id         String    @id @default(uuid())
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  merchant   Merchant? @relation(fields: [merchantId], references: [id])
   name       String
   address    String
   city       String
@@ -142,32 +153,17 @@ model Address {
   country    String
   zipCode    String?
   postalCode String?
-  isPrimary  Boolean    @default(false)
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  isPrimary  Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
   customerId String?
-  marketId   String?
-  deliveries Delivery[]
+  merchantId String?
 
   @@unique([name, customerId])
-  @@unique([name, marketId])
+  @@unique([name, merchantId])
   @@index([name, customerId])
-  @@index([name, marketId])
-}
-
-model Delivery {
-  id         String         @id @default(uuid())
-  order      Order          @relation(fields: [orderId], references: [id])
-  address    Address        @relation(fields: [addressId], references: [id])
-  status     DeliveryStatus
-  createdAt  DateTime       @default(now())
-  updatedAt  DateTime       @updatedAt
-  deletedAt  DateTime?
-  customer   Customer?      @relation(fields: [customerId], references: [id])
-  customerId String?
-  orderId    String         @unique
-  addressId  String
+  @@index([name, merchantId])
 }
 
 model ProductImage {
@@ -183,14 +179,14 @@ model ProductImage {
 model PhoneNumber {
   id         String    @id @default(uuid())
   customer   Customer? @relation(fields: [customerId], references: [id])
-  market     Market?   @relation(fields: [marketId], references: [id])
+  merchant   Merchant? @relation(fields: [merchantId], references: [id])
   number     String
   isPrimary  Boolean   @default(false)
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   deletedAt  DateTime?
   customerId String?
-  marketId   String?
+  merchantId String?
 }
 
 model Rating {
@@ -209,31 +205,31 @@ model Rating {
   @@index([productId])
 }
 
-model MarketVerification {
-  id        String                   @id @default(uuid())
-  market    Market                   @relation(fields: [marketId], references: [id])
-  status    MarketVerificationStatus
-  type      MarketVerificationType
-  scope     MarketVerificationScope
-  document  String
-  createdAt DateTime                 @default(now())
-  updatedAt DateTime                 @updatedAt
-  deletedAt DateTime?
-  marketId  String
+model MerchantVerification {
+  id         String                     @id @default(uuid())
+  merchant   Merchant                   @relation(fields: [merchantId], references: [id])
+  status     MerchantVerificationStatus
+  type       MerchantVerificationType
+  scope      MerchantVerificationScope
+  document   String
+  createdAt  DateTime                   @default(now())
+  updatedAt  DateTime                   @updatedAt
+  deletedAt  DateTime?
+  merchantId String
 }
 
-enum MarketVerificationStatus {
+enum MerchantVerificationStatus {
   PENDING
   APPROVED
   REJECTED
 }
 
-enum MarketVerificationType {
+enum MerchantVerificationType {
   BUSINESS_REGISTRATION
   IDENTITY_VERIFICATION
 }
 
-enum MarketVerificationScope {
+enum MerchantVerificationScope {
   NIN
   CAC
   UTILITY_BILL
@@ -259,7 +255,7 @@ enum ProductCategory {
   TOYS
 }
 
-enum MarketCategory {
+enum MerchantCategory {
   GROCERY
   PHARMACY
   RESTAURANT
@@ -270,10 +266,4 @@ enum MarketCategory {
   HARDWARE
   SPORTS
   TOYS
-}
-
-enum DeliveryStatus {
-  PICKED_UP
-  DELIVERED
-  CANCELLED
 }

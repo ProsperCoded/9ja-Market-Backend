@@ -3,12 +3,13 @@ import { Type } from "class-transformer";
 import { ArrayMaxSize, ArrayMinSize, IsArray, IsDefined, IsEmail, IsIn, IsNotEmpty, IsString, IsStrongPassword, ValidateNested } from "class-validator";
 import { AddressCreateDto } from "../../dtos/address-create.dto";
 
-interface MarketCreateInput extends Omit<Prisma.MarketCreateInput, "phoneNumbers" | "addresses"> {
+interface MerchantCreateInput extends Omit<Prisma.MerchantCreateInput, "phoneNumbers" | "addresses" | "market"> {
     phoneNumbers?: string[];
     addresses?: AddressCreateDto[];
+    marketName: string;
 }
 
-export class MarketRegisterRequestDto implements MarketCreateInput {
+export class MerchantRegisterRequestDto implements MerchantCreateInput {
     @IsDefined()
     @IsNotEmpty()
     @IsEmail()
@@ -28,8 +29,8 @@ export class MarketRegisterRequestDto implements MarketCreateInput {
     @IsDefined()
     @IsArray()
     @IsString({ each: true })
-    @IsIn(Object.values($Enums.MarketCategory), { each: true })
-    declare marketCategories?: $Enums.MarketCategory[];
+    @IsIn(Object.values($Enums.MerchantCategory), { each: true })
+    declare merchantCategories?: $Enums.MerchantCategory[];
 
     @IsDefined()
     @IsArray()
@@ -43,4 +44,9 @@ export class MarketRegisterRequestDto implements MarketCreateInput {
     @ValidateNested({ each: true })
     @Type(() => AddressCreateDto)
     declare addresses: AddressCreateDto[];
+
+    @IsDefined()
+    @IsNotEmpty()
+    @IsString()
+    declare marketName: string;
 }

@@ -1,31 +1,30 @@
+import { Prisma } from "@prisma/client";
 import { IsDefined, IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { MarketCreateDto } from "./market-create.dto";
 
-export class MarketUpdateDto implements Partial<MarketCreateDto> {
-    @IsOptional()
+
+export class MarketCreateDto implements Prisma.MarketCreateInput{
     @IsDefined()
     @IsString()
     @IsNotEmpty()
-    name?: string;
+    declare name: string;
 
-    @IsOptional()
     @IsDefined()
     @IsString()
     @IsNotEmpty()
-    address?: string;
+    declare address: string;
 
     @IsOptional()
     @IsString()
     @IsNotEmpty()
-    description?: string;
+    declare description: string;
 
     @IsOptional()
     @IsString()
     @IsNotEmpty()
-    city?: string;
+    declare city: string;
 
     @IsOptional()
     @IsString()
     @IsNotEmpty()
-    state?: string;
+    declare state: string; 
 }
