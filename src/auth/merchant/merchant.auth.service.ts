@@ -22,6 +22,7 @@ import { MerchantRegisterRequestDto } from "../dtos/merchant-register-request.dt
 import { IVerifyEmailRequest, VerifyEmailRequestByCodeDto, VerifyEmailRequestByTokenDto } from "../dtos/verify-email-request.dto";
 import { DataFormatterHelper } from "../../helpers/format.helper";
 import { Prisma } from "@prisma/client";
+import { MarketRepository } from "../../repositories/market.repository";
 
 
 export class MerchantAuthService implements IAuthService {
@@ -31,12 +32,14 @@ export class MerchantAuthService implements IAuthService {
     private readonly emailService: EmailService;
     private readonly eventEmiter: EventEmitter;
     private readonly merchantRepository: MerchantRepository;
+    private readonly marketRepository: MarketRepository;
 
     constructor(
         logger: ILogger,
         bcryptService: BcryptService,
         jwtService: JWTService,
-        merchantRepository: MerchantRepository
+        merchantRepository: MerchantRepository,
+        marketRepository: MarketRepository
     ) {
         this.logger = logger;
         this.bcryptService = bcryptService;
@@ -44,6 +47,7 @@ export class MerchantAuthService implements IAuthService {
         this.emailService = new EmailService();
         this.eventEmiter = eventEmmiter;
         this.merchantRepository = merchantRepository;
+        this.marketRepository = marketRepository;
         this.initializeEventHandlers();
     }
 
@@ -155,14 +159,28 @@ export class MerchantAuthService implements IAuthService {
             throw new BadRequestException(ErrorMessages.BRAND_NAME_EXISTS);
         }
 
+        // Ensure marketName exists
+        const market = await this.marketRepository.findByName(registerData.marketName);
+        if (!market) {
+            this.logger.error(ErrorMessages.MARKET_NOT_EXISTS);
+            throw new NotFoundException(ErrorMessages.MARKET_NOT_EXISTS);
+        }
+
+
         try {
             const hashedPassword = await this.bcryptService.hashPassword(password);
             registerData.password = hashedPassword;
 
             // Create new merchant
             const { addresses, phoneNumbers, ...newMerchantData } = registerData;
+            // Ensure addresses have different names
+            const addressNames = addresses.map(address => address.name);
+            if (new Set(addressNames).size !== addressNames.length) {
+                this.logger.error(ErrorMessages.DUPLICATE_ADDRESS_NAME);
+                throw new BadRequestException(ErrorMessages.DUPLICATE_ADDRESS_NAME);
+            }
             const formattedPhoneNumbers = DataFormatterHelper.formatPhoneNumbers(phoneNumbers);
-            const newMerchant = await this.merchantRepository.create(newMerchantData, addresses, formattedPhoneNumbers);
+            const newMerchant = await this.merchantRepository.create(newMerchantData, addresses, formattedPhoneNumbers, market.name);
 
             // Send welcome email
             this.eventEmiter.emit("sendMerchantWelcomeEmail", { email, brandName });

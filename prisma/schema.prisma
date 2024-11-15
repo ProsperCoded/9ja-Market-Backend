@@ -65,7 +65,7 @@ model Merchant {
 model Market {
   id          String     @id @default(uuid())
   name        String     @unique
-  description String
+  description String?
   address     String
   city        String?
   state       String?

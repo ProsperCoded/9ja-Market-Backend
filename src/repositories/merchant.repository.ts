@@ -120,7 +120,7 @@ export class MerchantRepository implements IMerchantRepository {
         })
     }
 
-    create(data: Prisma.MerchantCreateInput, addresses: Prisma.AddressCreateManyMerchantInput[] = [], phoneNumbers: Prisma.PhoneNumberCreateManyMerchantInput[] = []): Promise<Merchant> {
+    create(data: Prisma.MerchantCreateInput, addresses: Prisma.AddressCreateManyMerchantInput[] = [], phoneNumbers: Prisma.PhoneNumberCreateManyMerchantInput[] = [], marketName?: string): Promise<Merchant> {
         return new Promise(async (resolve, reject) => {
             try {
                 const merchant = await this.merchantDelegate.create({
@@ -134,6 +134,11 @@ export class MerchantRepository implements IMerchantRepository {
                         phoneNumbers: {
                             createMany: {
                                 data: phoneNumbers
+                            }
+                        },
+                        market: {
+                            connect: {
+                                name: marketName
                             }
                         }
                     },

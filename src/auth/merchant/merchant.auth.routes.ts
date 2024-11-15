@@ -13,6 +13,7 @@ import { VerifyEmailRequestByCodeDto, VerifyEmailRequestByTokenDto } from "../dt
 import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
 import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
 import passport from "passport";
+import { MarketRepository } from "../../repositories/market.repository";
 
 const router = Router();
 const validator = new Validator();
@@ -22,10 +23,11 @@ const logger = new WinstonLogger('MerchantAuthService');
 const bcryptService = new BcryptService();
 const jwtService = new JWTService();
 const merchantRepository = new MerchantRepository();
+const marketRepository = new MarketRepository();
 
 
 // Merchant Auth Service
-const merchantAuthService = new MerchantAuthService(logger, bcryptService, jwtService, merchantRepository);
+const merchantAuthService = new MerchantAuthService(logger, bcryptService, jwtService, merchantRepository, marketRepository);
 
 // Merchant Auth Controller
 const merchantAuthController = new MerchantAuthController(merchantAuthService);

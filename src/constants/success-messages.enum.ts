@@ -28,4 +28,8 @@ export enum SuccessMessages {
   UPDATE_RATING_SUCCESS = 'Update Rating Successful',
   DELETE_RATING_SUCCESS = 'Delete Rating Successful',
   WELCOME_HOME = 'Welcome Home',
+  GET_MARKET_SUCCESS = 'Get Market Successful',
+  CREATE_MARKET_SUCCESS = 'Market Created Successfully',
+  UPDATE_MARKET_SUCCESS = 'Market Updated Successfully',
+  DELETE_MARKET_SUCCESS = 'Market Deleted Successfully'
 }
