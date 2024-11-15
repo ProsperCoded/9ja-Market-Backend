@@ -10,25 +10,27 @@ import { MerchantAuthGaurd } from "../utils/middlewares/guards/merchant.auth.gua
 import { JWTService } from "../utils/jwt/jwt.service";
 import { IdDto } from "../dtos/id.dto";
 import { MerchantUpdateDto } from "./dtos/merchant-update.dto";
+import { MarketRepository } from "../repositories/market.repository";
 
 const router = Router();
 const addressRepository = new AddressRepository();
 const phoneNumberRepository = new PhoneNumberRepository();
 const merchantRepository = new MerchantRepository();
+const marketRepository = new MarketRepository();
 const logger = new WinstonLogger("MerchantService");
 const jwtService = new JWTService();
-const merchantService = new MerchantService(merchantRepository, addressRepository, phoneNumberRepository, logger);
+const merchantService = new MerchantService(merchantRepository,marketRepository, addressRepository, phoneNumberRepository, logger);
 const merchantController = new MerchantController(merchantService);
 const validator = new Validator();
 const merchantAuthGaurd = new MerchantAuthGaurd(merchantRepository, logger, jwtService);
 
 
-router.get("/:merchantId", merchantAuthGaurd.authorise({ id: true }), validator.single(IdDto, "params"), merchantController.getMerchantById);
+router.get("/:merchantId", validator.single(IdDto, "params"), merchantAuthGaurd.authorise({ id: true }), merchantController.getMerchantById);
 
-router.put("/:merchantId", merchantAuthGaurd.authorise({ id: true }), validator.multiple([
+router.put("/:merchantId", validator.multiple([
     { schema: IdDto, source: "params" },
     { schema: MerchantUpdateDto, source: "body" }
-]), merchantController.updateMerchant);
+]), merchantAuthGaurd.authorise({ id: true }), merchantController.updateMerchant);
 
 router.delete("/:merchantId", merchantAuthGaurd.authorise({ id: true }), validator.single(IdDto, "params"), merchantController.deleteMerchant);
 

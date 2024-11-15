@@ -32,17 +32,29 @@ export class PhoneNumberRepository {
         })
     }
 
-    createPhoneNumbers(phoneNumbers: Prisma.PhoneNumberCreateInput[]): Promise<boolean> {
+    createCustomerPhoneNumbers(customerId: string, phoneNumbers: Prisma.PhoneNumberCreateInput[]): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
             try {
-                await this.phoneNumberDelegate.createMany({ data: phoneNumbers });
+                const data = phoneNumbers.map(phoneNumber => ({ ...phoneNumber, customerId }));
+                await this.phoneNumberDelegate.createMany({ data });
                 resolve(true);
             } catch (e) {
                 reject(e);
             }
-        })
+        });
     }
 
+    createMerchantPhoneNumbers(merchantId: string, phoneNumbers: Prisma.PhoneNumberCreateInput[]): Promise<boolean> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const data = phoneNumbers.map(phoneNumber => ({ ...phoneNumber, merchantId }));
+                await this.phoneNumberDelegate.createMany({ data });
+                resolve(true);
+            } catch (e) {
+                reject(e);
+            }
+        });
+    }
     deleteCustomerNumbers(customerId: string): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
             try {

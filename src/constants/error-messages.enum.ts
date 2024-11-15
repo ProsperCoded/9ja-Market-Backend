@@ -33,6 +33,7 @@ export enum ErrorMessages {
   GET_MERCHANT_PRODUCTS_FAILED = 'Unable to Fetch Merchant Products',
   GET_FEATURED_PRODUCTS_FAILED = 'Unable to Fetch Featured Products',
   GET_PRODUCT_BY_ID_FAILED = 'Unable to Fetch Product by ID',
+  GET_MARKET_BY_NAME_FAILED = 'Unable to Fetch Market by Name',
   GET_ALL_PRODUCTS_FAILED = 'Unable to Fetch All Products',
   GET_MARKET_BY_ID_FAILED = 'Unable to Fetch Market by ID',
   GET_MARKET_NAMES_FAILED = 'Unable to Fetch Market Names',
@@ -55,6 +56,6 @@ export enum ErrorMessages {
   RATING_DELETE_FAILED = 'Unable to Delete Rating',
   EMAIL_VERIFICATION_FAILED = 'Email Verification Failed',
   BRAND_NAME_EXISTS = 'Brand Name Exists Already',
-  DUPLICATE_ADDRESS_NAME= 'Address Name Already Exists',
+  DUPLICATE_ADDRESS_NAME= 'Duplicate Address Name',
   REFRESH_TOKEN_NOT_EXISTS = 'Refresh Token Does Not Exist, Login Again',
 }

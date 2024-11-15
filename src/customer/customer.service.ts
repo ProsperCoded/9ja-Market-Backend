@@ -51,7 +51,7 @@ export class CustomerService {
             if (phoneNumbers) {
                 const mappedPhoneNumbers = DataFormatterHelper.formatPhoneNumbers(phoneNumbers);
                 await this.phoneNumberRepository.deleteCustomerNumbers(customerId);
-                await this.phoneNumberRepository.createPhoneNumbers(mappedPhoneNumbers);
+                await this.phoneNumberRepository.createCustomerPhoneNumbers(customerId, mappedPhoneNumbers);
             }
 
             // Update Addresses

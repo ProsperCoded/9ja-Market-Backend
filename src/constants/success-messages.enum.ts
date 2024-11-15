@@ -31,5 +31,6 @@ export enum SuccessMessages {
   GET_MARKET_SUCCESS = 'Get Market Successful',
   CREATE_MARKET_SUCCESS = 'Market Created Successfully',
   UPDATE_MARKET_SUCCESS = 'Market Updated Successfully',
-  DELETE_MARKET_SUCCESS = 'Market Deleted Successfully'
+  DELETE_MARKET_SUCCESS = 'Market Deleted Successfully',
+  GET_MARKET_NAMES_SUCCESS = 'Get Market Names Successful',
 }

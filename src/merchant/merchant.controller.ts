@@ -41,7 +41,7 @@ export class MerchantController {
 
     updateMerchant: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            const result = await this.merchantService.updateMerchant(request.params.id, request.body);
+            const result = await this.merchantService.updateMerchant(request.params.merchantId, request.body);
             this.formatMerchantData(result);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.UPDATE_MERCHANT_SUCCESS, result);
             return response.status(HttpStatus.OK).send(resObj);
@@ -59,7 +59,7 @@ export class MerchantController {
 
     deleteMerchant: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            const result = await this.merchantService.deleteMerchant(request.params.id);
+            const result = await this.merchantService.deleteMerchant(request.params.merchantId);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.DELETE_MERCHANT_SUCCESS, result);
             return response.status(HttpStatus.OK).send(resObj);
         } catch (e) {

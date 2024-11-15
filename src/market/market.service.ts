@@ -45,6 +45,19 @@ export class MarketService {
         }
     }
 
+    async getMarketByName(name: string) {
+        try {
+            const market = await this.marketRepository.findByName(name);
+            if (!market) {
+                throw new NotFoundException(ErrorMessages.MARKET_NOT_FOUND);
+            }
+            return market;
+        } catch (e) {
+            this.logger.error(`${ErrorMessages.GET_MARKET_BY_NAME_FAILED}: ${e}`);
+            throw new InternalServerException(ErrorMessages.GET_MARKET_BY_NAME_FAILED);
+        }
+    }
+
     async updateMarket(marketId: string, marketUpdateDto: MarketUpdateDto) {
         try {
             const updatedMarket = await this.marketRepository.updateMarket(marketId, marketUpdateDto);

@@ -103,11 +103,19 @@ export class MerchantRepository implements IMerchantRepository {
         })
     }
 
-    update(id: string, data: Prisma.MerchantUpdateInput): Promise<Merchant> {
+    update(id: string, data: Prisma.MerchantUpdateInput, marketName?: string): Promise<Merchant> {
         return new Promise(async (resolve, reject) => {
             try {
                 const merchant = await this.merchantDelegate.update({
-                    where: { id }, data,
+                    where: { id },
+                    data: {
+                        ...data,
+                        market: marketName ? {
+                            connect: {
+                                name: marketName
+                            }
+                        } : undefined
+                    },
                     include: {
                         addresses: true,
                         phoneNumbers: true

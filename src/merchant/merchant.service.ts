@@ -8,10 +8,12 @@ import { InternalServerException } from "../utils/exceptions/internal-server.exc
 import { NotFoundException } from "../utils/exceptions/not-found.exception";
 import { WinstonLogger } from "../utils/logger/winston.logger";
 import { MerchantUpdateDto } from "./dtos/merchant-update.dto";
+import { MarketRepository } from '../repositories/market.repository';
 
 export class MerchantService {
     constructor(
         private readonly merchantRepository: MerchantRepository,
+        private readonly marketRepository: MarketRepository,
         private readonly addressRepository: AddressRepository,
         private readonly phoneNumberRepository: PhoneNumberRepository,
         private readonly logger: WinstonLogger
@@ -32,7 +34,7 @@ export class MerchantService {
 
     async updateMerchant(merchantId: string, merchantUpdateDto: MerchantUpdateDto) {
         try {
-            const { phoneNumbers, addresses, brandName } = merchantUpdateDto;
+            const { phoneNumbers, addresses, brandName, marketName } = merchantUpdateDto;
             let merchant: Prisma.MerchantUpdateInput = {};
             // Update Brand Name
             if (brandName) {
@@ -43,7 +45,7 @@ export class MerchantService {
             if (phoneNumbers) {
                 const mappedPhoneNumbers = DataFormatterHelper.formatPhoneNumbers(phoneNumbers);
                 await this.phoneNumberRepository.deleteMerchantNumbers(merchantId);
-                await this.phoneNumberRepository.createPhoneNumbers(mappedPhoneNumbers);
+                await this.phoneNumberRepository.createMerchantPhoneNumbers(merchantId, mappedPhoneNumbers);
             }
 
             // Update Addresses
@@ -58,7 +60,16 @@ export class MerchantService {
                 })
             }
 
-            const updatedMerchant = await this.merchantRepository.update(merchantId, merchant);
+            if(marketName) {
+                // Check if market name is unique
+                const marketNameExists = await this.marketRepository.findByName(marketName);
+                if(!marketNameExists) {
+                    throw new NotFoundException(ErrorMessages.MARKET_NOT_FOUND);
+                }
+            }
+
+
+            const updatedMerchant = await this.merchantRepository.update(merchantId, merchant, marketName);
             return updatedMerchant;
         } catch (e) {
             this.logger.error(`${ErrorMessages.UPDATE_MERCHANT_FAILED}: ${e}`);

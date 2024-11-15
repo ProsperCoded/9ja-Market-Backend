@@ -48,6 +48,7 @@ export class Validator {
         return (request: Request, response: Response, next: NextFunction) => {
             args.forEach(({ schema, source = 'body' }) => {
                 validate(plainToInstance(schema, request[source]), { skipMissingProperties: true, whitelist: true, forbidNonWhitelisted: true }).then(errors => {
+                    
                     if (errors.length > 0) {
                         const errorArray = this.getErrors(errors);
                         const errorString = errorArray.join(', ');

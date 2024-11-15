@@ -23,6 +23,7 @@ import { IVerifyEmailRequest, VerifyEmailRequestByCodeDto, VerifyEmailRequestByT
 import { DataFormatterHelper } from "../../helpers/format.helper";
 import { Prisma } from "@prisma/client";
 import { MarketRepository } from "../../repositories/market.repository";
+import { BaseException } from "../../utils/exceptions/base.exception";
 
 
 export class MerchantAuthService implements IAuthService {
@@ -143,7 +144,8 @@ export class MerchantAuthService implements IAuthService {
     }
 
     async register(registerData: MerchantRegisterRequestDto, url: string): Promise<boolean> {
-        const { email, brandName, password } = registerData;
+        const {marketName, ...data} = registerData;
+        const { email, brandName, password } = data;
 
         // Check if email is already registered
         const merchant = await this.merchantRepository.getMerchantByEmail(email);
@@ -160,7 +162,7 @@ export class MerchantAuthService implements IAuthService {
         }
 
         // Ensure marketName exists
-        const market = await this.marketRepository.findByName(registerData.marketName);
+        const market = await this.marketRepository.findByName(marketName);
         if (!market) {
             this.logger.error(ErrorMessages.MARKET_NOT_EXISTS);
             throw new NotFoundException(ErrorMessages.MARKET_NOT_EXISTS);
@@ -169,10 +171,10 @@ export class MerchantAuthService implements IAuthService {
 
         try {
             const hashedPassword = await this.bcryptService.hashPassword(password);
-            registerData.password = hashedPassword;
+            data.password = hashedPassword;
 
             // Create new merchant
-            const { addresses, phoneNumbers, ...newMerchantData } = registerData;
+            const { addresses, phoneNumbers, ...newMerchantData } = data;
             // Ensure addresses have different names
             const addressNames = addresses.map(address => address.name);
             if (new Set(addressNames).size !== addressNames.length) {
@@ -180,7 +182,7 @@ export class MerchantAuthService implements IAuthService {
                 throw new BadRequestException(ErrorMessages.DUPLICATE_ADDRESS_NAME);
             }
             const formattedPhoneNumbers = DataFormatterHelper.formatPhoneNumbers(phoneNumbers);
-            const newMerchant = await this.merchantRepository.create(newMerchantData, addresses, formattedPhoneNumbers, market.name);
+            const newMerchant = await this.merchantRepository.create(newMerchantData, addresses, formattedPhoneNumbers, marketName);
 
             // Send welcome email
             this.eventEmiter.emit("sendMerchantWelcomeEmail", { email, brandName });
@@ -193,6 +195,9 @@ export class MerchantAuthService implements IAuthService {
             this.eventEmiter.emit("sendMerchantEmailVerificationEmail", { email, token, verificationCode, url });
             return true;
         } catch (e) {
+            if(e instanceof BaseException){
+                throw e;
+            }
             this.logger.error(`${ErrorMessages.REGISTER_MERCHANT_FAILED}: ${e}`);
             throw new InternalServerException(ErrorMessages.REGISTER_MERCHANT_FAILED);
         }
@@ -228,13 +233,11 @@ export class MerchantAuthService implements IAuthService {
             await this.merchantRepository.update(merchant.id, { emailVerifiedAt: new Date(), emailVerificationCode: null });
             return true;
         } catch (e) {
-            // if (e instanceof JsonWebTokenError) {
-            this.logger.error(ErrorMessages.INVALID_VERIFICATION_TOKEN);
+            if (e instanceof BaseException) {
+                throw e;
+            }
+            this.logger.error(`${ErrorMessages.INVALID_VERIFICATION_TOKEN}: ${e}`);
             throw new BadRequestException(ErrorMessages.INVALID_VERIFICATION_TOKEN);
-            // } else {
-            //     this.logger.error(`${ErrorMessages.EMAIL_VERIFICATION_FAILED}: ${e}`);
-            //     throw new InternalServerException(ErrorMessages.EMAIL_VERIFICATION_FAILED);
-            // }
         }
 
     }
@@ -271,14 +274,11 @@ export class MerchantAuthService implements IAuthService {
             await this.merchantRepository.update(merchant.id, { password: hashedPassword, passwordResetCode: null });
             return true;
         } catch (e) {
-            // if (e instanceof JsonWebTokenError) {
-            this.logger.error(ErrorMessages.INVALID_VERIFICATION_TOKEN);
-            throw new BadRequestException(ErrorMessages.INVALID_VERIFICATION_TOKEN);
-            // } else {
-            //     this.logger.error(`${ErrorMessages.EMAIL_VERIFICATION_FAILED}: ${e}`);
-            //     throw new InternalServerException(ErrorMessages.EMAIL_VERIFICATION_FAILED);
-            //     // throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.EMAIL_VERIFICATION_FAILED);
-            // }
+            if (e instanceof BaseException) {
+                throw e;
+            }
+            this.logger.error(`${ErrorMessages.INVALID_RESET_TOKEN}: ${e}`);
+            throw new BadRequestException(ErrorMessages.INVALID_RESET_TOKEN);
         }
     }
 

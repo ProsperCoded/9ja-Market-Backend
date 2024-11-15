@@ -23,4 +23,8 @@ export class MerchantUpdateDto implements MerchantUpdateInput{
     @ValidateNested({ each: true })
     @Type(() => AddressCreateDto)
     addresses?: AddressCreateDto[];
+
+    @IsString()
+    @IsNotEmpty()
+    marketName?: string;
 }
