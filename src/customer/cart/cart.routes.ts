@@ -24,19 +24,19 @@ const customerAuthGaurd = new CustomerAuthGaurd(customerRepository, logger, jwtS
 
 
 // Get Cart by Customer Id
-router.get("/:id", customerAuthGaurd.authorise({id: true}), validator.single(IdDto, "params"), cartController.getCart);
+router.get("/:customerId", customerAuthGaurd.authorise({id: true}), validator.single(IdDto, "params"), cartController.getCart);
 
 // Update Cart
-router.put("/:productId", customerAuthGaurd.authorise(), validator.multiple([
+router.put("/:productId", validator.multiple([
     { schema: IdDto, source: "params" },
     { schema: AddToCartDto, source: "body" }
-]), cartController.updateCart);
+]), customerAuthGaurd.authorise(), cartController.updateCart);
 
 // Clear Cart
 router.delete("/clear", customerAuthGaurd.authorise(), cartController.removeAllFromCart);
 
 // Remove product from Cart
-router.delete("/:productId", customerAuthGaurd.authorise(), validator.single(IdDto, "params"), cartController.removeFromCart);
+router.delete("/:productId",  validator.single(IdDto, "params"), customerAuthGaurd.authorise(), cartController.removeFromCart);
 
 
 export default router;

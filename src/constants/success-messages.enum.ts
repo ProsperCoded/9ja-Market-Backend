@@ -33,4 +33,5 @@ export enum SuccessMessages {
   UPDATE_MARKET_SUCCESS = 'Market Updated Successfully',
   DELETE_MARKET_SUCCESS = 'Market Deleted Successfully',
   GET_MARKET_NAMES_SUCCESS = 'Get Market Names Successful',
+  GET_MERCHANT_PRODUCTS_SUCCESS = 'Get Merchant Products Successful',
 }

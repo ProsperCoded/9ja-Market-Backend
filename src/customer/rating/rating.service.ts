@@ -33,20 +33,19 @@ export class RatingService {
         }
     }
 
-    async updateRating(customerId: string, productId: string, data: RatingUpdateDto) {
+    async updateRating(ratingId: string, data: RatingUpdateDto) {
         try {
-            await this.ratingRepository.update(customerId, productId, data);
-            const ratings = await this.getAllRatings(productId);
-            return ratings;
+            await this.ratingRepository.update(ratingId, data);
+            return true;
         } catch (e) {
             this.logger.error(`${ErrorMessages.RATING_UPDATE_FAILED}: ${e}`);
             throw new InternalServerException(ErrorMessages.RATING_UPDATE_FAILED);
         }
     }
 
-    async deleteRating(customerId: string, productId: string) {
+    async deleteRating(ratingId: string) {
         try {
-            await this.ratingRepository.delete(customerId, productId);
+            await this.ratingRepository.delete(ratingId);
             return true;
         } catch (e) {
             this.logger.error(`${ErrorMessages.RATING_DELETE_FAILED}: ${e}`);

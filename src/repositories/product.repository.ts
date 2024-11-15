@@ -78,6 +78,7 @@ export class ProductRepository {
     }
 
     create(merchantId: string, product: Prisma.ProductCreateWithoutMerchantInput): Promise<Product> {
+        console.log(merchantId, product);
         return new Promise(async (resolve, reject) => {
             try {
                 const newProduct = await this.productDelegate.create({

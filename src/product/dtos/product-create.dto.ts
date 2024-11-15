@@ -1,5 +1,5 @@
 import { $Enums, Prisma } from "@prisma/client";
-import { IsArray, IsDefined, IsIn, IsNumber, IsString } from "class-validator";
+import { IsDefined, IsIn, IsNumber, IsOptional, IsString } from "class-validator";
 
 interface IProductCreateDto extends Omit<Prisma.ProductCreateInput, "displayImages" | "displayImage" | "merchant"> {}
 
@@ -16,7 +16,7 @@ export class ProductCreateDto implements IProductCreateDto {
     @IsString()
     declare description: string;
 
-    @IsDefined()
+    @IsOptional()
     @IsNumber()
     declare prevPrice: number;
 
@@ -29,8 +29,7 @@ export class ProductCreateDto implements IProductCreateDto {
     declare stock: number;
 
     @IsDefined()
-    @IsArray()
-    @IsString({ each: true })
-    @IsIn(Object.values($Enums.ProductCategory), { each: true })
+    @IsString()
+    @IsIn(Object.values($Enums.ProductCategory))
     declare category: $Enums.ProductCategory;
 }

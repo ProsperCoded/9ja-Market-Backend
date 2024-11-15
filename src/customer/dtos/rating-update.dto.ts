@@ -1,12 +1,14 @@
 import { Prisma } from "@prisma/client";
-import { IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsInt, IsNotEmpty, IsString, Max, Min } from "class-validator";
 
 
 export class RatingUpdateDto implements Prisma.RatingUpdateInput {
-    @IsNumber()
-    rating?: number;
-  
-    @IsString()
-    @IsNotEmpty()
-    review?: string;
-  }
+  @IsInt()
+  @Min(1)
+  @Max(5)
+  rating?: number;
+
+  @IsString()
+  @IsNotEmpty()
+  review?: string;
+}

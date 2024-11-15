@@ -12,7 +12,7 @@ export class ProductController {
     constructor(private readonly productService: ProductService) { }
 
     private formatProductData(productData: Product): void {
-        DataFormatterHelper.formatDatabaseObject<Product>(productData, ["merchantId"]);
+        DataFormatterHelper.formatDatabaseObject<Product>(productData, ["merchantId"], "id");
     }
     /**
  * Get Product by Id
@@ -39,10 +39,29 @@ export class ProductController {
  */
     createProduct: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            const result = await this.productService.createProduct(request.body.merchant.id,request.body);
+            const merchantId = request.body.merchant.id;
+            delete request.body.merchant;
+            const result = await this.productService.createProduct(merchantId,request.body);
             this.formatProductData(result);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.CREATE_PRODUCT_SUCCESS, result);
             return response.status(HttpStatus.CREATED).send(resObj);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+       /**
+ * Get Merchant Products
+ * @param request {Request}
+ * @param response (Response}
+ * @param next {NextFunction}
+ */
+    getProductByMerchantId: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
+        try {
+            const result = await this.productService.getMerchantProducts(request.params.merchantId);
+            result.forEach((product) => this.formatProductData(product));
+            const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.GET_MERCHANT_PRODUCTS_SUCCESS, result);
+            return response.status(HttpStatus.OK).send(resObj);
         } catch (e) {
             next(e);
         }

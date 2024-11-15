@@ -30,6 +30,16 @@ export class ProductService {
         }
     }
 
+    async getMerchantProducts(merchantId: string): Promise<Product[]> {
+        try {
+            const products = await this.productRepository.getMerchantProducts(merchantId);
+            return products;
+        } catch (e) {
+            this.logger.error(`${ErrorMessages.GET_MERCHANT_PRODUCTS_FAILED}: ${e}`);
+            throw new InternalServerException(ErrorMessages.GET_MERCHANT_PRODUCTS_FAILED);
+        }
+    }
+
     async createProduct(merchantId: string, productData: ProductCreateDto): Promise<Product> {
         try {
             const displayImage = DefaultValues.PRODUCT_DISPLAY_IMAGE;

@@ -23,7 +23,7 @@ export class CartController {
  */
     getCart: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            const result = await this.cartService.getCart(request.params.id);
+            const result = await this.cartService.getCart(request.params.customerId);
             this.formatCartData(result);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.GET_CART_SUCCESS, result);
             return response.status(HttpStatus.OK).send(resObj);
@@ -50,6 +50,7 @@ export class CartController {
             next(e);
         }
     }
+    
 
 
     /**

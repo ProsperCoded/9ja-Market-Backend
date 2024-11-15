@@ -2,6 +2,7 @@ import { ErrorMessages } from "../../constants/error-messages.enum";
 import { CartProductRepository } from "../../repositories/cart-product.repository";
 import { ProductRepository } from "../../repositories/product.repository";
 import { BadRequestException } from "../../utils/exceptions/bad-request.exception";
+import { BaseException } from "../../utils/exceptions/base.exception";
 import { InternalServerException } from "../../utils/exceptions/internal-server.exception";
 import { NotFoundException } from "../../utils/exceptions/not-found.exception";
 import { WinstonLogger } from "../../utils/logger/winston.logger";
@@ -60,11 +61,16 @@ export class CartService {
 
             return this.getCart(customerId);
         } catch (e) {
-            this.logger.error(`${ErrorMessages.CART_ADD_FAILED}: ${e}`);
-            throw new InternalServerException(ErrorMessages.CART_ADD_FAILED);
+            if (e instanceof BaseException) {
+                throw e;
+            } else {
+                this.logger.error(`${ErrorMessages.CART_ADD_FAILED}: ${e}`);
+                throw new InternalServerException(ErrorMessages.CART_ADD_FAILED);
+            }
         }
     }
 
+    
     async removeFromCart(customerId: string, productId: string) {
         try {
             await this.cartProductRepository.removefromCart(productId, customerId);

@@ -201,7 +201,6 @@ model Rating {
   customerId String
   productId  String
 
-  @@unique([customerId, productId])
   @@index([productId])
 }
 

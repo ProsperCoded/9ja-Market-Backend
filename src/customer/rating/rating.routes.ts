@@ -28,18 +28,18 @@ const customerAuthGaurd = new CustomerAuthGaurd(customerRepository, logger, jwtS
 router.get("/:productId", customerAuthGaurd.authorise(), validator.single(IdDto, "params"), ratingController.getRatings);
 
 // Create Rating
-router.post("/:productId", customerAuthGaurd.authorise(), validator.multiple([
+router.post("/:productId", validator.multiple([
     { schema: IdDto, source: "params" },
     { schema: RatingCreateDto, source: "body" }
-]), ratingController.createRating);
+]), customerAuthGaurd.authorise(), ratingController.createRating);
 
 // Update Rating
-router.put("/:productId", customerAuthGaurd.authorise(), validator.multiple([
+router.put("/:ratingId", validator.multiple([
     { schema: IdDto, source: "params" },
     { schema: RatingUpdateDto, source: "body" }
-]), ratingController.updateRating);
+]), customerAuthGaurd.authorise(), ratingController.updateRating);
 
 // Delete Rating
-router.delete("/:productId", customerAuthGaurd.authorise(), validator.single(IdDto, "params"), ratingController.deleteRating);
+router.delete("/:ratingId", customerAuthGaurd.authorise(), validator.single(IdDto, "params"), ratingController.deleteRating);
 
 export default router;

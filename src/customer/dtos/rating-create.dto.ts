@@ -1,9 +1,11 @@
 import { Prisma } from "@prisma/client";
-import { IsDefined, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsDefined, IsInt, IsNotEmpty, IsString, Max, Min } from "class-validator";
 
 export class RatingCreateDto implements Omit<Prisma.RatingCreateWithoutCustomerInput, "product"> {
     @IsDefined()
-    @IsNumber()
+    @IsInt()
+    @Min(1)
+    @Max(5)
     declare rating: number;
 
     @IsDefined()

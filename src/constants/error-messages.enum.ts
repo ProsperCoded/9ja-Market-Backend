@@ -8,6 +8,7 @@ export enum ErrorMessages {
   PRODUCT_NOT_FOUND = 'Product Not Found',
   MARKET_NOT_FOUND = 'Market Not Found',
   MARKET_NOT_EXISTS = 'Market Does Not Exist',
+  LOGIN_FAILED = 'Login Failed',
   CUSTOMER_EMAIL_NOT_VERIFIED = 'Customer Email Not Verified',
   MERCHANT_EMAIL_NOT_VERIFIED = 'Merchant Email Not Verified',
   INVALID_VERIFICATION_TOKEN = 'Invalid Verification Token',

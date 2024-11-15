@@ -117,30 +117,38 @@ export class MerchantAuthService implements IAuthService {
     }
 
     async login(loginData: LoginRequestDto): Promise<LoginResponseDto> {
-        const { email, password } = loginData;
-
-        const merchant = await this.merchantRepository.getMerchantByEmail(email);
-        if (!merchant) {
-            this.logger.error(ErrorMessages.INVALID_EMAIL_PASSWORD);
-            throw new UnauthorizedException(ErrorMessages.INVALID_EMAIL_PASSWORD);
+        try {
+            const { email, password } = loginData;
+    
+            const merchant = await this.merchantRepository.getMerchantByEmail(email);
+            if (!merchant) {
+                this.logger.error(ErrorMessages.INVALID_EMAIL_PASSWORD);
+                throw new UnauthorizedException(ErrorMessages.INVALID_EMAIL_PASSWORD);
+            }
+    
+            const isPasswordMatch = await this.bcryptService.comparePassword(password, merchant.password!);
+            if (!isPasswordMatch) {
+                this.logger.error(ErrorMessages.INVALID_EMAIL_PASSWORD);
+                throw new UnauthorizedException(ErrorMessages.INVALID_EMAIL_PASSWORD);
+            }
+    
+            const payload = { email: merchant.email, id: merchant.id };
+            const accessToken = this.getToken(payload, "10h");
+            const _refreshToken = cryptoService.random();
+            const refreshToken = this.getToken({ email: merchant.email, refreshToken: _refreshToken }, "7d");
+            await this.merchantRepository.update(merchant.id, { refreshToken: _refreshToken });
+            const response = new LoginResponseDto();
+            response.id = merchant.id;
+            response.accessToken = accessToken;
+            response.refreshToken = refreshToken;
+            return response;
+        } catch (error) {
+            if (error instanceof BaseException) {
+                throw error;
+            }
+            this.logger.error(`${ErrorMessages.LOGIN_FAILED}: ${error}`);
+            throw new InternalServerException(ErrorMessages.LOGIN_FAILED);
         }
-
-        const isPasswordMatch = await this.bcryptService.comparePassword(password, merchant.password!);
-        if (!isPasswordMatch) {
-            this.logger.error(ErrorMessages.INVALID_EMAIL_PASSWORD);
-            throw new UnauthorizedException(ErrorMessages.INVALID_EMAIL_PASSWORD);
-        }
-
-        const payload = { email: merchant.email, id: merchant.id };
-        const accessToken = this.getToken(payload, "10h");
-        const _refreshToken = cryptoService.random();
-        const refreshToken = this.getToken({ email: merchant.email, refreshToken: _refreshToken }, "7d");
-        await this.merchantRepository.update(merchant.id, { refreshToken: _refreshToken });
-        const response = new LoginResponseDto();
-        response.id = merchant.id;
-        response.accessToken = accessToken;
-        response.refreshToken = refreshToken;
-        return response;
     }
 
     async register(registerData: MerchantRegisterRequestDto, url: string): Promise<boolean> {

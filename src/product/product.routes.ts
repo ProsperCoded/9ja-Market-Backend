@@ -27,14 +27,17 @@ const router = Router();
 // Get Product by Id
 router.get("/:id", validator.single(IdDto, "params"), productController.getProductById);
 
+// Get product by merchantId
+router.get("/merchant/:merchantId", validator.single(IdDto, "params"), productController.getProductByMerchantId);
+
 // Create a Product
-router.post("/", merchantAuthGaurd.authorise(), validator.single(ProductCreateDto, "body"), productController.createProduct);
+router.post("/", validator.single(ProductCreateDto, "body") , merchantAuthGaurd.authorise(), productController.createProduct);
 
 // Update Product
-router.put("/:id", merchantAuthGaurd.authorise(), validator.multiple([
+router.put("/:id", validator.multiple([
     { schema: IdDto, source: "params" },
     { schema: ProductUpdateDto, source: "body" }
-]), productController.updateProduct);
+]) , merchantAuthGaurd.authorise(), productController.updateProduct);
 
 
 // Delete Product

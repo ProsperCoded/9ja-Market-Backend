@@ -49,10 +49,10 @@ export class RatingRepository {
         });
     }
 
-    update(customerId: string, productId: string, data: Prisma.RatingUpdateInput): Promise<Rating> {
+    update(ratingId: string, data: Prisma.RatingUpdateInput): Promise<Rating> {
         return new Promise(async (resolve, reject) => {
             try {
-                const updatedRating = await this.ratingDelegate.update({ where: { customerId_productId: { customerId, productId } }, data });
+                const updatedRating = await this.ratingDelegate.update({ where: { id: ratingId }, data });
                 resolve(updatedRating);
             } catch (e) {
                 reject(e);
@@ -60,10 +60,10 @@ export class RatingRepository {
         });
     }
 
-    delete(customerId: string, productId: string): Promise<boolean> {
+    delete(ratingId: string): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
             try {
-                await this.ratingDelegate.delete({ where: { customerId_productId: { customerId, productId } } });
+                await this.ratingDelegate.delete({ where: { id: ratingId } });
                 resolve(true);
             } catch (e) {
                 reject(e);

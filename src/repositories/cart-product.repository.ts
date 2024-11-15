@@ -51,6 +51,17 @@ export class CartProductRepository {
         })
     }
 
+    updateQuantity(customerId: string, productId: string, data: {quantity: number, totalPrice: number}): Promise<CartProduct> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const updatedCartProduct = await this.cartProductDelegate.update({ where: { productId_customerId: { customerId, productId } }, data });
+                resolve(updatedCartProduct);
+            } catch (e) {
+                reject(e)
+            }
+        })
+    }
+
     removefromCart(productId: string, customerId: string): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
             try {
