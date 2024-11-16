@@ -1,19 +1,24 @@
 import { NextFunction, Request, Response } from "express";
+import multer from 'multer';
 
-export class FileParserMiddleware{
+const storage = multer.diskStorage({
+    filename: (request, file, callback) => {
+        callback(null, file.originalname + '-' + Date.now());
+    }
+})
+
+const upload = multer({ storage: storage });
+export class FileParser{
     constructor() { }
-    single(field: string) {
+    single(fieldName: string) {
         return (request: Request, response: Response, next: NextFunction) => {
-            try {
-                if (!request.file) {
-                    throw new Error("No file uploaded");
-                }
-                request.body[field] = request.file;
-                next();
-            }
-            catch (error) {
-                next(error);
-            }
-        };
+            upload.single(fieldName)(request, response, next);
+        }
+    }
+
+    array(fieldName: string, maxCount: number) {
+        return (request: Request, response: Response, next: NextFunction) => {
+            upload.array(fieldName, maxCount)(request, response, next);
+        }
     }
 }
