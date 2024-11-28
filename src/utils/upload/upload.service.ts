@@ -1,5 +1,5 @@
 import { configService } from "../config/config.service";
-import {v2 as cloudinary} from 'cloudinary';
+import { v2 as cloudinary } from 'cloudinary';
 
 
 cloudinary.config({
@@ -11,8 +11,8 @@ cloudinary.config({
 
 type UploadType = 'image' | 'video' | 'raw' | 'auto';
 export class UploadService {
-    public async uploadFile(path: string, type: UploadType ): Promise<string> {
-        const {secure_url} = await cloudinary.uploader.upload(path, {
+    public async uploadFile(path: string, type: UploadType): Promise<string> {
+        const { secure_url } = await cloudinary.uploader.upload(path, {
             resource_type: type,
             folder: type,
             overwrite: true,

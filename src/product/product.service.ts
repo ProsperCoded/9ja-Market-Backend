@@ -43,8 +43,7 @@ export class ProductService {
     async createProduct(merchantId: string, productData: ProductCreateDto): Promise<Product> {
         try {
             const displayImage = DefaultValues.PRODUCT_DISPLAY_IMAGE;
-            const productCreateData = { ...productData, displayImage };
-            const product = await this.productRepository.create(merchantId, productCreateData);
+            const product = await this.productRepository.create(merchantId, productData, displayImage);
             return product;
         } catch (e) {
             this.logger.error(`${ErrorMessages.CREATE_PRODUCT_FAILED}: ${e}`);

@@ -77,7 +77,7 @@ export class ProductRepository {
         });
     }
 
-    create(merchantId: string, product: Prisma.ProductCreateWithoutMerchantInput): Promise<Product> {
+    create(merchantId: string, product: Prisma.ProductCreateWithoutMerchantInput, displayImage: string): Promise<Product> {
         console.log(merchantId, product);
         return new Promise(async (resolve, reject) => {
             try {
@@ -88,7 +88,7 @@ export class ProductRepository {
                             connect: {
                                 id: merchantId
                             }
-                        }
+                        },
                     }
                 });
                 resolve(newProduct);
