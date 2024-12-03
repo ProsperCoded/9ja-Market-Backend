@@ -10,7 +10,7 @@ import { MerchantAuthGaurd } from "../utils/middlewares/guards/merchant.auth.gua
 import { JWTService } from "../utils/jwt/jwt.service";
 import { MerchantRepository } from "../repositories/merchant.repository";
 import { ProductCreateDto } from "./dtos/product-create.dto";
-import { FileParser } from "../utils/middlewares/file-parser.middleware";
+import { MulterMiddleware } from "../utils/middlewares/file-parser.middleware";
 
 const logger = new WinstonLogger("ProductService");
 const productRepository = new ProductRepository();
@@ -21,7 +21,7 @@ const merchantRepository = new MerchantRepository();
 const merchantAuthGaurd = new MerchantAuthGaurd(merchantRepository, logger, jwtService);
 
 const validator = new Validator();
-const fileParser = new FileParser();
+const fileParser = new MulterMiddleware(logger);
 
 const router = Router();
 
@@ -40,11 +40,38 @@ router.get("/merchant/:merchantId",
 
 // Create a Product
 router.post("/",
-    fileParser.single("displayImage"),
-    fileParser.array("productImages", 4),
-    validator.single(ProductCreateDto, "body"),
     merchantAuthGaurd.authorise(),
+    fileParser.multiple("productImages", 10),
+    validator.single(ProductCreateDto, "body"),
     productController.createProduct
+);
+
+// Add Product Images
+router.post("/:productId/images",
+    fileParser.multiple("productImages", 10),
+    validator.single(IdDto, "params"),
+    merchantAuthGaurd.authorise(),
+    productController.addProductImages
+);
+
+// Remove Product Image
+router.delete("/:productId/images/:imageId",
+    validator.multiple([
+        { schema: IdDto, source: "params" },
+        { schema: IdDto, source: "params" }
+    ]),
+    merchantAuthGaurd.authorise(),
+    productController.removeProductImage
+);
+
+// Make Display Image
+router.put("/:productId/images/:imageId/display",
+    validator.multiple([
+        { schema: IdDto, source: "params" },
+        { schema: IdDto, source: "params" }
+    ]),
+    merchantAuthGaurd.authorise(),
+    productController.makeDisplayImage
 );
 
 // Update Product

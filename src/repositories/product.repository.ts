@@ -25,7 +25,13 @@ export class ProductRepository {
     getById(id: string): Promise<Product | null> {
         return new Promise(async (resolve, reject) => {
             try {
-                const product = await this.productDelegate.findUnique({ where: { id } });
+                const product = await this.productDelegate.findUnique({
+                    where: { id },
+                    include: {
+                        images: true,
+                        displayImage: true
+                    }
+                });
                 resolve(product);
             } catch (error) {
                 reject(error);
@@ -68,7 +74,11 @@ export class ProductRepository {
             try {
                 const updatedProduct = await this.productDelegate.update({
                     where: { id },
-                    data: product
+                    data: product,
+                    include: {
+                        images: true,
+                        displayImage: true
+                    }
                 });
                 resolve(updatedProduct);
             } catch (error) {
@@ -77,8 +87,7 @@ export class ProductRepository {
         });
     }
 
-    create(merchantId: string, product: Prisma.ProductCreateWithoutMerchantInput, displayImage: string): Promise<Product> {
-        console.log(merchantId, product);
+    create(merchantId: string, product: Prisma.ProductCreateWithoutMerchantInput, displayImage: string, productImages: string[]): Promise<Product> {
         return new Promise(async (resolve, reject) => {
             try {
                 const newProduct = await this.productDelegate.create({
@@ -87,8 +96,22 @@ export class ProductRepository {
                         merchant: {
                             connect: {
                                 id: merchantId
+                            },
+                        },
+                        images: {
+                            createMany: {
+                                data: productImages.map((image) => ({ url: image }))
                             }
                         },
+                        displayImage: {
+                            create: {
+                                url: displayImage,
+                            }
+                        }
+                    },
+                    include: {
+                        images: true,
+                        displayImage: true
                     }
                 });
                 resolve(newProduct);
@@ -104,6 +127,76 @@ export class ProductRepository {
             try {
                 const deletedProduct = await this.productDelegate.delete({ where: { id } });
                 resolve(deletedProduct);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    makeDisplayImage(productId: string, imageId: string): Promise<Product> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const product = await this.productDelegate.update({
+                    where: { id: productId },
+                    data: {
+                        displayImage: {
+                            connect: {
+                                id: imageId
+                            }
+                        }
+                    },
+                    include: {
+                        images: true,
+                        displayImage: true
+                    }
+                });
+                resolve(product);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    addImages(productId: string, productImages: string[]): Promise<Product> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const product = await this.productDelegate.update({
+                    where: { id: productId },
+                    data: {
+                        images: {
+                            createMany: {
+                                data: productImages.map((image) => ({ url: image }))
+                            }
+                        }
+                    },
+                    include: {
+                        images: true,
+                        displayImage: true
+                    }
+                });
+                resolve(product);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    removeImage(productId: string, imageId: string): Promise<Product> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const product = await this.productDelegate.update({
+                    where: { id: productId },
+                    data: {
+                        images: {
+                            delete: { id: imageId }
+                        }
+                    },
+                    include: {
+                        images: true,
+                        displayImage: true
+                    }
+                });
+                resolve(product);
             } catch (error) {
                 reject(error);
             }

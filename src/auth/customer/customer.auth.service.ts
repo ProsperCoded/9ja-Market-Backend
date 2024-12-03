@@ -22,6 +22,7 @@ import { ForgotPasswordRequestDto } from "../dtos/forgot-password-request.dto";
 import { ResetPasswordRequestDto } from "../dtos/reset-password-request.dto";
 import { DataFormatterHelper } from "../../helpers/format.helper";
 import { Prisma } from "@prisma/client";
+import { BaseException } from "../../utils/exceptions/base.exception";
 
 
 export class CustomerAuthService implements IAuthService {
@@ -174,6 +175,7 @@ export class CustomerAuthService implements IAuthService {
             this.eventEmiter.emit("sendCustomerEmailVerificationEmail", { email, token, verificationCode, url });
             return true;
         } catch (e) {
+            if(e instanceof BaseException) throw e;
             this.logger.error(`${ErrorMessages.REGISTER_CUSTOMER_FAILED}: ${e}`);
             throw new InternalServerException(ErrorMessages.REGISTER_CUSTOMER_FAILED);
         }
@@ -209,14 +211,9 @@ export class CustomerAuthService implements IAuthService {
             await this.customerRepository.update(customer.id, { emailVerifiedAt: new Date(), emailVerificationCode: null });
             return true;
         } catch (e) {
-            // if (e instanceof JsonWebTokenError) {
+            if(e instanceof BaseException) throw e;
             this.logger.error(ErrorMessages.INVALID_VERIFICATION_TOKEN);
             throw new BadRequestException(ErrorMessages.INVALID_VERIFICATION_TOKEN);
-            // } else {
-            //     this.logger.error(`${ErrorMessages.EMAIL_VERIFICATION_FAILED}: ${e}`);
-            //     throw new InternalServerException(ErrorMessages.EMAIL_VERIFICATION_FAILED);
-            //     // throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.EMAIL_VERIFICATION_FAILED);
-            // }
         }
 
     }
@@ -253,14 +250,9 @@ export class CustomerAuthService implements IAuthService {
             await this.customerRepository.update(customer.id, { password: hashedPassword, passwordResetCode: null });
             return true;
         } catch (e) {
-            // if (e instanceof JsonWebTokenError) {
+            if(e instanceof BaseException) throw e;
             this.logger.error(ErrorMessages.INVALID_VERIFICATION_TOKEN);
             throw new BadRequestException(ErrorMessages.INVALID_VERIFICATION_TOKEN);
-            // } else {
-            //     this.logger.error(`${ErrorMessages.EMAIL_VERIFICATION_FAILED}: ${e}`);
-            //     throw new InternalServerException(ErrorMessages.EMAIL_VERIFICATION_FAILED);
-            //     // throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.EMAIL_VERIFICATION_FAILED);
-            // }
         }
     }
 

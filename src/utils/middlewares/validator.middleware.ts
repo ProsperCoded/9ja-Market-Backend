@@ -32,8 +32,6 @@ export class Validator {
 
     single(schema: any, source: IValidation["source"] = 'body') {
         return (request: Request, response: Response, next: NextFunction) => {
-            console.log(request.file);
-            console.log(request.files);
             validate(plainToInstance(schema, request[source]), { skipMissingProperties: true, whitelist: true, forbidNonWhitelisted: true }).then(errors => {
                 if (errors.length > 0) {
                     const errorArray = this.getErrors(errors);

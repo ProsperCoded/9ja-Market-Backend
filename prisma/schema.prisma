@@ -169,13 +169,13 @@ model Address {
 
 model ProductImage {
   id        String    @id @default(uuid())
-  product   Product   @relation("ProductImages",fields: [productId], references: [id])
+  product   Product?   @relation("ProductImages",fields: [productId], references: [id])
   productDisplay Product? @relation("DisplayImage")
   url       String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-  productId String
+  productId String?
 }
 
 model PhoneNumber {
