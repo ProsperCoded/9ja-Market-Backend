@@ -56,20 +56,14 @@ router.post("/:productId/images",
 
 // Remove Product Image
 router.delete("/:productId/images/:imageId",
-    validator.multiple([
-        { schema: IdDto, source: "params" },
-        { schema: IdDto, source: "params" }
-    ]),
+    validator.single(IdDto, "params"),
     merchantAuthGaurd.authorise(),
     productController.removeProductImage
 );
 
 // Make Display Image
 router.put("/:productId/images/:imageId/display",
-    validator.multiple([
-        { schema: IdDto, source: "params" },
-        { schema: IdDto, source: "params" }
-    ]),
+    validator.single(IdDto, "params"),
     merchantAuthGaurd.authorise(),
     productController.makeDisplayImage
 );
