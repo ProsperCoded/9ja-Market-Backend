@@ -59,4 +59,10 @@ export enum ErrorMessages {
   BRAND_NAME_EXISTS = 'Brand Name Exists Already',
   DUPLICATE_ADDRESS_NAME= 'Duplicate Address Name',
   REFRESH_TOKEN_NOT_EXISTS = 'Refresh Token Does Not Exist, Login Again',
+  ERROR_UPLOADING_IMAGE = 'Error Uploading Image',
+  ERROR_UPLOADING_IMAGES = 'Error Uploading Images',
+  PRODUCT_IMAGES_NOT_FOUND = 'Product Images Not Found',
+  ADD_PRODUCT_IMAGES_FAILED = 'Unable to Add Product Images',
+  REMOVE_PRODUCT_IMAGE_FAILED = 'Unable to Remove Product Image',
+  MAKE_DISPLAY_IMAGE_FAILED = 'Unable to Make Display Image',
 }

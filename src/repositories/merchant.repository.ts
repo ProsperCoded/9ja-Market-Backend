@@ -144,11 +144,11 @@ export class MerchantRepository implements IMerchantRepository {
                                 data: phoneNumbers
                             }
                         },
-                        market: {
+                        market: marketName ? {
                             connect: {
                                 name: marketName
                             }
-                        }
+                        } : undefined
                     },
                     include: {
                         addresses: true,

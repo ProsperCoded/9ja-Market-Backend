@@ -50,4 +50,10 @@ export class DataFormatterHelper {
             }
         }
     }
+
+    static formatProductData(product: any): void {
+        product.price = Number(product.price);
+        product.prevPrice = Number(product.prevPrice);
+        product.stock = Number(product.stock);
+    }
 }

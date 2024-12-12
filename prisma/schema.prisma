@@ -84,9 +84,9 @@ model Product {
   price        Float
   prevPrice    Float
   stock        Int
-  displayImage String
+  displayImage ProductImage? @relation("DisplayImage", fields: [displayImageId], references: [id])
   featuredDate DateTime?
-  images       ProductImage[]
+  images       ProductImage[] @relation("ProductImages")
   ratings      Rating[]
   cart         CartProduct[]
   category     ProductCategory
@@ -95,6 +95,7 @@ model Product {
   updatedAt    DateTime        @updatedAt
   deletedAt    DateTime?
   merchantId   String
+  displayImageId String? @unique
 
   @@index([name])
 }
@@ -169,12 +170,13 @@ model Address {
 
 model ProductImage {
   id        String    @id @default(uuid())
-  product   Product   @relation(fields: [productId], references: [id])
+  product   Product?   @relation("ProductImages",fields: [productId], references: [id])
+  productDisplay Product? @relation("DisplayImage")
   url       String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-  productId String
+  productId String?
 }
 
 model PhoneNumber {

@@ -1,5 +1,6 @@
 import { $Enums, Prisma } from "@prisma/client";
-import { IsDefined, IsIn, IsNumber, IsOptional, IsString } from "class-validator";
+import { IsDefined, IsIn, IsOptional, IsString } from "class-validator";
+import { IsNumberOrNumberString } from "../../constants/decorators/numberOrNumberString.decorator";
 
 interface IProductCreateDto extends Omit<Prisma.ProductCreateInput, "displayImages" | "displayImage" | "merchant"> {}
 
@@ -17,19 +18,22 @@ export class ProductCreateDto implements IProductCreateDto {
     declare description: string;
 
     @IsOptional()
-    @IsNumber()
+    @IsNumberOrNumberString()
     declare prevPrice: number;
 
     @IsDefined()
-    @IsNumber()
+    @IsNumberOrNumberString()
     declare price: number;
 
     @IsDefined()
-    @IsNumber()
+    @IsNumberOrNumberString()
     declare stock: number;
 
-    @IsDefined()
+    @IsDefined()    
     @IsString()
     @IsIn(Object.values($Enums.ProductCategory))
     declare category: $Enums.ProductCategory;
+
+    @IsOptional()
+    productImages?: Express.Multer.File[];
 }

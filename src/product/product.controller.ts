@@ -31,17 +31,18 @@ export class ProductController {
         }
     }
 
-      /**
- * Create New Product
- * @param request {Request}
- * @param response (Response}
- * @param next {NextFunction}
- */
+    /**
+* Create New Product
+* @param request {Request}
+* @param response (Response}
+* @param next {NextFunction}
+*/
     createProduct: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
             const merchantId = request.body.merchant.id;
             delete request.body.merchant;
-            const result = await this.productService.createProduct(merchantId,request.body);
+            const files = request.files as Express.Multer.File[];
+            const result = await this.productService.createProduct(merchantId, request.body, files);
             this.formatProductData(result);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.CREATE_PRODUCT_SUCCESS, result);
             return response.status(HttpStatus.CREATED).send(resObj);
@@ -50,12 +51,62 @@ export class ProductController {
         }
     }
 
-       /**
- * Get Merchant Products
- * @param request {Request}
- * @param response (Response}
- * @param next {NextFunction}
- */
+    /**
+* Add Product Images
+* @param request {Request}
+* @param response (Response}
+* @param next {NextFunction}
+*/
+    addProductImages: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
+        try {
+            const result = await this.productService.addProductImages(request.params.productId, request.files as Express.Multer.File[]);
+            this.formatProductData(result);
+            const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.ADD_PRODUCT_IMAGES_SUCCESS, result);
+            return response.status(HttpStatus.OK).send(resObj);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    /**
+* Delete Product Image
+* @param request {Request}
+* @param response (Response}
+* @param next {NextFunction}
+*/
+    removeProductImage: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
+        try {
+            await this.productService.removeProductImage(request.params.productId, request.params.imageId);
+            const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.REMOVE_PRODUCT_FROM_CART_SUCCESS);
+            return response.status(HttpStatus.NO_CONTENT).send(resObj);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    /**
+* Make Display Image
+* @param request {Request}
+* @param response (Response}
+* @param next {NextFunction}
+*/
+    makeDisplayImage: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
+        try {
+            const result = await this.productService.makeDisplayImage(request.params.productId, request.params.imageId);
+            this.formatProductData(result);
+            const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.UPDATE_PRODUCT_SUCCESS, result);
+            return response.status(HttpStatus.OK).send(resObj);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    /**
+* Get Merchant Products
+* @param request {Request}
+* @param response (Response}
+* @param next {NextFunction}
+*/
     getProductByMerchantId: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
             const result = await this.productService.getMerchantProducts(request.params.merchantId);
