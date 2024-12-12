@@ -96,5 +96,10 @@
     "ts-lint": "^4.5.1",
     "ts-node": "^10.9.2",
     "tslib": "^2.7.0"
+  },
+  "overrides": {
+  "multer-storage-cloudinary": {
+    "cloudinary": "^2.5.1"
   }
+}
 }
