@@ -41,7 +41,6 @@ export class MulterMiddleware {
             resolve();
           });
         });
-        console.log(req.file);
         next();
       } catch (err) {
         this.logger.error(ErrorMessages.ERROR_UPLOADING_IMAGE, err);
@@ -64,7 +63,6 @@ export class MulterMiddleware {
             resolve();
           });
         });
-        console.log("Files", req.files);
         next();
       } catch (err) {
         this.logger.error(ErrorMessages.ERROR_UPLOADING_IMAGES, err);

@@ -26,12 +26,6 @@ app.use(cors());
 app.use(helmet());
 app.use(passport.initialize());
 
-// Log all request bodies
-app.use((req, res, next) => {
-    console.log(req.body);
-    next();
-});
-
 // Use Index Router
 app.use(AppEnum.PREFIX, IndexRouter);
 
