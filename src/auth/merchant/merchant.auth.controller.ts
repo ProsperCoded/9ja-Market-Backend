@@ -155,7 +155,7 @@ export class MerchantAuthController {
             const result = await this.merchantAuthService.googleCreateOrLogin(profile);
             return response.redirect(`${AppEnum.CLIENT_URL}/auth?token=${result}`);
         } catch (e: any) {
-            return response.redirect(`${AppEnum.CLIENT_URL}/error=${e.message}`);
+            return response.redirect(`${AppEnum.CLIENT_URL}/?error=${e.message}`);
         }
     }
 

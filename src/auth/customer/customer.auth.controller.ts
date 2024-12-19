@@ -155,7 +155,7 @@ export class CustomerAuthController {
             const result = await this.customerAuthService.googleCreateOrLogin(profile);
             return response.redirect(`${AppEnum.CLIENT_URL}/auth?token=${result}`);
         } catch (e: any) {
-            return response.redirect(`${AppEnum.CLIENT_URL}/error=${e.message}`);
+            return response.redirect(`${AppEnum.CLIENT_URL}/?error=${e.message}`);
         }
     }
 
