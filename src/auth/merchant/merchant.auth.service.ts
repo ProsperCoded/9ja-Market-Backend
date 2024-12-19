@@ -327,19 +327,20 @@ export class MerchantAuthService implements IAuthService {
     }
 
     async googleCreateOrLogin(profile: any): Promise<string> {
-        const { emails: [{ value, verified }], id, name: { givenName }, photos } = profile;
+        const { emails: [{ value: emailValue, verified }], id, name: { givenName }, photos } = profile;
         try {
+            // Find By Email to prevent duplication
+            const existingEmail = await this.merchantRepository.getMerchantByEmail(emailValue)
+            if(existingEmail) throw new BadRequestException(ErrorMessages.EMAIL_EXISTS)
             const merchant = await this.merchantRepository.getMerchantByGoogleId(id);
-            console.log("Existing Merchant", {merchant})
             if (!merchant) {
                 let merchantData: Prisma.MerchantCreateInput = {
-                    email: value,
+                    email: emailValue,
                     googleId: id,
                     brandName: `${givenName}'s Store`,
                     emailVerifiedAt: verified ? new Date() : null,
                     displayImage: photos[0].value
                 }
-                console.log("google", {merchantData})
                 const newMerchant = await this.merchantRepository.create(merchantData);
                 const payload = { email: newMerchant.email, id: newMerchant.id };
                 const accessToken = this.getToken(payload, "10h");

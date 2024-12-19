@@ -175,7 +175,7 @@ export class CustomerAuthService implements IAuthService {
             this.eventEmiter.emit("sendCustomerEmailVerificationEmail", { email, token, verificationCode, url });
             return true;
         } catch (e) {
-            if(e instanceof BaseException) throw e;
+            if (e instanceof BaseException) throw e;
             this.logger.error(`${ErrorMessages.REGISTER_CUSTOMER_FAILED}: ${e}`);
             throw new InternalServerException(ErrorMessages.REGISTER_CUSTOMER_FAILED);
         }
@@ -211,7 +211,7 @@ export class CustomerAuthService implements IAuthService {
             await this.customerRepository.update(customer.id, { emailVerifiedAt: new Date(), emailVerificationCode: null });
             return true;
         } catch (e) {
-            if(e instanceof BaseException) throw e;
+            if (e instanceof BaseException) throw e;
             this.logger.error(ErrorMessages.INVALID_VERIFICATION_TOKEN);
             throw new BadRequestException(ErrorMessages.INVALID_VERIFICATION_TOKEN);
         }
@@ -250,7 +250,7 @@ export class CustomerAuthService implements IAuthService {
             await this.customerRepository.update(customer.id, { password: hashedPassword, passwordResetCode: null });
             return true;
         } catch (e) {
-            if(e instanceof BaseException) throw e;
+            if (e instanceof BaseException) throw e;
             this.logger.error(ErrorMessages.INVALID_VERIFICATION_TOKEN);
             throw new BadRequestException(ErrorMessages.INVALID_VERIFICATION_TOKEN);
         }
@@ -264,7 +264,7 @@ export class CustomerAuthService implements IAuthService {
             this.logger.error(ErrorMessages.CUSTOMER_NOT_FOUND);
             throw new NotFoundException(ErrorMessages.CUSTOMER_NOT_FOUND);
         }
-        if(!customer.refreshToken) {
+        if (!customer.refreshToken) {
             this.logger.error(ErrorMessages.REFRESH_TOKEN_NOT_EXISTS);
             throw new UnauthorizedException(ErrorMessages.REFRESH_TOKEN_NOT_EXISTS);
         }
@@ -293,27 +293,28 @@ export class CustomerAuthService implements IAuthService {
     }
 
     async googleCreateOrLogin(profile: any): Promise<string> {
-        const { emails: [{ value, verified }], id, name: { familyName, givenName }, photos } = profile;
+        const { emails: [{ value: emailValue, verified }], id, name: { familyName, givenName }, photos } = profile;
         try {
+            // Find By Email to prevent duplication
+            const existingEmail = await this.customerRepository.getCustomerByEmail(emailValue)
+            if(existingEmail) throw new BadRequestException(ErrorMessages.EMAIL_EXISTS)
             const customer = await this.customerRepository.getByGoogleId(id);
-            console.log("Existing Customer", customer)
             if (!customer) {
                 let customerData: Prisma.CustomerCreateInput = {
-                    email: value,
+                    email: emailValue,
                     googleId: id,
                     firstName: givenName,
                     lastName: familyName,
                     emailVerifiedAt: verified ? new Date() : null,
                     displayImage: photos[0].value
                 }
-                console.log("Customer Data", customerData)
                 const newCustomer = await this.customerRepository.create(customerData);
                 const payload = { email: newCustomer.email, id: newCustomer.id };
                 const accessToken = this.getToken(payload, "10h");
                 const _refreshToken = cryptoService.random();
                 const refreshToken = this.getToken({ email: newCustomer.email, refreshToken: _refreshToken }, "7d");
                 await this.customerRepository.update(newCustomer.id, { refreshToken: _refreshToken });
-                const result = this.getToken({id: newCustomer.id, accessToken, refreshToken}, "7m");
+                const result = this.getToken({ id: newCustomer.id, accessToken, refreshToken }, "7m");
                 return encodeURIComponent(result);
             } else {
                 const payload = { email: customer.email, id: customer.id };
@@ -321,7 +322,7 @@ export class CustomerAuthService implements IAuthService {
                 const _refreshToken = cryptoService.random();
                 const refreshToken = this.getToken({ email: customer.email, refreshToken: _refreshToken }, "7d");
                 await this.customerRepository.update(customer.id, { refreshToken: _refreshToken });
-                const result = this.getToken({id: customer.id, accessToken, refreshToken}, "7m");
+                const result = this.getToken({ id: customer.id, accessToken, refreshToken }, "7m");
                 return encodeURIComponent(result);
             }
         } catch (e) {
