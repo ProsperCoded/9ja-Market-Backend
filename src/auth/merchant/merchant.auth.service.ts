@@ -359,6 +359,7 @@ export class MerchantAuthService implements IAuthService {
                 return encodeURIComponent(result);
             }
         } catch (e) {
+            if (e instanceof BaseException) throw e;
             this.logger.error(`${ErrorMessages.GOOGLE_AUTH_FAILED}: ${e}`);
             throw new InternalServerException(ErrorMessages.GOOGLE_AUTH_FAILED);
         }
