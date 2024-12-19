@@ -296,6 +296,7 @@ export class CustomerAuthService implements IAuthService {
         const { emails: [{ value, verified }], id, name: { familyName, givenName }, photos } = profile;
         try {
             const customer = await this.customerRepository.getByGoogleId(id);
+            console.log("Existing Customer", customer)
             if (!customer) {
                 let customerData: Prisma.CustomerCreateInput = {
                     email: value,
@@ -305,6 +306,7 @@ export class CustomerAuthService implements IAuthService {
                     emailVerifiedAt: verified ? new Date() : null,
                     displayImage: photos[0].value
                 }
+                console.log("Customer Data", customerData)
                 const newCustomer = await this.customerRepository.create(customerData);
                 const payload = { email: newCustomer.email, id: newCustomer.id };
                 const accessToken = this.getToken(payload, "10h");
