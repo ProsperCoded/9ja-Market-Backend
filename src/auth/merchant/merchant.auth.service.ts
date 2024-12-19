@@ -330,6 +330,7 @@ export class MerchantAuthService implements IAuthService {
         const { emails: [{ value, verified }], id, name: { givenName }, photos } = profile;
         try {
             const merchant = await this.merchantRepository.getMerchantByGoogleId(id);
+            console.log("Existing Merchant", {merchant})
             if (!merchant) {
                 let merchantData: Prisma.MerchantCreateInput = {
                     email: value,
@@ -338,6 +339,7 @@ export class MerchantAuthService implements IAuthService {
                     emailVerifiedAt: verified ? new Date() : null,
                     displayImage: photos[0].value
                 }
+                console.log("google", {merchantData})
                 const newMerchant = await this.merchantRepository.create(merchantData);
                 const payload = { email: newMerchant.email, id: newMerchant.id };
                 const accessToken = this.getToken(payload, "10h");
