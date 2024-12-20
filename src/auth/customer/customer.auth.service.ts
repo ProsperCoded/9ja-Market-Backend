@@ -295,11 +295,12 @@ export class CustomerAuthService implements IAuthService {
     async googleCreateOrLogin(profile: any): Promise<string> {
         const { emails: [{ value: emailValue, verified }], id, name: { familyName, givenName }, photos } = profile;
         try {
+            let customer;
+            let existingEmail;
             // Find By Email to prevent duplication
-            const existingEmail = await this.customerRepository.getCustomerByEmail(emailValue)
-            if(existingEmail) throw new BadRequestException(ErrorMessages.EMAIL_EXISTS)
-            const customer = await this.customerRepository.getByGoogleId(id);
-            if (!customer) {
+            customer = await this.customerRepository.getByGoogleId(id);
+            if (!customer) existingEmail = await this.customerRepository.getCustomerByEmail(emailValue)
+            if (!existingEmail && !customer) {
                 let customerData: Prisma.CustomerCreateInput = {
                     email: emailValue,
                     googleId: id,
@@ -317,12 +318,16 @@ export class CustomerAuthService implements IAuthService {
                 const result = this.getToken({ id: newCustomer.id, accessToken, refreshToken }, "7m");
                 return encodeURIComponent(result);
             } else {
-                const payload = { email: customer.email, id: customer.id };
+                const customerData = customer ?? existingEmail;
+                if (!customerData) {
+                    throw new InternalServerException(ErrorMessages.CUSTOMER_NOT_FOUND);
+                }
+                const payload = { email: customerData.email, id: customerData.id };
                 const accessToken = this.getToken(payload, "10h");
                 const _refreshToken = cryptoService.random();
-                const refreshToken = this.getToken({ email: customer.email, refreshToken: _refreshToken }, "7d");
-                await this.customerRepository.update(customer.id, { refreshToken: _refreshToken });
-                const result = this.getToken({ id: customer.id, accessToken, refreshToken }, "7m");
+                const refreshToken = this.getToken({ email: customerData.email, refreshToken: _refreshToken }, "7d");
+                await this.customerRepository.update(customerData.id, { refreshToken: _refreshToken });
+                const result = this.getToken({ id: customerData.id, accessToken, refreshToken }, "7m");
                 return encodeURIComponent(result);
             }
         } catch (e) {

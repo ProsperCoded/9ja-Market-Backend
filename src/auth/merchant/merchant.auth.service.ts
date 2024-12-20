@@ -329,11 +329,12 @@ export class MerchantAuthService implements IAuthService {
     async googleCreateOrLogin(profile: any): Promise<string> {
         const { emails: [{ value: emailValue, verified }], id, name: { givenName }, photos } = profile;
         try {
+            let merchant;
+            let existingEmail;
             // Find By Email to prevent duplication
-            const existingEmail = await this.merchantRepository.getMerchantByEmail(emailValue)
-            if(existingEmail) throw new BadRequestException(ErrorMessages.EMAIL_EXISTS)
-            const merchant = await this.merchantRepository.getMerchantByGoogleId(id);
-            if (!merchant) {
+            merchant = await this.merchantRepository.getMerchantByGoogleId(id);
+            if (!merchant) existingEmail = await this.merchantRepository.getMerchantByEmail(emailValue)
+            if (!existingEmail && !merchant) {
                 let merchantData: Prisma.MerchantCreateInput = {
                     email: emailValue,
                     googleId: id,
@@ -350,12 +351,16 @@ export class MerchantAuthService implements IAuthService {
                 const result = this.getToken({ id: newMerchant.id, accessToken, refreshToken }, "7m");
                 return encodeURIComponent(result);
             } else {
-                const payload = { email: merchant.email, id: merchant.id };
+                const merchantData = merchant ?? existingEmail;
+                if (!merchantData) {
+                    throw new InternalServerException(ErrorMessages.MERCHANT_NOT_FOUND);
+                }
+                const payload = { email: merchantData.email, id: merchantData.id };
                 const accessToken = this.getToken(payload, "10h");
                 const _refreshToken = cryptoService.random();
-                const refreshToken = this.getToken({ email: merchant.email, refreshToken: _refreshToken }, "7d");
-                await this.merchantRepository.update(merchant.id, { refreshToken: _refreshToken });
-                const result = this.getToken({ id: merchant.id, accessToken, refreshToken }, "7m");
+                const refreshToken = this.getToken({ email: merchantData.email, refreshToken: _refreshToken }, "7d");
+                await this.merchantRepository.update(merchantData.id, { refreshToken: _refreshToken });
+                const result = this.getToken({ id: merchantData.id, accessToken, refreshToken }, "7m");
                 return encodeURIComponent(result);
             }
         } catch (e) {
