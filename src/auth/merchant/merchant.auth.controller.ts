@@ -153,7 +153,7 @@ export class MerchantAuthController {
         try {
             const profile = JSON.parse(request.query.profile as string);
             const result = await this.merchantAuthService.googleCreateOrLogin(profile);
-            return response.redirect(`${AppEnum.CLIENT_URL}/auth?token=${result}`);
+            return response.redirect(`${AppEnum.CLIENT_URL}/auth?token=${result}&userType=merchant`);
         } catch (e: any) {
             return response.redirect(`${AppEnum.CLIENT_URL}/?error=${e.message}`);
         }
