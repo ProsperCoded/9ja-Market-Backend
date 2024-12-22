@@ -119,6 +119,7 @@ model Transaction {
   amount     Float
   status     PaymentStatus
   for        PaymentFor
+  metaData   Json
   date       DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
   deletedAt  DateTime?
