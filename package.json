@@ -41,6 +41,7 @@
   "description": "",
   "dependencies": {
     "@prisma/client": "^5.19.1",
+    "axios": "^1.7.8",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
@@ -98,8 +99,8 @@
     "tslib": "^2.7.0"
   },
   "overrides": {
-  "multer-storage-cloudinary": {
-    "cloudinary": "^2.5.1"
+    "multer-storage-cloudinary": {
+      "cloudinary": "^2.5.1"
+    }
   }
-}
 }

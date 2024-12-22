@@ -65,4 +65,8 @@ export enum ErrorMessages {
   ADD_PRODUCT_IMAGES_FAILED = 'Unable to Add Product Images',
   REMOVE_PRODUCT_IMAGE_FAILED = 'Unable to Remove Product Image',
   MAKE_DISPLAY_IMAGE_FAILED = 'Unable to Make Display Image',
+  AD_PAYMENT_INITIALIZATION_FAILED = 'Unable to Initialize Ad Payment',
+  AD_PAYMENT_VERIFICATION_FAILED = 'Unable to Verify Ad Payment',
+  TRANSACTION_NOT_FOUND = 'Transaction Not Found',
+  PAYMENT_VERIFICATION_FAILED = 'Payment Verification Failed',
 }
