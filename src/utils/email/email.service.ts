@@ -16,7 +16,6 @@ export class EmailService implements IEmailService {
         // Load all providers
         const providerPath = path.join(__dirname, 'providers');
         const providerFiles = readdirSync(providerPath);
-
         // Iterate over all files in the providers directory
         for (const file of providerFiles) {
             if (file.endsWith('.provider.ts') || file.endsWith('.provider.js')) {

@@ -10,15 +10,21 @@ import { EmailPaths, EmailSubjects } from "../../../constants/email.enum";
 
 class OAuth2Client extends google.auth.OAuth2 { }
 
-export class NodemailerProvider implements IEmailService {
+export default class NodemailerProvider implements IEmailService {
     private readonly OAuth2Client: OAuth2Client;
     private readonly transporter: Transporter;
-    private logger: ILogger
-    ;
+    private logger: ILogger;
 
-    constructor(logger: ILogger, OAuth2Client: OAuth2Client) {
+    constructor(logger: ILogger) {
         this.logger = logger;
-        this.OAuth2Client = OAuth2Client;
+        this.OAuth2Client = new google.auth.OAuth2(
+            configService.get<string>("GMAIL_CLIENT_ID"),
+            configService.get<string>("GMAIL_CLIENT_SECRET"),
+            "https://developers.google.com/oauthplayground" // or your redirect URI
+          );
+          this.OAuth2Client.setCredentials({
+            refresh_token: configService.get<string>("GMAIL_REFRESH_TOKEN"),
+          });
         this.transporter = createTransport({
             service: 'gmail',
             auth: {
