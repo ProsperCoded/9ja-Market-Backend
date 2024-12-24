@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { AddressCreateDto } from "../../dtos/address-create.dto";
-import { ArrayMaxSize, ArrayMinSize, IsArray, IsDateString, IsNotEmpty, IsString, ValidateNested } from "class-validator";
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsDateString, IsEmail, IsNotEmpty, IsString, ValidateNested } from "class-validator";
 import { Type } from "class-transformer";
 
 interface CustomerUpdateInput extends Omit<Prisma.CustomerUpdateInput, "phoneNumbers" | "addresses"> {
@@ -8,9 +8,10 @@ interface CustomerUpdateInput extends Omit<Prisma.CustomerUpdateInput, "phoneNum
     addresses?: AddressCreateDto[];
 }
 
-export class CustomerUpdateDto implements CustomerUpdateInput{    
-    @IsString()
+export class CustomerUpdateDto implements CustomerUpdateInput{   
+    @IsEmail()
     @IsNotEmpty()
+    email?: string
     lastName?: string | Prisma.StringFieldUpdateOperationsInput | undefined;
 
     @IsString()
