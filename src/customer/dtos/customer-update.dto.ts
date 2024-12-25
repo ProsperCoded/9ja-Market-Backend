@@ -12,6 +12,9 @@ export class CustomerUpdateDto implements CustomerUpdateInput{
     @IsEmail()
     @IsNotEmpty()
     email?: string
+
+    @IsString()
+    @IsNotEmpty()
     lastName?: string | Prisma.StringFieldUpdateOperationsInput | undefined;
 
     @IsString()

@@ -51,6 +51,8 @@ export class CustomerService {
                     throw new UnauthorizedException(ErrorMessages.EMAIL_EXISTS);
                 }
                 customer.email = email;
+                customer.emailVerifiedAt = null;
+                customer.googleId = null;
             }
             // Set firstName and LastName
             customer.firstName = firstName;
