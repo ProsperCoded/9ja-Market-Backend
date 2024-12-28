@@ -67,14 +67,14 @@ export class CustomerService {
 
             // Update Addresses
             if (addresses) {
-                addresses.map(async (address) => {
+                await Promise.all(addresses.map(async (address) => {
                     const addressInstance = await this.addressRepository.getUniqueByCustomerId(address.name, customerId);
                     if (addressInstance) {
-                        await this.addressRepository.updateByCustomerId(address.name , customerId, address);
+                        await this.addressRepository.updateByCustomerId(address.name, customerId, address);
                     } else {
                         await this.addressRepository.createCustomerAddress(customerId, address);
                     }
-                });
+                }));
             }
 
             // Update The Customer
