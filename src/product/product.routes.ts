@@ -40,9 +40,9 @@ router.get("/merchant/:merchantId",
 
 // Create a Product
 router.post("/",
-    merchantAuthGaurd.authorise(),
     fileParser.multiple("productImages", 10),
     validator.single(ProductCreateDto, "body"),
+    merchantAuthGaurd.authorise(),
     productController.createProduct
 );
 
@@ -81,8 +81,8 @@ router.put("/:id",
 
 // Delete Product
 router.delete("/:id",
-    merchantAuthGaurd.authorise(),
     validator.single(IdDto, "params"),
+    merchantAuthGaurd.authorise(),
     productController.deleteProduct
 );
 
