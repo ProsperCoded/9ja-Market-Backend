@@ -82,7 +82,7 @@ model Product {
   details      String
   description  String
   price        Float
-  prevPrice    Float
+  prevPrice    Float?
   stock        Int
   displayImage ProductImage? @relation("DisplayImage", fields: [displayImageId], references: [id])
   featuredDate DateTime?

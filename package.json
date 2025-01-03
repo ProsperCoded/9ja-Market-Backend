@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node dist/src/server.js",
     "start:dev": "concurrently \"npm run watch-ts\" \"nodemon dist/src/server.js\"",
-    "build": "npm install --legacy-peer-deps && npm run clean && tsc",
+    "build": "npm install --legacy-peer-deps && npm run clean && npm run db:migrate && tsc",
     "clean": "rimraf dist/",
     "clean:logs": "rimraf logs/",
     "watch-ts": "tsc -w",
