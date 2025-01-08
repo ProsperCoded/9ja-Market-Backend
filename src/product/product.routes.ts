@@ -38,6 +38,12 @@ router.get("/merchant/:merchantId",
     productController.getProductByMerchantId
 );
 
+// Get product by marketId
+router.get("/market/:marketId",
+    validator.single(IdDto, "params"),
+    productController.getMarketProducts
+);
+
 // Create a Product
 router.post("/",
     fileParser.multiple("productImages", 10),

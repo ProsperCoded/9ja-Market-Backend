@@ -65,4 +65,5 @@ export enum ErrorMessages {
   ADD_PRODUCT_IMAGES_FAILED = 'Unable to Add Product Images',
   REMOVE_PRODUCT_IMAGE_FAILED = 'Unable to Remove Product Image',
   MAKE_DISPLAY_IMAGE_FAILED = 'Unable to Make Display Image',
+  GET_MARKET_PRODUCTS_FAILED = 'Unable to Fetch Market Products',
 }

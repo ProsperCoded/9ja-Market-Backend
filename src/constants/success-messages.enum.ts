@@ -35,4 +35,5 @@ export enum SuccessMessages {
   GET_MARKET_NAMES_SUCCESS = 'Get Market Names Successful',
   GET_MERCHANT_PRODUCTS_SUCCESS = 'Get Merchant Products Successful',
   ADD_PRODUCT_IMAGES_SUCCESS = 'Product Images Added Successfully',
+  GET_MARKET_PRODUCTS_SUCCESS = 'Get Market Products Successful',
 }
