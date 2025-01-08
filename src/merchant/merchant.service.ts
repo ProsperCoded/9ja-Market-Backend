@@ -33,6 +33,16 @@ export class MerchantService {
         }
     }
 
+    async getMerchantsByMarketId(marketId: string) {
+        try {
+            const merchants = await this.merchantRepository.getMarketMerchants(marketId);
+            return merchants;
+        } catch (error) {
+            this.logger.error(`${ErrorMessages.GET_MERCHANTS_BY_MARKET_ID_FAILED}: ${error}`);
+            throw new InternalServerException(ErrorMessages.GET_MERCHANTS_BY_MARKET_ID_FAILED);
+        }
+    }
+
     async updateMerchant(merchantId: string, merchantUpdateDto: MerchantUpdateDto) {
         try {
             const { phoneNumbers, addresses, brandName, marketName , email} = merchantUpdateDto;

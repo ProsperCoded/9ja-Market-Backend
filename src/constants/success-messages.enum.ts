@@ -38,4 +38,5 @@ export enum SuccessMessages {
   GET_MARKET_PRODUCTS_SUCCESS = 'Get Market Products Successful',
   GET_ALL_MARKETS_SUCCESS = 'Get All Markets Successful',
   GET_ALL_MALLS_SUCCESS = 'Get All Malls Successful',
+  GET_MERCHANTS_BY_MARKET_SUCCESS = 'Get Merchants by Market Successful',
 }
