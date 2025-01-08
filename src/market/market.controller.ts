@@ -67,6 +67,41 @@ export class MarketController {
 
 
     /**
+    * Get All Markets
+    * @param request {Request}
+    * @param response {Response}
+    * @param next {NextFunction}
+    */
+    getAllMarkets: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
+        try {
+            const result = await this.marketService.findAllMalls();
+            result.forEach(this.formatMarketData);
+            const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.GET_ALL_MARKETS_SUCCESS, result);
+            return response.status(HttpStatus.OK).send(resObj);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    /**
+    * Get All Malls
+    * @param request {Request}
+    * @param response {Response}
+    * @param next {NextFunction}
+    */
+    getAllMalls: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
+        try {
+            const result = await this.marketService.findAllMalls();
+            result.forEach(this.formatMarketData);
+            const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.GET_ALL_MALLS_SUCCESS, result);
+            return response.status(HttpStatus.OK).send(resObj);
+        } catch (e) {
+            next(e);
+        }
+    }
+
+
+    /**
     * Create Market
     * @param request {Request}
     * @param response {Response}

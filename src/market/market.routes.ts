@@ -18,6 +18,10 @@ const validator = new Validator();
 
 router.get("/names", marketController.getMarketNames);
 
+router.get("/markets", marketController.getAllMarkets);
+
+router.get("/malls", marketController.getAllMalls);
+
 router.get("/", validator.single(GetByNameDto, "body"), marketController.getMarketByName);
 
 router.get("/:marketId", validator.single(IdDto, "params"), marketController.getMarketById);

@@ -22,6 +22,26 @@ export class MarketService {
         }
     }
 
+    async findMarkets() {
+        try {
+            const markets = await this.marketRepository.findAllMarkets();
+            return markets;
+        } catch (e) {
+            this.logger.error(`${ErrorMessages.GET_MARKETS_FAILED}: ${e}`);
+            throw new InternalServerException(ErrorMessages.GET_MARKETS_FAILED);
+        }
+    }
+
+    async findAllMalls() {
+        try {
+            const malls = await this.marketRepository.findAllMalls();
+            return malls;
+        } catch (e) {
+            this.logger.error(`${ErrorMessages.GET_MALLS_FAILED}: ${e}`);
+            throw new InternalServerException(ErrorMessages.GET_MALLS_FAILED);
+        }
+    }
+
     async findMarketNames() {
         try {
             const names = await this.marketRepository.findNames();
