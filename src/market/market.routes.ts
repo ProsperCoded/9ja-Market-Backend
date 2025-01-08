@@ -18,7 +18,7 @@ const validator = new Validator();
 
 router.get("/names", marketController.getMarketNames);
 
-router.get("/markets", marketController.getAllMarkets);
+router.get("/", marketController.getAllMarkets);
 
 router.get("/malls", marketController.getAllMalls);
 
