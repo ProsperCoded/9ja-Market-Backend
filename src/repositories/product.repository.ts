@@ -63,6 +63,28 @@ export class ProductRepository {
         });
     }
 
+    getMarketProducts(marketId: string): Promise<Product[]> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const products = await this.productDelegate.findMany({
+                    where: {
+                        merchant: {
+                            marketId
+                        }
+                    },
+                    include: {
+                        displayImage: true,
+                        images: true,
+                        ratings: true
+                    }
+                });
+                resolve(products);
+            } catch (error) {
+                reject(error);
+            }
+        })
+    }
+
     getFeaturedProducts(merchantId: string): Promise<Product[]> {
         return new Promise(async (resolve, reject) => {
             try {
