@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import { IsBoolean, IsDefined, IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsBooleanString, IsDefined, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 
 export class MarketCreateDto implements Prisma.MarketCreateInput{
@@ -29,6 +29,6 @@ export class MarketCreateDto implements Prisma.MarketCreateInput{
     declare state: string; 
 
     @IsOptional()
-    @IsBoolean()
+    @IsBooleanString()
     declare isMall: boolean;
 }
