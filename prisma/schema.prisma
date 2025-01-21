@@ -9,8 +9,8 @@ generator client {
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
@@ -64,38 +64,40 @@ model Merchant {
 }
 
 model Market {
-  id          String     @id @default(uuid())
-  name        String     @unique
-  description String?
-  address     String
-  city        String?
-  state       String?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  deletedAt   DateTime?
-  merchants   Merchant[]
+  id           String     @id @default(uuid())
+  name         String     @unique
+  displayImage String?
+  description  String?
+  address      String
+  city         String?
+  state        String?
+  isMall       Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  deletedAt    DateTime?
+  merchants    Merchant[]
 }
 
 model Product {
-  id             String          @id @default(uuid())
-  name           String
-  details        String
-  description    String
-  price          Float
-  prevPrice      Float
-  stock          Int
-  displayImage   ProductImage?   @relation("DisplayImage", fields: [displayImageId], references: [id])
-  featuredDate   DateTime?
-  images         ProductImage[]  @relation("ProductImages")
-  ratings        Rating[]
-  cart           CartProduct[]
-  category       ProductCategory
-  merchant       Merchant        @relation(fields: [merchantId], references: [id])
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  deletedAt      DateTime?
-  merchantId     String
-  displayImageId String?         @unique
+  id               String          @id @default(uuid())
+  name             String
+  details          String
+  description      String
+  price            Float
+  prevPrice        Float?
+  stock            Int
+  displayImage     ProductImage?     @relation("DisplayImage", fields: [displayImageId], references: [id])
+  featuredDate     DateTime?
+  images           ProductImage[]   @relation("ProductImages")
+  ratings          Rating[]
+  cart             CartProduct[]
+  category         ProductCategory
+  merchant         Merchant        @relation(fields: [merchantId], references: [id])
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  deletedAt        DateTime?
+  merchantId       String
+  displayImageId String?                 @unique
   Ad             Ad[]
 
   @@index([name])

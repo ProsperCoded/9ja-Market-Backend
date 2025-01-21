@@ -69,4 +69,8 @@ export enum ErrorMessages {
   AD_PAYMENT_VERIFICATION_FAILED = 'Unable to Verify Ad Payment',
   TRANSACTION_NOT_FOUND = 'Transaction Not Found',
   PAYMENT_VERIFICATION_FAILED = 'Payment Verification Failed',
+  GET_MARKET_PRODUCTS_FAILED = 'Unable to Fetch Market Products',
+  GET_MARKETS_FAILED = 'Unable to Fetch Markets',
+  GET_MALLS_FAILED = 'Unable to Fetch Malls',
+  GET_MERCHANTS_BY_MARKET_ID_FAILED = 'Unable to Fetch Merchants by Market ID',
 }
