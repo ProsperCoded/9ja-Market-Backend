@@ -56,4 +56,14 @@ export class TransactionRepository {
         });
     }
 
+    update(transactionId: string, data: Prisma.TransactionUpdateInput): Promise<Transaction> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const transaction = await this.transactionDelegate.update({ where: { id: transactionId }, data });
+                resolve(transaction);
+            } catch (e) {
+                reject(e);
+            }
+        });
+    }
 }

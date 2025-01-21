@@ -73,4 +73,7 @@ export enum ErrorMessages {
   GET_MARKETS_FAILED = 'Unable to Fetch Markets',
   GET_MALLS_FAILED = 'Unable to Fetch Malls',
   GET_MERCHANTS_BY_MARKET_ID_FAILED = 'Unable to Fetch Merchants by Market ID',
+  AD_NOT_FOUND = 'Ad Not Found',
+  FREE_AD_ACTIVATION_FAILED = 'Unable to Activate Free Ad',
+  FREE_AD_EXISTS = 'Free Ad Exists Already',
 }

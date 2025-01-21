@@ -9,14 +9,11 @@ export class AdRepository {
         this.adDelegate = databaseService.ad;
     }
 
-    create(level: number, productId: string): Promise<Ad> {
+    create(data: Prisma.AdCreateInput): Promise<Ad> {
         return new Promise(async (resolve, reject) => {
             try {
                 const ad = await this.adDelegate.create({ 
-                    data: {
-                        level,
-                        product: { connect: { id: productId } }
-                    }
+                    data
                  });
                 resolve(ad);
             } catch (e) {
@@ -25,10 +22,22 @@ export class AdRepository {
         });
     }
 
+
     getAd(adId: string): Promise<Ad | null> {
         return new Promise(async (resolve, reject) => {
             try {
                 const ad = await this.adDelegate.findUnique({ where: { id: adId } });
+                resolve(ad);
+            } catch (e) {
+                reject(e);
+            }
+        });
+    }
+
+    getFreeAd(productId: string): Promise<Ad | null> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const ad = await this.adDelegate.findFirst({ where: { level: 0, product: { id: productId } } });
                 resolve(ad);
             } catch (e) {
                 reject(e);
