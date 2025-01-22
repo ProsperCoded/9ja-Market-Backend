@@ -1,13 +1,23 @@
-import { Prisma, Product } from "@prisma/client";
+import { Prisma, Product, ProductCategory } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 import { databaseService } from "../utils/database";
 
 
+interface ProductSearchResult extends Product {
+    priority: boolean;
+}
+
+interface WeightedAd<T> {
+    ad: T;
+    weight: number;
+}
 export class ProductRepository {
     private readonly productDelegate: Prisma.ProductDelegate<DefaultArgs>;
+    private readonly adDelegate: Prisma.AdDelegate<DefaultArgs>;
 
     constructor() {
         this.productDelegate = databaseService.product;
+        this.adDelegate = databaseService.ad;
     }
 
 
@@ -18,7 +28,12 @@ export class ProductRepository {
                     include: {
                         displayImage: true,
                         images: true,
-                        ratings: true
+                        ratings: true,
+                        merchant: {
+                            include: {
+                                market: true
+                            }
+                        },
                     }
                 });
                 resolve(products);
@@ -36,7 +51,12 @@ export class ProductRepository {
                     include: {
                         displayImage: true,
                         images: true,
-                        ratings: true
+                        ratings: true,
+                        merchant: {
+                            include: {
+                                market: true
+                            }
+                        },
                     }
                 });
                 resolve(product);
@@ -53,7 +73,12 @@ export class ProductRepository {
                     where: { merchantId }, include: {
                         displayImage: true,
                         images: true,
-                        ratings: true
+                        ratings: true,
+                        merchant: {
+                            include: {
+                                market: true
+                            }
+                        },
                     }
                 });
                 resolve(products);
@@ -75,7 +100,12 @@ export class ProductRepository {
                     include: {
                         displayImage: true,
                         images: true,
-                        ratings: true
+                        ratings: true,
+                        merchant: {
+                            include: {
+                                market: true
+                            }
+                        },
                     }
                 });
                 resolve(products);
@@ -83,30 +113,6 @@ export class ProductRepository {
                 reject(error);
             }
         })
-    }
-
-    getFeaturedProducts(merchantId: string): Promise<Product[]> {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const products = await this.productDelegate.findMany({
-                    where: {
-                        merchantId,
-                        NOT: { featuredDate: null }
-                    },
-                    include: {
-                        displayImage: true,
-                        images: true,
-                        ratings: true
-                    },
-                    orderBy: {
-                        featuredDate: 'desc'
-                    }
-                });
-                resolve(products);
-            } catch (error) {
-                reject(error);
-            }
-        });
     }
 
     update(id: string, product: Prisma.ProductUpdateInput): Promise<Product> {
@@ -118,7 +124,12 @@ export class ProductRepository {
                     include: {
                         displayImage: true,
                         images: true,
-                        ratings: true
+                        ratings: true,
+                        merchant: {
+                            include: {
+                                market: true
+                            }
+                        },
                     }
                 });
                 resolve(updatedProduct);
@@ -153,7 +164,12 @@ export class ProductRepository {
                     include: {
                         displayImage: true,
                         images: true,
-                        ratings: true
+                        ratings: true,
+                        merchant: {
+                            include: {
+                                market: true
+                            }
+                        },
                     }
                 });
                 resolve(newProduct);
@@ -190,7 +206,12 @@ export class ProductRepository {
                     include: {
                         displayImage: true,
                         images: true,
-                        ratings: true
+                        ratings: true,
+                        merchant: {
+                            include: {
+                                market: true
+                            }
+                        },
                     }
                 });
                 resolve(product);
@@ -215,7 +236,12 @@ export class ProductRepository {
                     include: {
                         displayImage: true,
                         images: true,
-                        ratings: true
+                        ratings: true,
+                        merchant: {
+                            include: {
+                                market: true
+                            }
+                        },
                     }
                 });
                 resolve(product);
@@ -238,10 +264,141 @@ export class ProductRepository {
                     include: {
                         displayImage: true,
                         images: true,
-                        ratings: true
+                        ratings: true,
+                        merchant: {
+                            include: {
+                                market: true
+                            }
+                        },
                     }
                 });
                 resolve(product);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    searchProducts(searchTerm: string): Promise<ProductSearchResult[]> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const matchingProducts = await this.productDelegate.findMany({
+                    where: {
+                        OR: [
+                            { name: { contains: searchTerm, mode: "insensitive" } },
+                            { description: { contains: searchTerm, mode: "insensitive" } },
+                            { category: searchTerm as ProductCategory },
+                        ]
+                    },
+                    include: {
+                        displayImage: true,
+                        images: true,
+                        ratings: true,
+                        merchant: {
+                            include: {
+                                market: true
+                            }
+                        },
+                        ads: {
+                            where: {
+                                expiresAt: { gte: new Date() },
+                                paidFor: true
+                            }
+                        }
+                    }
+                });
+                // Prioritize products with ads
+                const sortedProducts = matchingProducts.sort((a, b) => {
+                    const levelA = a.ads.length > 0 ? Math.max(...a.ads.map(ad => ad.level)) : 0;
+                    const levelB = b.ads.length > 0 ? Math.max(...b.ads.map(ad => ad.level)) : 0;
+                    return levelB - levelA;
+                })
+
+                // Add extra "priority" field to products with ads and remove ads from the response
+                const products = sortedProducts.map(product => {
+                    if (product.ads.length > 0) {
+                        (product as unknown as ProductSearchResult).priority = true;
+                    }
+                    return product;
+                });
+                resolve(products as unknown as ProductSearchResult[]);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    // Featured Products
+    getFeaturedProducts(limit: number = 10): Promise<Product[]> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const ads = await this.adDelegate.findMany({
+                    where: {
+                        expiresAt: { gte: new Date() },
+                        paidFor: true
+                    },
+                    include: {
+                        product: {
+                            include: {
+                                displayImage: true,
+                                images: true,
+                                ratings: true,
+                                merchant: {
+                                    include: {
+                                        market: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Apply weighted random selection to ads
+                const weightedAds: WeightedAd<typeof ads[0]>[] = ads.map(ad => ({ ad, weight: ad.level }));
+                const selectedAds: typeof ads = [];
+                for (let i = 0; i < Math.min(weightedAds.length, limit); i++) {
+                    const totalWeight = weightedAds.reduce((acc, curr) => acc + curr.weight, 0);
+                    const random = Math.random() * totalWeight;
+                    let sum = 0;
+                    for (let j = 0; j < weightedAds.length; j++) {
+                        sum += weightedAds[j].weight;
+                        if (random < sum) {
+                            selectedAds.push(weightedAds[j].ad);
+                            weightedAds.splice(j, 1);
+                            break;
+                        }
+                    }
+                }
+
+                // Extract products from ads
+                const featuredProducts = selectedAds.map(ad => ad.product);
+
+                // Fill up with random products if necessary
+                if (featuredProducts.length < limit) {
+                    const remainingProducts = await this.productDelegate.findMany({
+                        where: {
+                            NOT: {
+                                id: {
+                                    in: featuredProducts.map(product => product.id)
+                                }
+                            }
+                        },
+                        include: {
+                            displayImage: true,
+                            images: true,
+                            ratings: true,
+                            merchant: {
+                                include: {
+                                    market: true
+                                }
+                            }
+                        },
+                        take: limit - featuredProducts.length,
+                    });
+                    featuredProducts.push(...remainingProducts);
+                }
+
+                resolve(featuredProducts);
             } catch (error) {
                 reject(error);
             }

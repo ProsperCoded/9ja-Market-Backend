@@ -87,7 +87,6 @@ model Product {
   prevPrice      Float?
   stock          Int
   displayImage   ProductImage?   @relation("DisplayImage", fields: [displayImageId], references: [id])
-  featuredDate   DateTime?
   images         ProductImage[]  @relation("ProductImages")
   ratings        Rating[]
   cart           CartProduct[]
@@ -98,7 +97,7 @@ model Product {
   deletedAt      DateTime?
   merchantId     String
   displayImageId String?         @unique
-  Ad             Ad[]
+  ads             Ad[]
 
   @@index([name])
 }
