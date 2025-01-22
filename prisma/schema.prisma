@@ -98,15 +98,26 @@ model Product {
   deletedAt      DateTime?
   merchantId     String
   displayImageId String?         @unique
+  Ad             Ad[]
 
   @@index([name])
+}
+
+model Ad {
+  id        String    @id @default(uuid())
+  level     Int
+  paidFor   Boolean   @default(false)
+  product   Product   @relation(fields: [productId], references: [id])
+  productId String
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Order {
   id            String        @id @default(uuid())
   customer      Customer      @relation(fields: [customerId], references: [id])
   products      CartProduct[]
-  transaction   Transaction   @relation(fields: [transactionId], references: [id])
   status        OrderStatus
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
@@ -117,15 +128,15 @@ model Order {
 }
 
 model Transaction {
-  id         String    @id @default(uuid())
-  merchant   Merchant  @relation(fields: [merchantId], references: [id])
-  order      Order?
+  id         String        @id @default(uuid())
+  merchant   Merchant      @relation(fields: [merchantId], references: [id])
   amount     Float
-  status     String
-  date       DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  status     PaymentStatus
+  for        PaymentFor
+  reference  String
+  date       DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
   deletedAt  DateTime?
-  customerId String
   merchantId String
 }
 
@@ -270,4 +281,16 @@ enum MerchantCategory {
   HARDWARE
   SPORTS
   TOYS
+}
+
+enum PaymentFor {
+  ADVERTISEMENT
+}
+
+enum PaymentStatus {
+  SUCCESS
+  FAILED
+  INCOMPLETE
+  INITIALIZED
+  PENDING
 }
