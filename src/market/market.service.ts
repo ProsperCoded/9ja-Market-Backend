@@ -37,7 +37,6 @@ export class MarketService {
     async findMarkets() {
         try {
             const markets = await this.marketRepository.findAllMarkets();
-            console.log("Markets Found", markets);
             return markets;
         } catch (e) {
             this.logger.error(`${ErrorMessages.GET_MARKETS_FAILED}: ${e}`);
