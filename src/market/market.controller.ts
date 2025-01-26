@@ -74,7 +74,7 @@ export class MarketController {
     */
     getAllMarkets: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            const result = await this.marketService.findAllMalls();
+            const result = await this.marketService.findMarkets();
             result.forEach(this.formatMarketData);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.GET_ALL_MARKETS_SUCCESS, result);
             return response.status(HttpStatus.OK).send(resObj);

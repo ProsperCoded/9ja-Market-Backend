@@ -6,7 +6,7 @@ import { BaseException } from "../exceptions/base.exception";
 
 
 function errorHandler(error: BaseException, request: Request, response: Response, next: NextFunction) {
-  // console.log(error);
+  console.log(error);
   const status = error.status || HttpStatus.INTERNAL_SERVER_ERROR;
   const message = error.message || "Something went wrong";
 

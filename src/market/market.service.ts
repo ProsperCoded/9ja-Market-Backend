@@ -6,6 +6,8 @@ import { NotFoundException } from "../utils/exceptions/not-found.exception";
 import { WinstonLogger } from "../utils/logger/winston.logger";
 import { MarketCreateDto } from "./dtos/market-create.dto";
 import { MarketUpdateDto } from "./dtos/market-update.dto";
+import { BadRequestException } from "../utils/exceptions/bad-request.exception";
+import { BaseException } from "../utils/exceptions/base.exception";
 
 export class MarketService {
     constructor(
@@ -15,12 +17,18 @@ export class MarketService {
 
     async createMarket(market: MarketCreateDto, file?: Express.Multer.File) {
         try {
+            // Check if Market Exists
+            const marketExists = await this.marketRepository.findByName(market.name);
+            if (marketExists) {
+                throw new BadRequestException(ErrorMessages.MARKET_ALREADY_EXISTS);
+            }
             if (file) {
                 (market as Prisma.MarketCreateInput).displayImage = file.path;
             }
             const createdMarket = await this.marketRepository.createMarket(market);
             return createdMarket;
         } catch (e) {
+            if(e instanceof BaseException) throw e;
             this.logger.error(`${ErrorMessages.CREATE_MARKET_FAILED}: ${e}`);
             throw new InternalServerException(ErrorMessages.CREATE_MARKET_FAILED);
         }
@@ -29,6 +37,7 @@ export class MarketService {
     async findMarkets() {
         try {
             const markets = await this.marketRepository.findAllMarkets();
+            console.log("Markets Found", markets);
             return markets;
         } catch (e) {
             this.logger.error(`${ErrorMessages.GET_MARKETS_FAILED}: ${e}`);
