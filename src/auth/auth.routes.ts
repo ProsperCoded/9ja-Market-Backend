@@ -1,7 +1,7 @@
 import { Request, Response, Router } from "express";
 
 import CustomerAuthRouter from './customer/customer.auth.routes';
-import MarketAuthRouter from './merchant/merchant.auth.routes';
+import MerchantAuthRouter from './merchant/merchant.auth.routes';
 import passport from "passport";
 
 const router = Router();
@@ -10,7 +10,7 @@ const router = Router();
 router.use('/customer', CustomerAuthRouter);
 
 // Market Authentication Routes
-router.use('/merchant', MarketAuthRouter);
+router.use('/merchant', MerchantAuthRouter);
 
 // Google auth Base callback
 router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/login' }), (req: Request, res: Response)=>{
