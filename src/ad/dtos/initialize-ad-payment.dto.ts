@@ -1,11 +1,10 @@
-import { IsDefined, IsInt, IsUUID, Max, Min } from "class-validator";
+import { IsDefined, IsNumberString, IsUUID, Matches } from "class-validator";
 
 export class InitializeAdPaymentDto{
     @IsDefined()
-    @IsInt()
-    @Min(1)
-    @Max(3)
-    declare level : number;
+    @IsNumberString()
+    @Matches(/^[1-3]$/, { message: 'Level must be a number between 1 and 3' })
+    declare level : string;
 
     @IsDefined()
     @IsUUID()

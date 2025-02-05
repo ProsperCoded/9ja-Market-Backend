@@ -77,4 +77,5 @@ export enum ErrorMessages {
   FREE_AD_ACTIVATION_FAILED = 'Unable to Activate Free Ad',
   FREE_AD_EXISTS = 'Free Ad Exists Already',
   MARKET_ALREADY_EXISTS = 'Market Already Exists',
+  NOT_YOUR_PRODUCT= "Product is not yours"
 }

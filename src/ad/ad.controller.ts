@@ -39,7 +39,7 @@ export class AdController {
 
     initializeAdPayment: RequestHandler = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            const result = await this.adService.initializeAdPayment(request.params.level as unknown as keyof typeof AdPrices, request.params.productId, request.body.merchant);
+            const result = await this.adService.initializeAdPayment(parseInt(request.params.level) as unknown as keyof typeof AdPrices, request.params.productId, request.body.merchant);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.AD_PAYMENT_INITIALIZATION_SUCCESS, result);
             return response.status(HttpStatus.OK).send(resObj);
         } catch (e) {

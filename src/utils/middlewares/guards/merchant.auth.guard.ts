@@ -7,6 +7,7 @@ import { UnauthorizedException } from '../../exceptions/unauthorized.exception';
 import { cryptoService } from "../../crytpo/crypto.service";
 import { MerchantRepository } from "../../../repositories/merchant.repository";
 import { NotFoundException } from "../../exceptions/not-found.exception";
+import { BaseException } from "../../exceptions/base.exception";
 
 
 export class MerchantAuthGaurd {
@@ -73,6 +74,7 @@ export class MerchantAuthGaurd {
 
             return merchant;
         } catch (error) {
+            if(error instanceof BaseException) throw error;
             this.logger.error(`${ErrorMessages.USER_UNAUTHORIZED}: ${error}`);
             throw new UnauthorizedException(ErrorMessages.USER_UNAUTHORIZED);
         }

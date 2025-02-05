@@ -10,6 +10,7 @@ import { BaseException } from "../utils/exceptions/base.exception";
 import { InternalServerException } from "../utils/exceptions/internal-server.exception";
 import { ILogger } from "../utils/logger/logger.interface";
 import { QuickTellerRequest } from './dtos/quickTeller-request.dto';
+import { UnauthorizedException } from '../utils/exceptions/unauthorized.exception';
 
 
 export class AdService {
@@ -27,6 +28,9 @@ export class AdService {
             // Check if the product exists
             const product = await this.productRepository.getById(productId);
             if (!product) throw new BadRequestException(ErrorMessages.PRODUCT_NOT_FOUND);
+
+            // Ensure Merchant Owns Product
+            if(product.merchantId !== merchant.id) throw new UnauthorizedException(ErrorMessages.NOT_YOUR_PRODUCT)
 
             // Check if the merchant has a free ad
             const freeAd = await this.adRepository.getFreeAd(productId);
@@ -72,12 +76,14 @@ export class AdService {
     async verifyAdPayment(reference: string) {
         try {
             // Verify payment
-            const transactionId = reference.split('-')[1];
+            const transactionId = reference.replace("txn-", "");
             const transaction = await this.transactionRepository.getTransaction(transactionId);
             if (!transaction) throw new BadRequestException(ErrorMessages.TRANSACTION_NOT_FOUND);
 
             const verification = await this.paymentService.verifyPayment(reference, transaction.amount);
             if (!verification) throw new BadRequestException(ErrorMessages.PAYMENT_VERIFICATION_FAILED);
+
+            console.log(verification);
 
             if (verification.ResponseCode in ["00", "01", "11"]) {
                 if(verification.Amount !== transaction.amount) throw new BadRequestException(ErrorMessages.PAYMENT_VERIFICATION_FAILED);
