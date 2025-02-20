@@ -31,7 +31,9 @@ export class ProductRepository {
                         ratings: true,
                         merchant: {
                             include: {
-                                market: true
+                                market: true,
+                                addresses: true,
+                                phoneNumbers: true,
                             }
                         },
                     }
@@ -54,7 +56,9 @@ export class ProductRepository {
                         ratings: true,
                         merchant: {
                             include: {
-                                market: true
+                                market: true,
+                                addresses: true,
+                                phoneNumbers: true,
                             }
                         },
                     }
@@ -76,7 +80,9 @@ export class ProductRepository {
                         ratings: true,
                         merchant: {
                             include: {
-                                market: true
+                                market: true,
+                                addresses: true,
+                                phoneNumbers: true,
                             }
                         },
                     }
@@ -103,7 +109,9 @@ export class ProductRepository {
                         ratings: true,
                         merchant: {
                             include: {
-                                market: true
+                                market: true,
+                                addresses: true,
+                                phoneNumbers: true,
                             }
                         },
                     }
@@ -127,7 +135,9 @@ export class ProductRepository {
                         ratings: true,
                         merchant: {
                             include: {
-                                market: true
+                                market: true,
+                                addresses: true,
+                                phoneNumbers: true,
                             }
                         },
                     }
@@ -167,7 +177,9 @@ export class ProductRepository {
                         ratings: true,
                         merchant: {
                             include: {
-                                market: true
+                                market: true,
+                                addresses: true,
+                                phoneNumbers: true,
                             }
                         },
                     }
@@ -209,7 +221,9 @@ export class ProductRepository {
                         ratings: true,
                         merchant: {
                             include: {
-                                market: true
+                                market: true,
+                                addresses: true,
+                                phoneNumbers: true,
                             }
                         },
                     }
@@ -239,7 +253,9 @@ export class ProductRepository {
                         ratings: true,
                         merchant: {
                             include: {
-                                market: true
+                                market: true,
+                                addresses: true,
+                                phoneNumbers: true,
                             }
                         },
                     }
@@ -267,7 +283,9 @@ export class ProductRepository {
                         ratings: true,
                         merchant: {
                             include: {
-                                market: true
+                                market: true,
+                                addresses: true,
+                                phoneNumbers: true,
                             }
                         },
                     }
@@ -296,7 +314,9 @@ export class ProductRepository {
                         ratings: true,
                         merchant: {
                             include: {
-                                market: true
+                                market: true,
+                                addresses: true,
+                                phoneNumbers: true,
                             }
                         },
                         ads: {
@@ -345,7 +365,9 @@ export class ProductRepository {
                                 ratings: true,
                                 merchant: {
                                     include: {
-                                        market: true
+                                        market: true,
+                                        addresses: true,
+                                        phoneNumbers: true,
                                     }
                                 }
                             }
@@ -389,7 +411,9 @@ export class ProductRepository {
                             ratings: true,
                             merchant: {
                                 include: {
-                                    market: true
+                                    market: true,
+                                    addresses: true,
+                                    phoneNumbers: true,
                                 }
                             }
                         },
