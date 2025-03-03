@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node dist/src/server.js",
     "start:dev": "concurrently \"npm run watch-ts\" \"nodemon dist/src/server.js\"",
+    "dev": "tsx watch src/server.ts",
     "build": "npm install --legacy-peer-deps && npm run clean && npm run db:migrate && tsc",
     "clean": "rimraf dist/",
     "clean:logs": "rimraf logs/",
@@ -41,8 +42,10 @@
   "description": "",
   "dependencies": {
     "@prisma/client": "^5.19.1",
+    "@types/bcryptjs": "^2.4.6",
     "axios": "^1.7.8",
     "bcrypt": "^5.1.1",
+    "bcryptjs": "^3.0.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "cloudinary": "^2.5.1",
