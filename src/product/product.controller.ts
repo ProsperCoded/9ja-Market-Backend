@@ -11,11 +11,7 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   private formatProductData(productData: Product): void {
-    DataFormatterHelper.formatDatabaseObject<Product>(
-      productData,
-      ["merchantId"],
-      "id"
-    );
+    DataFormatterHelper.formatDatabaseObject<Product>(productData, [], "id");
   }
   /**
    * Get Product by Id
