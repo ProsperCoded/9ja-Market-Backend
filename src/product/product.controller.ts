@@ -13,6 +13,41 @@ export class ProductController {
   private formatProductData(productData: Product): void {
     DataFormatterHelper.formatDatabaseObject<Product>(productData, [], "id");
   }
+
+  /**
+   * Get All Products with pagination
+   * @param request {Request}
+   * @param response {Response}
+   * @param next {NextFunction}
+   */
+  getAllProducts: RequestHandler = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { page, pageSize, category, state } = request.query;
+      const result = await this.productService.getProducts(
+        Number(page) || 1,
+        Number(pageSize) || 40,
+        category as any,
+        state as string
+      );
+
+      // Format each product in the items array
+      result.items.forEach((product) => this.formatProductData(product));
+
+      const resObj = new ResponseDto(
+        ResponseStatus.SUCCESS,
+        SuccessMessages.GET_PRODUCTS_SUCCESS,
+        result
+      );
+      return response.status(HttpStatus.OK).send(resObj);
+    } catch (e) {
+      next(e);
+    }
+  };
+
   /**
    * Get Product by Id
    * @param request {Request}
