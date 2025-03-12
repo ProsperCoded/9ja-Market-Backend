@@ -1,6 +1,7 @@
 import { Ad, Prisma } from "@prisma/client";
 import { DefaultArgs } from "@prisma/client/runtime/library";
 import { databaseService } from "../utils/database";
+import moment from "moment-timezone";
 
 export class AdRepository {
   private readonly adDelegate: Prisma.AdDelegate<DefaultArgs>;
@@ -24,7 +25,7 @@ export class AdRepository {
   getAd(adId: string): Promise<Ad | null> {
     return new Promise(async (resolve, reject) => {
       try {
-        const ad = await this.adDelegate.findUnique({
+        const ad = await this.adDelegate.findFirst({
           where: { id: adId },
           include: { product: true },
         });
@@ -111,13 +112,58 @@ export class AdRepository {
     });
   }
 
+  getAllFilteredAds(filters: {
+    marketId?: string;
+    merchantId?: string;
+  }): Promise<Ad[]> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const where: any = {};
+
+        if (filters.merchantId) {
+          where.product = {
+            ...where.product,
+            merchantId: filters.merchantId,
+          };
+        }
+
+        if (filters.marketId) {
+          where.product = {
+            ...where.product,
+            merchant: {
+              marketId: filters.marketId,
+            },
+          };
+        }
+
+        const ads = await this.adDelegate.findMany({
+          where,
+          include: {
+            product: {
+              include: {
+                displayImage: true,
+                images: true,
+              },
+            },
+          },
+        });
+        resolve(ads);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+  // * checks if validated and not expired
   getFilteredAds(filters: {
     marketId?: string;
     merchantId?: string;
   }): Promise<Ad[]> {
     return new Promise(async (resolve, reject) => {
       try {
-        const where: any = { paidFor: true };
+        const where: any = {
+          paidFor: true,
+          expiresAt: { gt: moment.tz("Africa/Lagos").toDate() },
+        };
 
         if (filters.merchantId) {
           where.product = {

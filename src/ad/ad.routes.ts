@@ -63,7 +63,10 @@ router.get(
 );
 
 // Get Ads (with optional filters)
-router.get("/", adController.getAds);
+router.get("/all", adController.getAllFilteredAds);
+
+// * filters out ads that have expired and not paid for
+router.get("/", adController.getFilteredAds);
 router.get("/:adId", validator.single(IdDto, "params"), adController.getAd);
 router.get(
   "/product/:productId",

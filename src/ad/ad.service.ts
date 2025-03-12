@@ -10,6 +10,7 @@ import { BaseException } from "../utils/exceptions/base.exception";
 import { InternalServerException } from "../utils/exceptions/internal-server.exception";
 import { ILogger } from "../utils/logger/logger.interface";
 import { UnauthorizedException } from "../utils/exceptions/unauthorized.exception";
+import moment from "moment-timezone";
 
 export class AdService {
   constructor(
@@ -131,9 +132,11 @@ export class AdService {
           const ad = await this.adRepository.getAd(transaction.reference);
           if (!ad) throw new BadRequestException(ErrorMessages.AD_NOT_FOUND);
 
-          const expiresAt = new Date(
-            Date.now() + AdTimeLine[ad.level as keyof typeof AdTimeLine]
-          );
+          // specify nigeria timezone
+          const todayNigeria = moment.tz("Africa/Lagos");
+          const expiresAt = todayNigeria
+            .add(AdTimeLine[ad.level as keyof typeof AdTimeLine], "day")
+            .toDate();
           await this.adRepository.update(transaction.reference, {
             expiresAt,
             paidFor: true,
@@ -173,7 +176,18 @@ export class AdService {
     }
   }
 
-  async getAds(filters: { marketId?: string; merchantId?: string }) {
+  async getAllFilteredAds(filters: { marketId?: string; merchantId?: string }) {
+    try {
+      const ads = await this.adRepository.getAllFilteredAds(filters);
+      return ads;
+    } catch (error) {
+      if (error instanceof BaseException) throw error;
+      this.logger.error(ErrorMessages.AD_FETCH_FAILED, error);
+      throw new InternalServerException(ErrorMessages.AD_FETCH_FAILED);
+    }
+  }
+
+  async getFilteredAds(filters: { marketId?: string; merchantId?: string }) {
     try {
       const ads = await this.adRepository.getFilteredAds(filters);
       return ads;

@@ -93,13 +93,35 @@ export class AdController {
     }
   };
 
+  getAllFilteredAds: RequestHandler = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { market: marketId, merchant: merchantId } = request.query;
+      const filters = {
+        ...(marketId && { marketId: marketId as string }),
+        ...(merchantId && { merchantId: merchantId as string }),
+      };
+      const result = await this.adService.getAllFilteredAds(filters);
+      const resObj = new ResponseDto(
+        ResponseStatus.SUCCESS,
+        SuccessMessages.AD_FETCH_SUCCESS,
+        result
+      );
+      return response.status(HttpStatus.OK).send(resObj);
+    } catch (e) {
+      next(e);
+    }
+  };
   /**
    * Get Ads with optional market and merchant filters
    * @param request {Request}
    * @param response {Response}
    * @param next {NextFunction}
    */
-  getAds: RequestHandler = async (
+  getFilteredAds: RequestHandler = async (
     request: Request,
     response: Response,
     next: NextFunction
@@ -111,7 +133,7 @@ export class AdController {
         ...(merchantId && { merchantId: merchantId as string }),
       };
 
-      const result = await this.adService.getAds(filters);
+      const result = await this.adService.getFilteredAds(filters);
       const resObj = new ResponseDto(
         ResponseStatus.SUCCESS,
         SuccessMessages.AD_FETCH_SUCCESS,
