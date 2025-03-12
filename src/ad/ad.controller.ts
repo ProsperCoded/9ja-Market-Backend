@@ -123,6 +123,44 @@ export class AdController {
     }
   };
 
+  getAd: RequestHandler = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const result = await this.adService.getAd(request.params.adId);
+      const resObj = new ResponseDto(
+        ResponseStatus.SUCCESS,
+        SuccessMessages.AD_FETCH_SUCCESS,
+        result
+      );
+      return response.status(HttpStatus.OK).send(resObj);
+    } catch (e) {
+      next(e);
+    }
+  };
+
+  getAdByProduct: RequestHandler = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const result = await this.adService.getAdByProduct(
+        request.params.productId
+      );
+      const resObj = new ResponseDto(
+        ResponseStatus.SUCCESS,
+        SuccessMessages.AD_FETCH_SUCCESS,
+        result
+      );
+      return response.status(HttpStatus.OK).send(resObj);
+    } catch (e) {
+      next(e);
+    }
+  };
+
   /**
    * Track Ad Click
    * @param request {Request}

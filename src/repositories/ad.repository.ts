@@ -35,6 +35,19 @@ export class AdRepository {
     });
   }
 
+  getAdByProductId(productId: string): Promise<Ad | null> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const ad = await this.adDelegate.findFirst({
+          where: { productId, paidFor: true },
+        });
+        resolve(ad);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
   getFreeAd(productId: string): Promise<Ad | null> {
     return new Promise(async (resolve, reject) => {
       try {

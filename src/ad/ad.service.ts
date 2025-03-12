@@ -184,6 +184,26 @@ export class AdService {
     }
   }
 
+  async getAd(adId: string) {
+    try {
+      const ad = await this.adRepository.getAd(adId);
+      return ad;
+    } catch (error) {
+      if (error instanceof BaseException) throw error;
+      this.logger.error(ErrorMessages.AD_FETCH_FAILED, error);
+      throw new InternalServerException(ErrorMessages.AD_FETCH_FAILED);
+    }
+  }
+  async getAdByProduct(productId: string) {
+    try {
+      const ad = await this.adRepository.getAdByProductId(productId);
+      return ad;
+    } catch (error) {
+      if (error instanceof BaseException) throw error;
+      this.logger.error(ErrorMessages.AD_FETCH_FAILED, error);
+      throw new InternalServerException(ErrorMessages.AD_FETCH_FAILED);
+    }
+  }
   async incrementAdViews(adId: string): Promise<void> {
     try {
       await this.adRepository.incrementViews(adId);

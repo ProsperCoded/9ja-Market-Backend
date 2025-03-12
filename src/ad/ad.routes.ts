@@ -12,6 +12,8 @@ import { MerchantRepository } from "../repositories/merchant.repository";
 import { JWTService } from "../utils/jwt/jwt.service";
 import { InitializeAdPaymentDto } from "./dtos/initialize-ad-payment.dto";
 import { IdDto } from "./dtos/Id.dto";
+import cors from "cors";
+import { ProductIdDto } from "./dtos/productId.dto";
 
 const router = Router();
 
@@ -62,14 +64,18 @@ router.get(
 
 // Get Ads (with optional filters)
 router.get("/", adController.getAds);
-
+router.get("/:adId", validator.single(IdDto, "params"), adController.getAd);
+router.get(
+  "/product/:productId",
+  validator.single(ProductIdDto, "params"),
+  adController.getAdByProduct
+);
 // Track Ad Click
 router.put(
   "/:adId/click",
   validator.single(IdDto, "params"),
   adController.trackAdClick
 );
-
 // Track Ad View
 router.put(
   "/:adId/view",
