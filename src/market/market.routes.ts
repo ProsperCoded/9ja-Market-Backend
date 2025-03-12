@@ -9,7 +9,7 @@ import { MarketUpdateDto } from "./dtos/market-update.dto";
 import { MarketCreateDto } from "./dtos/market-create.dto";
 import { GetByNameDto } from "./dtos/get-by-name.dto";
 import { MulterMiddleware } from "../utils/middlewares/file-parser.middleware";
-
+import { httpCacheDuration } from "../utils/middlewares/httpCache.middleware";
 const router = Router();
 const marketRepository = new MarketRepository();
 const logger = new WinstonLogger("MarketService");
@@ -20,28 +20,44 @@ const fileParser = new MulterMiddleware(logger);
 
 router.get("/names", marketController.getMarketNames);
 
-router.get("/", marketController.getAllMarkets);
+router.get("/", httpCacheDuration(3600), marketController.getAllMarkets);
 
-router.get("/malls", marketController.getAllMalls);
+router.get("/malls", httpCacheDuration(3600), marketController.getAllMalls);
 
-router.get("/", validator.single(GetByNameDto, "body"), marketController.getMarketByName);
-
-router.get("/:marketId", validator.single(IdDto, "params"), marketController.getMarketById);
-
-
-router.post("/",
-    fileParser.single("displayImage"),
-    validator.single(MarketCreateDto, "body"),
-    marketController.createMarket
+router.get(
+  "/",
+  validator.single(GetByNameDto, "body"),
+  marketController.getMarketByName
 );
 
-router.put("/:marketId",
-    fileParser.single("displayImage"),
-    validator.multiple([
-        { schema: IdDto, source: "params" },
-        { schema: MarketUpdateDto, source: "body" }
-    ]), marketController.updateMarket);
+router.get(
+  "/:marketId",
+  httpCacheDuration(3600),
+  validator.single(IdDto, "params"),
+  marketController.getMarketById
+);
 
-router.delete("/:marketId", validator.single(IdDto, "params"), marketController.deleteMarket);
+router.post(
+  "/",
+  fileParser.single("displayImage"),
+  validator.single(MarketCreateDto, "body"),
+  marketController.createMarket
+);
+
+router.put(
+  "/:marketId",
+  fileParser.single("displayImage"),
+  validator.multiple([
+    { schema: IdDto, source: "params" },
+    { schema: MarketUpdateDto, source: "body" },
+  ]),
+  marketController.updateMarket
+);
+
+router.delete(
+  "/:marketId",
+  validator.single(IdDto, "params"),
+  marketController.deleteMarket
+);
 
 export default router;
