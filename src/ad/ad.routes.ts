@@ -11,6 +11,7 @@ import { MerchantAuthGaurd } from "../utils/middlewares/guards/merchant.auth.gua
 import { MerchantRepository } from "../repositories/merchant.repository";
 import { JWTService } from "../utils/jwt/jwt.service";
 import { InitializeAdPaymentDto } from "./dtos/initialize-ad-payment.dto";
+import { IdDto } from "./dtos/Id.dto";
 
 const router = Router();
 
@@ -57,6 +58,23 @@ router.get(
   "/verify/:reference",
   merchantAuthGaurd.authorise({ strict: true }),
   adController.verifyAdPayment
+);
+
+// Get Ads (with optional filters)
+router.get("/", adController.getAds);
+
+// Track Ad Click
+router.put(
+  "/:adId/click",
+  validator.single(IdDto, "params"),
+  adController.trackAdClick
+);
+
+// Track Ad View
+router.put(
+  "/:adId/view",
+  validator.single(IdDto, "params"),
+  adController.trackAdView
 );
 
 export default router;

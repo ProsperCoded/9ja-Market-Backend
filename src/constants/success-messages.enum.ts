@@ -43,4 +43,5 @@ export enum SuccessMessages {
   AD_PAYMENT_INITIALIZATION_SUCCESS = "Ad Payment Initialized Successfully",
   FREE_AD_ACTIVATION_SUCCESS = "Free Ad Activated Successfully",
   AD_PAYMENT_VERIFICATION_SUCCESS = "Ad Payment Verified Successfully",
+  AD_FETCH_SUCCESS = "Ad Fetched Successfully",
 }

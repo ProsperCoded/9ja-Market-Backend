@@ -111,4 +111,11 @@ router.delete(
   productController.deleteProduct
 );
 
+// Track Product Click
+router.put(
+  "/:id/click",
+  validator.single(IdDto, "params"),
+  productController.trackProductClick
+);
+
 export default router;

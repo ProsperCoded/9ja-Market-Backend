@@ -151,4 +151,56 @@ export class AdService {
       );
     }
   }
+
+  async getAllAds() {
+    try {
+      const ads = await this.adRepository.getAds();
+      return ads;
+    } catch (error) {
+      if (error instanceof BaseException) throw error;
+      this.logger.error(ErrorMessages.AD_FETCH_FAILED, error);
+      throw new InternalServerException(ErrorMessages.AD_FETCH_FAILED);
+    }
+  }
+  async getAdsByMerchant(merchantId: string) {
+    try {
+      const ads = await this.adRepository.getAdsByMerchantId(merchantId);
+      return ads;
+    } catch (error) {
+      if (error instanceof BaseException) throw error;
+      this.logger.error(ErrorMessages.AD_FETCH_FAILED, error);
+      throw new InternalServerException(ErrorMessages.AD_FETCH_FAILED);
+    }
+  }
+
+  async getAds(filters: { marketId?: string; merchantId?: string }) {
+    try {
+      const ads = await this.adRepository.getFilteredAds(filters);
+      return ads;
+    } catch (error) {
+      if (error instanceof BaseException) throw error;
+      this.logger.error(ErrorMessages.AD_FETCH_FAILED, error);
+      throw new InternalServerException(ErrorMessages.AD_FETCH_FAILED);
+    }
+  }
+
+  async incrementAdViews(adId: string): Promise<void> {
+    try {
+      await this.adRepository.incrementViews(adId);
+    } catch (error) {
+      if (error instanceof BaseException) throw error;
+      this.logger.error("Failed to increment ad views", error);
+      throw new InternalServerException("Failed to increment ad views");
+    }
+  }
+
+  async incrementAdClicks(adId: string): Promise<void> {
+    try {
+      await this.adRepository.incrementClicks(adId);
+    } catch (error) {
+      if (error instanceof BaseException) throw error;
+      this.logger.error("Failed to increment ad clicks", error);
+      throw new InternalServerException("Failed to increment ad clicks");
+    }
+  }
 }

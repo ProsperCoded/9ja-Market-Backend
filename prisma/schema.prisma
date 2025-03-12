@@ -97,7 +97,8 @@ model Product {
   deletedAt      DateTime?
   merchantId     String
   displayImageId String?         @unique
-  ads             Ad[]
+  ads            Ad[]
+  clicks         Int             @default(0)
 
   @@index([name])
 }
@@ -108,6 +109,8 @@ model Ad {
   paidFor   Boolean   @default(false)
   product   Product   @relation(fields: [productId], references: [id])
   productId String
+  adViews   Int       @default(0)
+  adClicks  Int       @default(0)
   expiresAt DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -270,7 +273,7 @@ enum ProductCategory {
   FASHION_AND_ACCESSORIES
   HEALTH_AND_WELLNESS
   HOME_AND_LIVING
-  AUTOMOBILE_NEEDS 
+  AUTOMOBILE_NEEDS
   TRADITIONAL_CRAFTS
   SPORTS_AND_OUTDOOR
   KIDS_AND_BABY_PRODUCTS

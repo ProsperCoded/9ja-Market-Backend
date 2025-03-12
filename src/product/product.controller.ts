@@ -192,7 +192,7 @@ export class ProductController {
   /**
    * Get Merchant Products
    * @param request {Request}
-   * @param response (Response}
+   * @param response {Response}
    * @param next {NextFunction}
    */
   getProductByMerchantId: RequestHandler = async (
@@ -293,6 +293,19 @@ export class ProductController {
         SuccessMessages.DELETE_PRODUCT_SUCCESS
       );
       return response.status(HttpStatus.NO_CONTENT).send(resObj);
+    } catch (e) {
+      next(e);
+    }
+  };
+
+  trackProductClick: RequestHandler = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) => {
+    try {
+      await this.productService.incrementProductClicks(request.params.id);
+      return response.status(HttpStatus.NO_CONTENT).send();
     } catch (e) {
       next(e);
     }
