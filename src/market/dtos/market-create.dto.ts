@@ -38,6 +38,6 @@ export class MarketCreateDto
   declare state: string;
 
   @IsOptional()
-  @IsBoolean()
+  @IsBooleanString()
   declare isMall: "true" | "false";
 }
