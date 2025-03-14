@@ -22,10 +22,16 @@ export class MarketService {
       if (marketExists) {
         throw new BadRequestException(ErrorMessages.MARKET_ALREADY_EXISTS);
       }
+      const MarketTransformed: Prisma.MarketCreateInput = {
+        ...market,
+        isMall: market.isMall === "true" ? true : false,
+      };
       if (file) {
-        (market as Prisma.MarketCreateInput).displayImage = file.path;
+        MarketTransformed.displayImage = file.path;
       }
-      const createdMarket = await this.marketRepository.createMarket(market);
+      const createdMarket =
+        await this.marketRepository.createMarket(MarketTransformed);
+      this.logger.debug(`Market created successfully: ${createdMarket.id}`);
       return createdMarket;
     } catch (e) {
       if (e instanceof BaseException) throw e;
