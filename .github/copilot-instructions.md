@@ -6,28 +6,12 @@
 - Build upon existing functionality rather than replacing it
 - Follow established coding standards and patterns
 
-## Commit Guidelines
-
-- Use semantic commit messages:
-  - `feat:` for new features
-  - `fix:` for bug fixes
-
 ## Code Standards
 
 1. **Authentication**
 
    - Maintain existing auth routes structure
    - Keep current passport strategy implementations
-
-2. **Routing**
-
-   - Follow modular routing pattern
-   - Keep route naming conventions
-
-3. **Services**
-
-   - Implement interfaces for new services
-   - Follow existing dependency injection patterns
 
 ## Breaking Changes
 

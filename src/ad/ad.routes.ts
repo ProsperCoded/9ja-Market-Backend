@@ -12,17 +12,20 @@ import { MerchantRepository } from "../repositories/merchant.repository";
 import { JWTService } from "../utils/jwt/jwt.service";
 import { InitializeAdPaymentDto } from "./dtos/initialize-ad-payment.dto";
 import { IdDto } from "./dtos/Id.dto";
-import cors from "cors";
 import { ProductIdDto } from "./dtos/productId.dto";
-
+import { CustomerAuthGaurd } from "../utils/middlewares/guards/customer.auth.guard";
+import { CustomerRepository } from "../repositories/customer.repository";
+import { Role } from "@prisma/client";
 const router = Router();
 
 const merchantRepository = new MerchantRepository();
+const customerRepository = new CustomerRepository();
 const jwtService = new JWTService();
 const adRepository = new AdRepository();
 const paymentService = new PaystackPaymentRepository();
 const productRepository = new ProductRepository();
 const transactionRepository = new TransactionRepository();
+
 const logger = new WinstonLogger("AdService");
 const adService = new AdService(
   adRepository,
@@ -34,6 +37,11 @@ const adService = new AdService(
 const adController = new AdController(adService);
 
 const validator = new Validator();
+const customerAuthGuard = new CustomerAuthGaurd(
+  customerRepository,
+  logger,
+  jwtService
+);
 const merchantAuthGaurd = new MerchantAuthGaurd(
   merchantRepository,
   logger,

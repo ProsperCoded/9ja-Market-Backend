@@ -34,8 +34,15 @@ model Customer {
   ratings               Rating[]
   createdAt             DateTime      @default(now())
   updatedAt             DateTime      @updatedAt
+  role                  Role          @default(USER)
 
   @@index([email])
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+  USER
 }
 
 model Merchant {
@@ -60,7 +67,30 @@ model Merchant {
   transactions          Transaction[]
   marketId              String?
 
+  referredById String?
+  referredBy   Marketer? @relation(fields: [referredById], references: [id])
+
   @@index([email, brandName])
+}
+
+model Marketer {
+  id                String     @id @default(uuid())
+  email             String     @unique
+  referrerCode      String     @unique
+  referredMerchants Merchant[]
+  firstName         String
+  lastName          String
+  phoneNumber       String
+
+  accountName   String
+  accountBank   String
+  accountNumber String
+
+  credentialsUrl      String
+  BusinessType        String
+  marketingExperience String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }
 
 model Market {

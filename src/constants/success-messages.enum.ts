@@ -44,4 +44,8 @@ export enum SuccessMessages {
   FREE_AD_ACTIVATION_SUCCESS = "Free Ad Activated Successfully",
   AD_PAYMENT_VERIFICATION_SUCCESS = "Ad Payment Verified Successfully",
   AD_FETCH_SUCCESS = "Ad Fetched Successfully",
+  AD_REVENUE_FETCH_SUCCESS = "Ad Revenue Statistics Fetched Successfully",
+  ADMIN_REGISTRATION_SUCCESSFUL = "Admin registration successful",
+  STATS_FETCH_SUCCESS = "Platform statistics fetched successfully",
+  REVENUE_FETCH_SUCCESS = "Revenue statistics fetched successfully",
 }
