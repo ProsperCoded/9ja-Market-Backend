@@ -220,28 +220,4 @@ export class AdController {
       next(e);
     }
   };
-
-  /**
-   * Get Ad Revenue Statistics
-   * @param request {Request}
-   * @param response {Response}
-   * @param next {NextFunction}
-   */
-  getAdRevenue: RequestHandler = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ) => {
-    try {
-      const result = await this.adService.getAdRevenue();
-      const resObj = new ResponseDto(
-        ResponseStatus.SUCCESS,
-        SuccessMessages.AD_REVENUE_FETCH_SUCCESS,
-        result
-      );
-      return response.status(HttpStatus.OK).send(resObj);
-    } catch (e) {
-      next(e);
-    }
-  };
 }

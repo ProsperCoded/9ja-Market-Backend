@@ -127,4 +127,14 @@ export class MarketService {
       throw new InternalServerException(ErrorMessages.DELETE_MARKET_FAILED);
     }
   }
+
+  async deleteAllMarkets() {
+    try {
+      await this.marketRepository.deleteAllMarkets();
+      return true;
+    } catch (e) {
+      this.logger.error(`${ErrorMessages.DELETE_MARKET_FAILED}: ${e}`);
+      throw new InternalServerException(ErrorMessages.DELETE_MARKET_FAILED);
+    }
+  }
 }

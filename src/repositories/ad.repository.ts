@@ -234,4 +234,21 @@ export class AdRepository {
       }
     });
   }
+
+  count(): Promise<number> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        // Count only active ads (paid for and not expired)
+        const count = await this.adDelegate.count({
+          where: {
+            paidFor: true,
+            expiresAt: { gt: moment.tz("Africa/Lagos").toDate() },
+          },
+        });
+        resolve(count);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
 }

@@ -61,4 +61,40 @@ export class StatsController {
       next(e);
     }
   };
+
+  getTotalProducts: RequestHandler = async (
+    _request: Request,
+    response: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const result = await this.statsService.getTotalProducts();
+      const resObj = new ResponseDto(
+        ResponseStatus.SUCCESS,
+        SuccessMessages.STATS_FETCH_SUCCESS,
+        { totalProducts: result }
+      );
+      return response.status(HttpStatus.OK).send(resObj);
+    } catch (e) {
+      next(e);
+    }
+  };
+
+  getTotalAds: RequestHandler = async (
+    _request: Request,
+    response: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const result = await this.statsService.getTotalAds();
+      const resObj = new ResponseDto(
+        ResponseStatus.SUCCESS,
+        SuccessMessages.STATS_FETCH_SUCCESS,
+        { totalAds: result }
+      );
+      return response.status(HttpStatus.OK).send(resObj);
+    } catch (e) {
+      next(e);
+    }
+  };
 }

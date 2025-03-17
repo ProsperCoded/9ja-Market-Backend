@@ -10,6 +10,10 @@ import { MarketCreateDto } from "./dtos/market-create.dto";
 import { GetByNameDto } from "./dtos/get-by-name.dto";
 import { MulterMiddleware } from "../utils/middlewares/file-parser.middleware";
 import { httpCacheDuration } from "../utils/middlewares/httpCache.middleware";
+import { CustomerRepository } from "../repositories/customer.repository";
+import { CustomerAuthGaurd } from "../utils/middlewares/guards/customer.auth.guard";
+import { Role } from "@prisma/client";
+import { JWTService } from "../utils/jwt/jwt.service";
 const router = Router();
 const marketRepository = new MarketRepository();
 const logger = new WinstonLogger("MarketService");
@@ -17,6 +21,13 @@ const marketService = new MarketService(marketRepository, logger);
 const marketController = new MarketController(marketService);
 const validator = new Validator();
 const fileParser = new MulterMiddleware(logger);
+const customerRepository = new CustomerRepository();
+const jwtService = new JWTService();
+const customerAuthGuard = new CustomerAuthGaurd(
+  customerRepository,
+  logger,
+  jwtService
+);
 
 router.get("/names", marketController.getMarketNames);
 
@@ -37,8 +48,10 @@ router.get(
   marketController.getMarketById
 );
 
+// Admin protected routes
 router.post(
   "/",
+  customerAuthGuard.authorise({ strict: true, role: Role.ADMIN }),
   fileParser.single("displayImage"),
   validator.single(MarketCreateDto, "body"),
   marketController.createMarket
@@ -46,6 +59,7 @@ router.post(
 
 router.put(
   "/:marketId",
+  customerAuthGuard.authorise({ strict: true, role: Role.ADMIN }),
   fileParser.single("displayImage"),
   validator.multiple([
     { schema: IdDto, source: "params" },
@@ -56,8 +70,15 @@ router.put(
 
 router.delete(
   "/:marketId",
+  customerAuthGuard.authorise({ strict: true, role: Role.ADMIN }),
   validator.single(IdDto, "params"),
   marketController.deleteMarket
+);
+
+router.delete(
+  "/",
+  customerAuthGuard.authorise({ strict: true, role: Role.ADMIN }),
+  marketController.deleteAllMarkets
 );
 
 export default router;

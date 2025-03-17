@@ -6,12 +6,16 @@ import { ErrorMessages } from "../constants/error-messages.enum";
 import { PaymentStatus, PaymentFor } from "@prisma/client";
 import moment from "moment-timezone";
 import { TransactionRepository } from "../repositories/transaction.repository";
+import { ProductRepository } from "../repositories/product.repository";
+import { AdRepository } from "../repositories/ad.repository";
 
 export class StatsService {
   constructor(
     private readonly customerRepository: CustomerRepository,
     private readonly merchantRepository: MerchantRepository,
     private readonly transactionRepository: TransactionRepository,
+    private readonly productRepository: ProductRepository,
+    private readonly adRepository: AdRepository,
     private readonly logger: WinstonLogger
   ) {}
 
@@ -35,16 +39,41 @@ export class StatsService {
     }
   }
 
+  async getTotalProducts(): Promise<number> {
+    try {
+      const total = await this.productRepository.count();
+      return total;
+    } catch (error) {
+      this.logger.error(`${ErrorMessages.INTERNAL_SERVER_ERROR}: ${error}`);
+      throw new InternalServerException(ErrorMessages.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async getTotalAds(): Promise<number> {
+    try {
+      const total = await this.adRepository.count();
+      return total;
+    } catch (error) {
+      this.logger.error(`${ErrorMessages.INTERNAL_SERVER_ERROR}: ${error}`);
+      throw new InternalServerException(ErrorMessages.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   async getPlatformStats() {
     try {
-      const [totalCustomers, totalMerchants] = await Promise.all([
-        this.getTotalCustomers(),
-        this.getTotalMerchants(),
-      ]);
+      const [totalCustomers, totalMerchants, totalProducts, totalAds] =
+        await Promise.all([
+          this.getTotalCustomers(),
+          this.getTotalMerchants(),
+          this.getTotalProducts(),
+          this.getTotalAds(),
+        ]);
 
       return {
         totalCustomers,
         totalMerchants,
+        totalProducts,
+        totalAds,
       };
     } catch (error) {
       this.logger.error(`${ErrorMessages.INTERNAL_SERVER_ERROR}: ${error}`);

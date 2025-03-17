@@ -106,7 +106,7 @@ export class MarketController {
   ) => {
     try {
       const result = await this.marketService.findMarkets();
-      result.forEach(this.formatMarketData);
+      // result.forEach(this.formatMarketData);
       const resObj = new ResponseDto(
         ResponseStatus.SUCCESS,
         SuccessMessages.GET_ALL_MARKETS_SUCCESS,
@@ -132,7 +132,7 @@ export class MarketController {
   ) => {
     try {
       const result = await this.marketService.findAllMalls();
-      result.forEach(this.formatMarketData);
+      // result.forEach(this.formatMarketData);
       const resObj = new ResponseDto(
         ResponseStatus.SUCCESS,
         SuccessMessages.GET_ALL_MALLS_SUCCESS,
@@ -212,7 +212,33 @@ export class MarketController {
     next: NextFunction
   ) => {
     try {
-      const result = await this.marketService.deleteMarket(request.params.id);
+      const result = await this.marketService.deleteMarket(
+        request.params.marketId
+      );
+      const resObj = new ResponseDto(
+        ResponseStatus.SUCCESS,
+        SuccessMessages.DELETE_MARKET_SUCCESS,
+        result
+      );
+      return response.status(HttpStatus.OK).send(resObj);
+    } catch (e) {
+      next(e);
+    }
+  };
+
+  /**
+   * Delete All Markets
+   * @param request {Request}
+   * @param response {Response}
+   * @param next {NextFunction}
+   */
+  deleteAllMarkets: RequestHandler = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const result = await this.marketService.deleteAllMarkets();
       const resObj = new ResponseDto(
         ResponseStatus.SUCCESS,
         SuccessMessages.DELETE_MARKET_SUCCESS,

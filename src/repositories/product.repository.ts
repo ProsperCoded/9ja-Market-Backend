@@ -532,4 +532,19 @@ export class ProductRepository {
       }
     });
   }
+
+  count(): Promise<number> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const count = await this.productDelegate.count({
+          where: {
+            deletedAt: null, // Only count non-deleted products
+          },
+        });
+        resolve(count);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
 }
