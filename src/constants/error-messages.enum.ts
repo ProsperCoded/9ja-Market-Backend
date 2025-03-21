@@ -84,4 +84,16 @@ export enum ErrorMessages {
   INTERNAL_SERVER_ERROR = "Internal Server Error",
   REVENUE_FETCH_FAILED = "Failed to fetch revenue statistics",
   STATS_FETCH_FAILED = "Stats Fetch Failed",
+
+  // Marketer Error Messages
+  MARKETER_NOT_FOUND = "Marketer not found",
+  CREATE_MARKETER_FAILED = "Failed to create marketer",
+  UPDATE_MARKETER_FAILED = "Failed to update marketer",
+  DELETE_MARKETER_FAILED = "Failed to delete marketer",
+  GET_MARKETER_FAILED = "Failed to get marketer",
+  GET_MARKETERS_FAILED = "Failed to get marketers",
+  VERIFY_MARKETER_FAILED = "Failed to verify marketer",
+  CALCULATE_MARKETER_EARNINGS_FAILED = "Failed to calculate marketer earnings",
+  INVALID_REFERRER_CODE = "Invalid referrer code",
+  MERCHANT_ALREADY_HAS_REFERRER = "Merchant already has a referrer",
 }

@@ -28,6 +28,7 @@ import { DataFormatterHelper } from "../../helpers/format.helper";
 import { Customer, Prisma, Role } from "@prisma/client";
 import { BaseException } from "../../utils/exceptions/base.exception";
 import { AdminRegisterRequestDto } from "../dtos/admin-register-request.dto";
+import { MarketerRepository } from "../../repositories/marketer.repository";
 
 export class CustomerAuthService implements IAuthService {
   private readonly logger: ILogger;
@@ -36,6 +37,7 @@ export class CustomerAuthService implements IAuthService {
   private readonly emailService: EmailService;
   private readonly eventEmiter: EventEmitter;
   private readonly customerRepository: CustomerRepository;
+  private readonly marketerRepository: MarketerRepository;
 
   constructor(
     logger: ILogger,
@@ -49,6 +51,7 @@ export class CustomerAuthService implements IAuthService {
     this.emailService = new EmailService();
     this.eventEmiter = eventEmmiter;
     this.customerRepository = customerRepository;
+    this.marketerRepository = new MarketerRepository();
     this.initializeEventHandlers();
   }
 
@@ -170,7 +173,7 @@ export class CustomerAuthService implements IAuthService {
   }
 
   async register(
-    registerData: CustomerRegisterRequestDto,
+    registerData: CustomerRegisterRequestDto & { role?: Role },
     url: string
   ): Promise<boolean> {
     const { email, firstName, lastName, password, dateOfBirth } = registerData;
@@ -190,6 +193,16 @@ export class CustomerAuthService implements IAuthService {
       // Hash password
       const hashedPassword = await this.bcryptService.hashPassword(password);
       registerData.password = hashedPassword;
+
+      // Check if email exists in Marketer table and set role accordingly
+      const marketerWithSameEmail =
+        await this.marketerRepository.getMarketerByEmail(email);
+      if (marketerWithSameEmail) {
+        registerData.role = Role.MARKETER;
+        this.logger.info(
+          `Setting customer role to MARKETER for email: ${email}`
+        );
+      }
 
       // Create customer
       const { addresses, phoneNumbers, ...newCustomerData } = registerData;

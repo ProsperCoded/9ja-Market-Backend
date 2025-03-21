@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your 9ja Market Marketer Account is Verified!</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        padding: 20px;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      .container {
+        border: 1px solid #e1e1e1;
+        border-radius: 5px;
+        padding: 20px;
+      }
+      .header {
+        text-align: center;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e1e1e1;
+      }
+      .header h1 {
+        color: #009933;
+        margin-bottom: 5px;
+      }
+      .content {
+        padding: 20px 0;
+      }
+      .referral-code {
+        background-color: #f5f5f5;
+        padding: 15px;
+        text-align: center;
+        font-size: 1.2em;
+        font-weight: bold;
+        border-radius: 5px;
+        margin: 20px 0;
+        border: 1px dashed #ccc;
+      }
+      .steps {
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 20px 0;
+      }
+      .steps h3 {
+        margin-top: 0;
+        color: #009933;
+      }
+      .footer {
+        text-align: center;
+        padding-top: 20px;
+        border-top: 1px solid #e1e1e1;
+        font-size: 0.8em;
+        color: #888;
+      }
+      .benefits {
+        margin: 20px 0;
+      }
+      .benefits ul {
+        padding-left: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>9ja Market</h1>
+        <p>Congratulations! Your Marketer Account is Verified</p>
+      </div>
+      <div class="content">
+        <p>Dear <%= firstName %> <%= lastName %>,</p>
+
+        <p>
+          Great news! Your application to become a 9ja Market Marketer has been
+          approved. You're now ready to start onboarding merchants and earning
+          commissions.
+        </p>
+
+        <div class="referral-code">
+          <p>Your Unique Referrer Code:</p>
+          <p><%= referrerCode %></p>
+        </div>
+
+        <p>
+          Merchants can also use your username
+          <strong><%= username %></strong> when registering. Either your
+          referrer code or username will connect you to merchants you refer.
+        </p>
+
+        <div class="steps">
+          <h3>How to Get Started:</h3>
+          <ol>
+            <li>
+              <strong>Reach out to vendors</strong> in your locality and in
+              markets around you
+            </li>
+            <li>
+              <strong>Explain the benefits</strong> of joining 9ja Market:
+              <div class="benefits">
+                <ul>
+                  <li>Expanded online presence and visibility</li>
+                  <li>Access to a wider customer base</li>
+                  <li>Easy-to-use platform for managing products</li>
+                  <li>Convenient payment processing</li>
+                  <li>Support for growing their business digitally</li>
+                </ul>
+              </div>
+            </li>
+            <li>
+              <strong>Guide them through registration</strong> and ensure they
+              include your referral code or username
+            </li>
+            <li>
+              <strong>Earn commissions</strong> when merchants you refer
+              purchase advertising packages
+            </li>
+          </ol>
+        </div>
+
+        <p>
+          You'll earn <strong><%= (10 * 100).toFixed(0) %>%</strong> commission
+          on all ad placements purchased by merchants you refer. Your earnings
+          will be calculated automatically and can be viewed in your dashboard.
+        </p>
+
+        <p>
+          We recommend starting with merchants you already know and gradually
+          expanding your network. Our most successful marketers focus on
+          explaining how 9ja Market helps merchants grow their businesses
+          online.
+        </p>
+
+        <p>
+          If you have any questions or need assistance, please don't hesitate to
+          contact our support team.
+        </p>
+
+        <p>Thank you for partnering with 9ja Market!</p>
+
+        <p>
+          Best regards,<br />
+          The 9ja Market Team
+        </p>
+      </div>
+      <div class="footer">
+        <p>
+          &copy; <%= new Date().getFullYear() %> 9ja Market. All rights
+          reserved.
+        </p>
+        <p>
+          This is an automated message, please do not reply directly to this
+          email.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

@@ -39,12 +39,6 @@ model Customer {
   @@index([email])
 }
 
-enum Role {
-  ADMIN
-  EDITOR
-  USER
-}
-
 model Merchant {
   id                    String                 @id @default(uuid())
   googleId              String?                @unique
@@ -66,9 +60,11 @@ model Merchant {
   updatedAt             DateTime               @updatedAt
   transactions          Transaction[]
   marketId              String?
+  // role                  Role                   @default(MERCHANT)
 
-  referredById String?
-  referredBy   Marketer? @relation(fields: [referredById], references: [id])
+  referredById     String?
+  referredBy       Marketer?          @relation(fields: [referredById], references: [id])
+  referrerEarnings MarketerEarnings[]
 
   @@index([email, brandName])
 }
@@ -76,21 +72,43 @@ model Merchant {
 model Marketer {
   id                String     @id @default(uuid())
   email             String     @unique
-  referrerCode      String     @unique
+  referrerCode      String?    @unique
   referredMerchants Merchant[]
   firstName         String
   lastName          String
+  username          String     @unique
   phoneNumber       String
 
   accountName   String
   accountBank   String
   accountNumber String
 
-  credentialsUrl      String
-  BusinessType        String
-  marketingExperience String?
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  BusinessType            String
+  marketingExperience     String?
+  IdentityCredentialType  String
+  IdentityCredentialImage String
+
+  earnings  MarketerEarnings[]
+  verified  Boolean            @default(false)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+}
+
+model MarketerEarnings {
+  id         String   @id @default(uuid())
+  marketer   Marketer @relation(fields: [marketerId], references: [id])
+  merchant   Merchant @relation(fields: [merchantId], references: [id])
+  amount     Float
+  marketerId String
+  merchantId String
+  AdId       String   @unique
+  Ad         Ad       @relation(fields: [AdId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([marketerId])
+  @@index([merchantId])
 }
 
 model Market {
@@ -144,6 +162,8 @@ model Ad {
   expiresAt DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+
+  MarketerEarnings MarketerEarnings?
 }
 
 model Order {
@@ -332,4 +352,12 @@ enum PaymentStatus {
   INCOMPLETE
   INITIALIZED
   PENDING
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+  USER
+  MARKETER
+  MERCHANT
 }

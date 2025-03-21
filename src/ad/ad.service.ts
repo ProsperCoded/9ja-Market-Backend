@@ -11,6 +11,7 @@ import { InternalServerException } from "../utils/exceptions/internal-server.exc
 import { ILogger } from "../utils/logger/logger.interface";
 import { UnauthorizedException } from "../utils/exceptions/unauthorized.exception";
 import moment from "moment-timezone";
+import { MarketerService } from "../marketer/marketer.service";
 
 export class AdService {
   constructor(
@@ -18,6 +19,7 @@ export class AdService {
     private readonly paymentService: PaystackPaymentRepository,
     private readonly productRepository: ProductRepository,
     private readonly transactionRepository: TransactionRepository,
+    private readonly marketerService: MarketerService,
     private readonly logger: ILogger
   ) {}
 
@@ -141,6 +143,9 @@ export class AdService {
             expiresAt,
             paidFor: true,
           });
+
+          // Calculate and record marketer earnings if applicable
+          await this.marketerService.calculateAndRecordEarnings(ad.id);
         }
         return updatedTransaction;
       }

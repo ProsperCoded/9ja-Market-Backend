@@ -8,6 +8,8 @@ import MarketRouter from "./market/market.routes";
 import ProductRouter from "./product/product.routes";
 import AdRouter from "./ad/ad.routes";
 import StatsRouter from "./stats/stats.routes";
+import marketerRoutes from "./marketer/marketer.routes";
+
 const router = Router();
 
 // Home Route
@@ -33,5 +35,7 @@ router.use("/product", ProductRouter);
 router.use("/ad", AdRouter);
 
 router.use("/stats", StatsRouter);
+
+router.use("/marketer", marketerRoutes);
 
 export default router;

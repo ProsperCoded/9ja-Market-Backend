@@ -11,12 +11,15 @@ import { JWTService } from "../utils/jwt/jwt.service";
 import { IdDto } from "../dtos/id.dto";
 import { MerchantUpdateDto } from "./dtos/merchant-update.dto";
 import { MarketRepository } from "../repositories/market.repository";
+import { MarketerRepository } from "../repositories/marketer.repository";
+import { MerchantReferrerDto } from "./dtos/merchant-referrer.dto";
 
 const router = Router();
 const addressRepository = new AddressRepository();
 const phoneNumberRepository = new PhoneNumberRepository();
 const merchantRepository = new MerchantRepository();
 const marketRepository = new MarketRepository();
+const marketerRepository = new MarketerRepository();
 const logger = new WinstonLogger("MerchantService");
 const jwtService = new JWTService();
 const merchantService = new MerchantService(
@@ -24,6 +27,7 @@ const merchantService = new MerchantService(
   marketRepository,
   addressRepository,
   phoneNumberRepository,
+  marketerRepository,
   logger
 );
 const merchantController = new MerchantController(merchantService);
@@ -62,5 +66,16 @@ router.delete(
   validator.single(IdDto, "params"),
   merchantController.deleteMerchant
 );
+
+// // Add referrer code to merchant
+// router.post(
+//   "/:merchantId/referrer",
+//   merchantAuthGaurd.authorise(),
+//   validator.multiple([
+//     { schema: IdDto, source: "params" },
+//     { schema: MerchantReferrerDto, source: "body" },
+//   ]),
+//   merchantController.connectToMarketer
+// );
 
 export default router;

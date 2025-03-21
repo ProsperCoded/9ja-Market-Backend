@@ -48,10 +48,8 @@ router.get(
   marketController.getMarketById
 );
 
-// Admin protected routes
 router.post(
   "/",
-  customerAuthGuard.authorise({ strict: true, role: Role.ADMIN }),
   fileParser.single("displayImage"),
   validator.single(MarketCreateDto, "body"),
   marketController.createMarket

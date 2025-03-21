@@ -28,6 +28,7 @@ import { DataFormatterHelper } from "../../helpers/format.helper";
 import { Prisma } from "@prisma/client";
 import { MarketRepository } from "../../repositories/market.repository";
 import { BaseException } from "../../utils/exceptions/base.exception";
+import { MarketerRepository } from "../../repositories/marketer.repository";
 
 export class MerchantAuthService implements IAuthService {
   private readonly logger: ILogger;
@@ -37,6 +38,7 @@ export class MerchantAuthService implements IAuthService {
   private readonly eventEmiter: EventEmitter;
   private readonly merchantRepository: MerchantRepository;
   private readonly marketRepository: MarketRepository;
+  private marketerRepository: MarketerRepository;
 
   constructor(
     logger: ILogger,
@@ -52,6 +54,7 @@ export class MerchantAuthService implements IAuthService {
     this.eventEmiter = eventEmmiter;
     this.merchantRepository = merchantRepository;
     this.marketRepository = marketRepository;
+    this.marketerRepository = new MarketerRepository();
     this.initializeEventHandlers();
   }
 
@@ -190,7 +193,7 @@ export class MerchantAuthService implements IAuthService {
     url: string
   ): Promise<boolean> {
     const { marketName, ...data } = registerData;
-    const { email, brandName, password } = data;
+    const { email, brandName, password, referrerCode, referrerUsername } = data;
 
     // Check if email is already registered
     const merchant = await this.merchantRepository.getMerchantByEmail(email);
@@ -218,8 +221,39 @@ export class MerchantAuthService implements IAuthService {
       const hashedPassword = await this.bcryptService.hashPassword(password);
       data.password = hashedPassword;
 
+      // Handle referrer code or username if provided
+      let referredById: string | undefined;
+
+      if (referrerCode) {
+        const marketer =
+          await this.marketerRepository.getMarketerByReferrerCode(referrerCode);
+        if (marketer && marketer.verified) {
+          referredById = marketer.id;
+        } else if (marketer) {
+          this.logger.warn(
+            `Attempted to use unverified marketer code: ${referrerCode}`
+          );
+        }
+      } else if (referrerUsername) {
+        const marketer =
+          await this.marketerRepository.getMarketerByUsername(referrerUsername);
+        if (marketer && marketer.verified) {
+          referredById = marketer.id;
+        } else if (marketer) {
+          this.logger.warn(
+            `Attempted to use unverified marketer username: ${referrerUsername}`
+          );
+        }
+      }
+
       // Create new merchant
-      const { addresses, phoneNumbers, ...newMerchantData } = data;
+      const {
+        addresses,
+        phoneNumbers,
+        referrerCode: code,
+        referrerUsername: user,
+        ...newMerchantData
+      } = data;
       // Ensure addresses have different names
       const addressNames = addresses.map((address) => address.name);
       if (new Set(addressNames).size !== addressNames.length) {
@@ -229,7 +263,10 @@ export class MerchantAuthService implements IAuthService {
       const formattedPhoneNumbers =
         DataFormatterHelper.formatPhoneNumbers(phoneNumbers);
       const newMerchant = await this.merchantRepository.create(
-        newMerchantData,
+        {
+          ...newMerchantData,
+          ...(referredById && { referredById }), // Add referrer only if valid
+        },
         addresses,
         formattedPhoneNumbers,
         marketName

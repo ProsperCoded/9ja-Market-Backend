@@ -8,6 +8,7 @@ import moment from "moment-timezone";
 import { TransactionRepository } from "../repositories/transaction.repository";
 import { ProductRepository } from "../repositories/product.repository";
 import { AdRepository } from "../repositories/ad.repository";
+import { MarketerRepository } from "../repositories/marketer.repository";
 
 export class StatsService {
   constructor(
@@ -16,6 +17,7 @@ export class StatsService {
     private readonly transactionRepository: TransactionRepository,
     private readonly productRepository: ProductRepository,
     private readonly adRepository: AdRepository,
+    private readonly marketerRepository: MarketerRepository,
     private readonly logger: WinstonLogger
   ) {}
 
@@ -59,22 +61,39 @@ export class StatsService {
     }
   }
 
+  async getTotalMarketers(): Promise<number> {
+    try {
+      const total = await this.marketerRepository.count();
+      return total;
+    } catch (error) {
+      this.logger.error(`${ErrorMessages.INTERNAL_SERVER_ERROR}: ${error}`);
+      throw new InternalServerException(ErrorMessages.INTERNAL_SERVER_ERROR);
+    }
+  }
   async getPlatformStats() {
     try {
-      const [totalCustomers, totalMerchants, totalProducts, totalAds] =
-        await Promise.all([
-          this.getTotalCustomers(),
-          this.getTotalMerchants(),
-          this.getTotalProducts(),
-          this.getTotalAds(),
-        ]);
-
-      return {
+      const [
         totalCustomers,
         totalMerchants,
         totalProducts,
         totalAds,
+        totalMarketers,
+      ] = await Promise.all([
+        this.getTotalCustomers(),
+        this.getTotalMerchants(),
+        this.getTotalProducts(),
+        this.getTotalAds(),
+        this.getTotalMarketers(),
+      ]);
+      const data = {
+        totalCustomers,
+        totalMerchants,
+        totalProducts,
+        totalAds,
+        totalMarketers,
       };
+      this.logger.info(`Platform Stats: ${JSON.stringify(data)}`);
+      return data;
     } catch (error) {
       this.logger.error(`${ErrorMessages.INTERNAL_SERVER_ERROR}: ${error}`);
       throw new InternalServerException(ErrorMessages.INTERNAL_SERVER_ERROR);

@@ -134,4 +134,38 @@ export class MerchantController {
       next(e);
     }
   };
+
+  /**
+   * Connect Merchant to Marketer using referrer code
+   * @param request {Request}
+   * @param response (Response}
+   * @param next {NextFunction}
+   */
+  connectToMarketer: RequestHandler = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const result = await this.merchantService.connectMerchantToMarketer(
+        request.params.merchantId,
+        {
+          referrerCode: request.body.referrerCode,
+          referrerUsername: request.body.referrerUsername,
+        }
+      );
+
+      this.formatMerchantData(result);
+
+      const resObj = new ResponseDto(
+        ResponseStatus.SUCCESS,
+        SuccessMessages.CONNECT_MERCHANT_TO_MARKETER_SUCCESS,
+        result
+      );
+
+      return response.status(HttpStatus.OK).send(resObj);
+    } catch (e) {
+      next(e);
+    }
+  };
 }

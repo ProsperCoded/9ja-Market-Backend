@@ -10,6 +10,7 @@ import { Role } from "@prisma/client";
 import { JWTService } from "../utils/jwt/jwt.service";
 import { ProductRepository } from "../repositories/product.repository";
 import { AdRepository } from "../repositories/ad.repository";
+import { MarketerRepository } from "../repositories/marketer.repository";
 
 const router = Router();
 
@@ -18,6 +19,7 @@ const merchantRepository = new MerchantRepository();
 const transactionRepository = new TransactionRepository();
 const productRepository = new ProductRepository();
 const adRepository = new AdRepository();
+const marketerRepository = new MarketerRepository();
 const logger = new WinstonLogger("StatsService");
 const jwtService = new JWTService();
 
@@ -27,6 +29,7 @@ const statsService = new StatsService(
   transactionRepository,
   productRepository,
   adRepository,
+  marketerRepository,
   logger
 );
 const statsController = new StatsController(statsService);
