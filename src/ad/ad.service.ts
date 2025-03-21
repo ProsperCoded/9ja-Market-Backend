@@ -144,8 +144,27 @@ export class AdService {
             paidFor: true,
           });
 
-          // Calculate and record marketer earnings if applicable
-          await this.marketerService.calculateAndRecordEarnings(ad.id);
+          // Get the product and merchant
+          const product = await this.adRepository.getProductForAd(ad.id);
+          if (product && product.merchant) {
+            const merchant = product.merchant;
+
+            // Check if merchant was registered less than 6 months ago
+            const merchantCreatedAt = moment(merchant.createdAt).tz(
+              "Africa/Lagos"
+            );
+            const sixMonthsAgo = todayNigeria.clone().subtract(6, "months");
+
+            if (merchantCreatedAt.isAfter(sixMonthsAgo)) {
+              // Only calculate earnings if merchant is less than 6 months old
+              await this.marketerService.calculateAndRecordEarnings(ad.id);
+              this.logger.info(`Calculated marketer earnings for ad: ${ad.id}`);
+            } else {
+              this.logger.info(
+                `Skipped marketer earnings for ad: ${ad.id} - merchant registered more than 6 months ago`
+              );
+            }
+          }
         }
         return updatedTransaction;
       }

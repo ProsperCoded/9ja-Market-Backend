@@ -99,6 +99,7 @@ model MarketerEarnings {
   marketer   Marketer @relation(fields: [marketerId], references: [id])
   merchant   Merchant @relation(fields: [merchantId], references: [id])
   amount     Float
+  paid       Boolean  @default(false)
   marketerId String
   merchantId String
   AdId       String   @unique

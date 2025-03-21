@@ -21,7 +21,7 @@ const customerRepository = new CustomerRepository();
 const marketerEarningsRepository = new MarketerEarningsRepository();
 const adRepository = new AdRepository();
 const logger = new WinstonLogger("MarketerService");
-const marketerService = new MarketerService(
+export const marketerService = new MarketerService(
   marketerRepository,
   customerRepository,
   marketerEarningsRepository,
@@ -63,6 +63,28 @@ router.get(
   customerAuthGuard.authorise({ strict: true }),
   validator.single(IdDto, "params"),
   marketerController.getMarketerEarnings
+);
+
+// New routes for marketer earnings
+router.get(
+  "/:marketerId/earnings-paid",
+  customerAuthGuard.authorise({ strict: true }),
+  validator.single(IdDto, "params"),
+  marketerController.getMarketerPaidEarnings
+);
+
+router.get(
+  "/:marketerId/earnings-unpaid",
+  customerAuthGuard.authorise({ strict: true }),
+  validator.single(IdDto, "params"),
+  marketerController.getMarketerUnpaidEarnings
+);
+
+router.post(
+  "/:marketerId/payment-made",
+  customerAuthGuard.authorise({ strict: true, role: Role.ADMIN }),
+  validator.single(IdDto, "params"),
+  marketerController.markEarningsAsPaid
 );
 
 router.post(

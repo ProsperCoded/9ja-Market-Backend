@@ -58,4 +58,7 @@ export enum SuccessMessages {
   DELETE_MARKETER_SUCCESS = "Marketer deleted successfully",
   GET_MARKETER_EARNINGS_SUCCESS = "Marketer earnings fetched successfully",
   CONNECT_MERCHANT_TO_MARKETER_SUCCESS = "Merchant connected to marketer successfully",
+
+  MARKETER_EARNINGS_RETRIEVED = "Marketer earnings retrieved successfully",
+  MARKETER_EARNINGS_PAID = "Marketer earnings marked as paid successfully",
 }

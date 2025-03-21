@@ -255,6 +255,113 @@ export class MarketerService {
     }
   }
 
+  async getMarketerPaidEarnings(id: string) {
+    try {
+      // Check if marketer exists
+      const marketer = await this.marketerRepository.getMarketerById(id);
+      if (!marketer) {
+        throw new NotFoundException("Marketer not found");
+      }
+
+      const earnings =
+        await this.marketerEarningsRepository.getPaidEarningsByMarketer(id);
+      const totalPaidEarnings =
+        await this.marketerEarningsRepository.getTotalPaidEarningsByMarketer(
+          id
+        );
+
+      return {
+        earnings,
+        totalPaidEarnings,
+      };
+    } catch (error) {
+      if (error instanceof BaseException) throw error;
+      this.logger.error(`Failed to get marketer paid earnings: ${id}`, error);
+      throw new InternalServerException("Failed to get marketer paid earnings");
+    }
+  }
+
+  async getMarketerUnpaidEarnings(id: string) {
+    try {
+      // Check if marketer exists
+      const marketer = await this.marketerRepository.getMarketerById(id);
+      if (!marketer) {
+        throw new NotFoundException("Marketer not found");
+      }
+
+      const earnings =
+        await this.marketerEarningsRepository.getUnpaidEarningsByMarketer(id);
+      const totalUnpaidEarnings =
+        await this.marketerEarningsRepository.getTotalUnpaidEarningsByMarketer(
+          id
+        );
+
+      return {
+        earnings,
+        totalUnpaidEarnings,
+      };
+    } catch (error) {
+      if (error instanceof BaseException) throw error;
+      this.logger.error(`Failed to get marketer unpaid earnings: ${id}`, error);
+      throw new InternalServerException(
+        "Failed to get marketer unpaid earnings"
+      );
+    }
+  }
+
+  async markEarningsAsPaid(id: string) {
+    try {
+      // Check if marketer exists
+      const marketer = await this.marketerRepository.getMarketerById(id);
+      if (!marketer) {
+        throw new NotFoundException("Marketer not found");
+      }
+
+      // Get unpaid earnings
+      const unpaidEarnings =
+        await this.marketerEarningsRepository.getUnpaidEarningsByMarketer(id);
+
+      if (unpaidEarnings.length === 0) {
+        return {
+          message: "No unpaid earnings found for this marketer",
+          markedAsPaid: 0,
+          totalPaid: 0,
+        };
+      }
+
+      // Mark all unpaid earnings as paid
+      const markEarningsPromises = unpaidEarnings.map((earning) =>
+        this.marketerEarningsRepository.updateEarning(earning.id, {
+          paid: true,
+        })
+      );
+
+      await Promise.all(markEarningsPromises);
+
+      const totalPaid = unpaidEarnings.reduce(
+        (sum, earning) => sum + earning.amount,
+        0
+      );
+
+      this.logger.info(
+        `Marked ${unpaidEarnings.length} earnings as paid for marketer: ${id}`
+      );
+
+      return {
+        message: "Successfully marked all unpaid earnings as paid",
+        markedAsPaid: unpaidEarnings.length,
+        totalPaid,
+      };
+    } catch (error) {
+      if (error instanceof BaseException) throw error;
+      this.logger.error(
+        `Failed to mark earnings as paid for marketer: ${id}`,
+        error
+      );
+      throw new InternalServerException("Failed to mark earnings as paid");
+    }
+  }
+
   async calculateAndRecordEarnings(adId: string): Promise<void> {
     try {
       // Get the ad

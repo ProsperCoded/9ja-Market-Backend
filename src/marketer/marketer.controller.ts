@@ -263,4 +263,82 @@ export class MarketerController {
       next(e);
     }
   };
+
+  /**
+   * Get Marketer Earnings that have been paid
+   * @param request {Request}
+   * @param response {Response}
+   * @param next {NextFunction}
+   */
+  getMarketerPaidEarnings: RequestHandler = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const result = await this.marketerService.getMarketerPaidEarnings(
+        request.params.marketerId
+      );
+      const resObj = new ResponseDto(
+        ResponseStatus.SUCCESS,
+        SuccessMessages.MARKETER_EARNINGS_RETRIEVED,
+        result
+      );
+      return response.status(HttpStatus.OK).send(resObj);
+    } catch (e) {
+      next(e);
+    }
+  };
+
+  /**
+   * Get Marketer Earnings that are unpaid
+   * @param request {Request}
+   * @param response {Response}
+   * @param next {NextFunction}
+   */
+  getMarketerUnpaidEarnings: RequestHandler = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const result = await this.marketerService.getMarketerUnpaidEarnings(
+        request.params.marketerId
+      );
+      const resObj = new ResponseDto(
+        ResponseStatus.SUCCESS,
+        SuccessMessages.MARKETER_EARNINGS_RETRIEVED,
+        result
+      );
+      return response.status(HttpStatus.OK).send(resObj);
+    } catch (e) {
+      next(e);
+    }
+  };
+
+  /**
+   * Mark all unpaid earnings as paid for a marketer
+   * @param request {Request}
+   * @param response {Response}
+   * @param next {NextFunction}
+   */
+  markEarningsAsPaid: RequestHandler = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const result = await this.marketerService.markEarningsAsPaid(
+        request.params.marketerId
+      );
+      const resObj = new ResponseDto(
+        ResponseStatus.SUCCESS,
+        SuccessMessages.MARKETER_EARNINGS_PAID,
+        result
+      );
+      return response.status(HttpStatus.OK).send(resObj);
+    } catch (e) {
+      next(e);
+    }
+  };
 }

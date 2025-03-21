@@ -15,7 +15,7 @@ import { IdDto } from "./dtos/Id.dto";
 import { ProductIdDto } from "./dtos/productId.dto";
 import { CustomerAuthGaurd } from "../utils/middlewares/guards/customer.auth.guard";
 import { CustomerRepository } from "../repositories/customer.repository";
-import { Role } from "@prisma/client";
+import { marketerService } from "../marketer/marketer.routes";
 const router = Router();
 
 const merchantRepository = new MerchantRepository();
@@ -25,13 +25,13 @@ const adRepository = new AdRepository();
 const paymentService = new PaystackPaymentRepository();
 const productRepository = new ProductRepository();
 const transactionRepository = new TransactionRepository();
-
 const logger = new WinstonLogger("AdService");
 const adService = new AdService(
   adRepository,
   paymentService,
   productRepository,
   transactionRepository,
+  marketerService,
   logger
 );
 const adController = new AdController(adService);
