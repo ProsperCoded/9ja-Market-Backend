@@ -110,7 +110,7 @@ export class CustomerController {
     next: NextFunction
   ) => {
     try {
-      const { email } = req.customer as any;
+      const { email } = req.body.customer;
       const marketerProfile =
         await this.customerService.getMarketerByCustomerEmail(email);
       res.status(200).json({
@@ -129,7 +129,7 @@ export class CustomerController {
     next: NextFunction
   ) => {
     try {
-      const { email } = req.customer as any;
+      const { email } = req.body.customer;
 
       // First, get the marketer profile to ensure they are a marketer
       const marketerProfile =

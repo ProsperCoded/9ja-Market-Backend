@@ -78,13 +78,13 @@ router.delete(
 // New routes for customer-marketer functionality
 router.get(
   "/get-marketer",
-  customerAuthGaurd.authorise(),
+  customerAuthGaurd.authorise({}),
   customerController.getCustomerMarketerProfile
 );
 
 router.get(
   "/get-referrals",
-  customerAuthGaurd.authorise(),
+  customerAuthGaurd.authorise({}),
   customerController.getCustomerMarketerReferrals
 );
 
