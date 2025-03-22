@@ -21,7 +21,7 @@ const customerRepository = new CustomerRepository();
 export const marketerEarningsRepository = new MarketerEarningsRepository();
 const adRepository = new AdRepository();
 const logger = new WinstonLogger("MarketerService");
-const marketerService = new MarketerService(
+export const marketerService = new MarketerService(
   marketerRepository,
   customerRepository,
   marketerEarningsRepository,
