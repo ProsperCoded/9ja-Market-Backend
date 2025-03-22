@@ -119,4 +119,17 @@ export class MarketerEarningsRepository {
       data,
     });
   }
+
+  async getEarningsByMerchantAndMarketer(
+    merchantId: string,
+    marketerId: string
+  ) {
+    const earnings = await this.prisma.marketerEarnings.findMany({
+      where: {
+        merchantId: merchantId,
+        marketerId: marketerId,
+      },
+    });
+    return earnings;
+  }
 }

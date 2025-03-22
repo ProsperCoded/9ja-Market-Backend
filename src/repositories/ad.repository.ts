@@ -232,6 +232,7 @@ export class AdRepository {
                 id: true,
                 email: true,
                 referredById: true,
+                createdAt: true,
               },
             },
           },

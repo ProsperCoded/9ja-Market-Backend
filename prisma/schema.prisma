@@ -60,7 +60,7 @@ model Merchant {
   updatedAt             DateTime               @updatedAt
   transactions          Transaction[]
   marketId              String?
-  // role                  Role                   @default(MERCHANT)
+  role                  Role                   @default(MERCHANT)
 
   referredById     String?
   referredBy       Marketer?          @relation(fields: [referredById], references: [id])

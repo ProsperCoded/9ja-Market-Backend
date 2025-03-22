@@ -99,9 +99,9 @@ export class CustomerAuthService implements IAuthService {
         const { email, firstName, lastName } = data;
         await this.emailService.sendMail({
           to: email,
-          subject: EmailSubjects.WELCOME,
+          subject: EmailSubjects.WELCOME_CUSTOMER,
           options: {
-            template: EmailPaths.WELCOME,
+            template: EmailPaths.WELCOME_CUSTOMER,
             data: { firstName, lastName },
           },
         });
@@ -217,8 +217,8 @@ export class CustomerAuthService implements IAuthService {
       // Send welcome email
       this.eventEmiter.emit("sendCustomerWelcomeEmail", {
         email,
-        firstName,
-        lastName,
+        firstName: registerData.firstName || "",
+        lastName: registerData.lastName || "",
       });
 
       // Send email verification code

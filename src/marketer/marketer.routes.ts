@@ -16,12 +16,12 @@ import { CustomerRepository } from "../repositories/customer.repository";
 import { JWTService } from "../utils/jwt/jwt.service";
 
 const router = Router();
-const marketerRepository = new MarketerRepository();
+export const marketerRepository = new MarketerRepository();
 const customerRepository = new CustomerRepository();
-const marketerEarningsRepository = new MarketerEarningsRepository();
+export const marketerEarningsRepository = new MarketerEarningsRepository();
 const adRepository = new AdRepository();
 const logger = new WinstonLogger("MarketerService");
-export const marketerService = new MarketerService(
+const marketerService = new MarketerService(
   marketerRepository,
   customerRepository,
   marketerEarningsRepository,
@@ -49,6 +49,13 @@ router.get(
   "/",
   customerAuthGuard.authorise({ strict: true, role: Role.ADMIN }),
   marketerController.getAllMarketers
+);
+
+// New route to get all marketers with their earnings
+router.get(
+  "/earnings",
+  customerAuthGuard.authorise({ strict: true, role: Role.ADMIN }),
+  marketerController.getAllMarketersWithEarnings
 );
 
 router.get(

@@ -52,6 +52,7 @@ export enum SuccessMessages {
   // Marketer Success Messages
   CREATE_MARKETER_SUCCESS = "Marketer created successfully",
   GET_MARKETERS_SUCCESS = "Marketers fetched successfully",
+  GET_MARKETERS_WITH_EARNINGS_SUCCESS = "Marketers with earnings fetched successfully",
   GET_MARKETER_SUCCESS = "Marketer fetched successfully",
   UPDATE_MARKETER_SUCCESS = "Marketer updated successfully",
   VERIFY_MARKETER_SUCCESS = "Marketer verified successfully",

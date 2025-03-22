@@ -177,26 +177,50 @@ export class MerchantRepository implements IMerchantRepository {
   ): Promise<Merchant> {
     return new Promise(async (resolve, reject) => {
       try {
+        // If there's a referredById in the data, properly format it for Prisma
+        if ("referredById" in data) {
+          const referrerId = data.referredById;
+          // Delete the direct referredById property
+          delete data.referredById;
+
+          // Add the proper relation format if the referrerId exists
+          if (referrerId) {
+            data.referredBy = {
+              connect: { id: referrerId as string },
+            };
+          }
+        }
+
         const merchant = await this.merchantDelegate.create({
           data: {
             ...data,
-            addresses: {
-              createMany: {
-                data: addresses,
+            ...(marketName && {
+              market: {
+                connect: {
+                  name: marketName,
+                },
               },
-            },
-            phoneNumbers: {
-              createMany: {
-                data: phoneNumbers,
-              },
-            },
-            market: marketName
-              ? {
-                  connect: {
-                    name: marketName,
+            }),
+            ...(addresses &&
+              addresses.length > 0 && {
+                addresses: {
+                  createMany: {
+                    data: addresses.map((address) => ({
+                      ...address,
+                    })),
                   },
-                }
-              : undefined,
+                },
+              }),
+            ...(phoneNumbers &&
+              phoneNumbers.length > 0 && {
+                phoneNumbers: {
+                  createMany: {
+                    data: phoneNumbers.map((phoneNumber) => ({
+                      ...phoneNumber,
+                    })),
+                  },
+                },
+              }),
           },
           include: {
             addresses: true,
@@ -204,8 +228,8 @@ export class MerchantRepository implements IMerchantRepository {
           },
         });
         resolve(merchant);
-      } catch (e) {
-        reject(e);
+      } catch (error) {
+        reject(error);
       }
     });
   }
@@ -230,5 +254,24 @@ export class MerchantRepository implements IMerchantRepository {
         reject(e);
       }
     });
+  }
+
+  async getMerchantsByReferrerId(referrerId: string) {
+    try {
+      const merchants = await this.merchantDelegate.findMany({
+        where: {
+          referredById: referrerId,
+        },
+        include: {
+          market: true,
+          addresses: true,
+          phoneNumbers: true,
+        },
+      });
+      return merchants;
+    } catch (error) {
+      console.error(`Failed to get merchants by referrer ID: ${error}`);
+      throw error;
+    }
   }
 }

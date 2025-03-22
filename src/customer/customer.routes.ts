@@ -11,6 +11,11 @@ import { CustomerAuthGaurd } from "../utils/middlewares/guards/customer.auth.gua
 import { JWTService } from "../utils/jwt/jwt.service";
 import { CustomerUpdateDto } from "./dtos/customer-update.dto";
 import CartRouter from "./cart/cart.routes";
+import { merchantRepository } from "../merchant/merchant.routes";
+import {
+  marketerRepository,
+  marketerEarningsRepository,
+} from "../marketer/marketer.routes";
 import RatingRouter from "./rating/rating.routes";
 
 // Customer Service Dependents
@@ -22,6 +27,9 @@ const jwtService = new JWTService();
 
 const customerService = new CustomerService(
   customerRepository,
+  marketerRepository,
+  merchantRepository,
+  marketerEarningsRepository,
   addressRepository,
   phoneNumberRepository,
   logger
@@ -65,6 +73,19 @@ router.delete(
   validator.single(IdDto, "params"),
   customerAuthGaurd.authorise({ id: true }),
   customerController.deleteCustomer
+);
+
+// New routes for customer-marketer functionality
+router.get(
+  "/get-marketer",
+  customerAuthGaurd.authorise(),
+  customerController.getCustomerMarketerProfile
+);
+
+router.get(
+  "/get-referrals",
+  customerAuthGaurd.authorise(),
+  customerController.getCustomerMarketerReferrals
 );
 
 export default router;

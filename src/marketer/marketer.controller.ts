@@ -36,8 +36,6 @@ export class MarketerController {
         identityCredentialImage
       );
 
-      this.formatMarketerData(result);
-
       const resObj = new ResponseDto(
         ResponseStatus.SUCCESS,
         SuccessMessages.CREATE_MARKETER_SUCCESS,
@@ -64,12 +62,35 @@ export class MarketerController {
     try {
       const result = await this.marketerService.getAllMarketers();
 
-      // Format all marketer data
-      result.forEach(this.formatMarketerData);
-
       const resObj = new ResponseDto(
         ResponseStatus.SUCCESS,
         SuccessMessages.GET_MARKETERS_SUCCESS,
+        result
+      );
+
+      return response.status(HttpStatus.OK).send(resObj);
+    } catch (e) {
+      next(e);
+    }
+  };
+
+  /**
+   * Get all marketers with their earnings summary
+   * @param request {Request}
+   * @param response {Response}
+   * @param next {NextFunction}
+   */
+  getAllMarketersWithEarnings: RequestHandler = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const result = await this.marketerService.getAllMarketersWithEarnings();
+
+      const resObj = new ResponseDto(
+        ResponseStatus.SUCCESS,
+        SuccessMessages.GET_MARKETERS_WITH_EARNINGS_SUCCESS,
         result
       );
 
@@ -94,9 +115,6 @@ export class MarketerController {
       const result = await this.marketerService.getMarketerById(
         request.params.marketerId
       );
-
-      // Format marketer data
-      this.formatMarketerData(result);
 
       const resObj = new ResponseDto(
         ResponseStatus.SUCCESS,
@@ -125,9 +143,6 @@ export class MarketerController {
       const result = await this.marketerService.getMarketerByReferrerCode(
         request.params.referrerCode
       );
-
-      // Format marketer data
-      this.formatMarketerData(result);
 
       const resObj = new ResponseDto(
         ResponseStatus.SUCCESS,
@@ -164,9 +179,6 @@ export class MarketerController {
         identityCredentialImage
       );
 
-      // Format marketer data
-      this.formatMarketerData(result);
-
       const resObj = new ResponseDto(
         ResponseStatus.SUCCESS,
         SuccessMessages.UPDATE_MARKETER_SUCCESS,
@@ -194,9 +206,6 @@ export class MarketerController {
       const result = await this.marketerService.verifyMarketer(
         request.params.marketerId
       );
-
-      // Format marketer data
-      this.formatMarketerData(result);
 
       const resObj = new ResponseDto(
         ResponseStatus.SUCCESS,

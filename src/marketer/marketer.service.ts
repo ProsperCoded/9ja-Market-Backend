@@ -90,6 +90,43 @@ export class MarketerService {
     }
   }
 
+  async getAllMarketersWithEarnings(): Promise<any[]> {
+    try {
+      // Get all marketers
+      const marketers = await this.marketerRepository.getAllMarketers();
+
+      // Get earnings for each marketer
+      const marketersWithEarnings = await Promise.all(
+        marketers.map(async (marketer) => {
+          const totalPaidEarnings =
+            await this.marketerEarningsRepository.getTotalPaidEarningsByMarketer(
+              marketer.id
+            );
+          const totalUnpaidEarnings =
+            await this.marketerEarningsRepository.getTotalUnpaidEarningsByMarketer(
+              marketer.id
+            );
+
+          return {
+            ...marketer,
+            earnings: {
+              paid: totalPaidEarnings,
+              unpaid: totalUnpaidEarnings,
+            },
+          };
+        })
+      );
+
+      return marketersWithEarnings;
+    } catch (error) {
+      if (error instanceof BaseException) throw error;
+      this.logger.error("Failed to get marketers with earnings", error);
+      throw new InternalServerException(
+        "Failed to get marketers with earnings"
+      );
+    }
+  }
+
   async getMarketerById(id: string) {
     try {
       const marketer =

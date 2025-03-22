@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to 9ja Market</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      .header {
+        background-color: #009933;
+        padding: 20px;
+        text-align: center;
+        color: white;
+        border-radius: 5px 5px 0 0;
+      }
+      .content {
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-top: none;
+        border-radius: 0 0 5px 5px;
+      }
+      h1,
+      h2 {
+        color: #009933;
+      }
+      .steps {
+        margin: 20px 0;
+        padding-left: 20px;
+      }
+      .steps li {
+        margin-bottom: 15px;
+      }
+      .highlight {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-left: 4px solid #009933;
+        margin: 15px 0;
+      }
+      .footer {
+        margin-top: 30px;
+        text-align: center;
+        font-size: 0.9em;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Welcome to 9ja Market!</h1>
+    </div>
+    <div class="content">
+      <h2>Dear <%= brandName %> Team,</h2>
+
+      <p>
+        Thank you for joining 9ja Market! We're thrilled to have you as part of
+        our growing community of merchants connecting with customers across
+        Nigeria.
+      </p>
+
+      <div class="highlight">
+        <strong
+          >Your brand "<%= brandName %>" is now live on our platform!</strong
+        >
+      </div>
+
+      <h3>Here's how to get started:</h3>
+
+      <ol class="steps">
+        <li>
+          <strong>Complete your profile</strong> - Add your business
+          information, operating hours, and contact details to help customers
+          find you.
+        </li>
+
+        <li>
+          <strong>Upload your products</strong> - Showcase your inventory with
+          high-quality images and detailed descriptions. Each product will be
+          listed under your brand name within your market category.
+        </li>
+
+        <li>
+          <strong>Promote with ads</strong> - Give your products prime
+          visibility by clicking "Run Ad" on selected items. Advertised products
+          appear first in search results and on the main page, both
+          platform-wide and within your specific market.
+        </li>
+
+        <li>
+          <strong>Track your performance</strong> - Monitor your sales, customer
+          interactions, and most popular products through your merchant
+          dashboard.
+        </li>
+      </ol>
+
+      <div class="highlight">
+        <p>
+          <strong>Pro Tip:</strong> Products with multiple clear images and
+          detailed descriptions typically sell 3x faster!
+        </p>
+      </div>
+
+      <p>
+        Our platform makes it easy to connect with customers in your local
+        market and across Nigeria. You can also process orders, manage
+        inventory, and handle secure transactions all in one place.
+      </p>
+
+      <p>
+        If you have any questions or need assistance, our merchant support team
+        is available to help you succeed.
+      </p>
+
+      <p>
+        Best regards,<br />
+        The 9ja Market Team
+      </p>
+
+      <div class="footer">
+        <p>© 9ja Market - Connecting Local Markets Across Nigeria</p>
+      </div>
+    </div>
+  </body>
+</html>

@@ -107,9 +107,9 @@ export class MerchantAuthService implements IAuthService {
         const { email, brandName } = data;
         await this.emailService.sendMail({
           to: email,
-          subject: EmailSubjects.WELCOME,
+          subject: EmailSubjects.WELCOME_MERCHANT,
           options: {
-            template: EmailPaths.WELCOME,
+            template: EmailPaths.WELCOME_MERCHANT,
             data: { brandName },
           },
         });
@@ -262,10 +262,13 @@ export class MerchantAuthService implements IAuthService {
       }
       const formattedPhoneNumbers =
         DataFormatterHelper.formatPhoneNumbers(phoneNumbers);
+
+      // Modify how we handle referredById
       const newMerchant = await this.merchantRepository.create(
         {
           ...newMerchantData,
-          ...(referredById && { referredById }), // Add referrer only if valid
+          // Pass the referrerId as referredById for the repository to handle
+          ...(referredById && { referredById }),
         },
         addresses,
         formattedPhoneNumbers,
@@ -273,7 +276,10 @@ export class MerchantAuthService implements IAuthService {
       );
 
       // Send welcome email
-      this.eventEmiter.emit("sendMerchantWelcomeEmail", { email, brandName });
+      this.eventEmiter.emit("sendMerchantWelcomeEmail", {
+        email,
+        brandName,
+      });
 
       // Send email verification code
       const verificationCode = cryptoService.randomInt();

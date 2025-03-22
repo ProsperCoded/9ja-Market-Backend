@@ -12,12 +12,11 @@ import { IdDto } from "../dtos/id.dto";
 import { MerchantUpdateDto } from "./dtos/merchant-update.dto";
 import { MarketRepository } from "../repositories/market.repository";
 import { MarketerRepository } from "../repositories/marketer.repository";
-import { MerchantReferrerDto } from "./dtos/merchant-referrer.dto";
 
 const router = Router();
 const addressRepository = new AddressRepository();
 const phoneNumberRepository = new PhoneNumberRepository();
-const merchantRepository = new MerchantRepository();
+export const merchantRepository = new MerchantRepository();
 const marketRepository = new MarketRepository();
 const marketerRepository = new MarketerRepository();
 const logger = new WinstonLogger("MerchantService");
