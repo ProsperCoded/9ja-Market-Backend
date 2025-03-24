@@ -51,7 +51,7 @@ model Merchant {
   displayImage          String?
   refreshToken          String?
   market                Market?                @relation(fields: [marketId], references: [id])
-  merchantCategories    MerchantCategory[]
+  merchantCategories    ProductCategory[]      @default([])
   addresses             Address[]
   phoneNumbers          PhoneNumber[]
   products              Product[]
@@ -328,19 +328,6 @@ enum ProductCategory {
   TRADITIONAL_CRAFTS
   SPORTS_AND_OUTDOOR
   KIDS_AND_BABY_PRODUCTS
-}
-
-enum MerchantCategory {
-  GROCERY
-  PHARMACY
-  RESTAURANT
-  BAKERY
-  CLOTHING
-  ELECTRONICS
-  FURNITURE
-  HARDWARE
-  SPORTS
-  TOYS
 }
 
 enum PaymentFor {

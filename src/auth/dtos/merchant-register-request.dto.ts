@@ -45,8 +45,8 @@ export class MerchantRegisterRequestDto implements MerchantCreateInput {
   @IsDefined()
   @IsArray()
   @IsString({ each: true })
-  @IsIn(Object.values($Enums.MerchantCategory), { each: true })
-  declare merchantCategories?: $Enums.MerchantCategory[];
+  @IsIn(Object.values($Enums.ProductCategory), { each: true })
+  declare merchantCategories?: $Enums.ProductCategory[];
 
   @IsDefined()
   @IsArray()

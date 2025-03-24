@@ -217,6 +217,13 @@ export class MerchantAuthService implements IAuthService {
       throw new NotFoundException(ErrorMessages.MARKET_NOT_EXISTS);
     }
 
+    // Prevent marketer registering as merchant
+    const marketer = await this.marketerRepository.getMarketerByEmail(email);
+    if (marketer) {
+      this.logger.error(ErrorMessages.EMAIL_REGISTERED_AS_MARKETER);
+      throw new BadRequestException(ErrorMessages.EMAIL_REGISTERED_AS_MARKETER);
+    }
+
     try {
       const hashedPassword = await this.bcryptService.hashPassword(password);
       data.password = hashedPassword;

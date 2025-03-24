@@ -96,4 +96,5 @@ export enum ErrorMessages {
   CALCULATE_MARKETER_EARNINGS_FAILED = "Failed to calculate marketer earnings",
   INVALID_REFERRER_CODE = "Invalid referrer code",
   MERCHANT_ALREADY_HAS_REFERRER = "Merchant already has a referrer",
+  EMAIL_REGISTERED_AS_MARKETER = "Email is already registered as a marketer",
 }
