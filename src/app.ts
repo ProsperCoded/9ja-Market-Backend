@@ -11,7 +11,27 @@ import "./auth/passport.config";
 // Import Index Router
 import IndexRouter from "./routes";
 import passport from "passport";
+import { eventEmmiter } from "./utils/events";
+import { EmailService } from "./utils/email/email.service";
+import { EmailPaths, EmailSubjects } from "./constants/email.enum";
 
+// Testing
+const emailService = new EmailService();
+emailService
+  .sendMail({
+    to: "enweremproper@gmail.com",
+    subject: EmailSubjects.PASSWORD_RESET_MERCHANT,
+    options: {
+      template: EmailPaths.PASSWORD_RESET,
+      data: { resetCode: 2020220 },
+    },
+  })
+  .then((result) => {
+    console.log("Email sent successfully:", result);
+  })
+  .catch((error) => {
+    console.error("Error sending email:", error);
+  });
 // Create App
 const app: express.Express = express();
 

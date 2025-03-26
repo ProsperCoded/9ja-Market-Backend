@@ -20,7 +20,7 @@ export default class NodemailerProvider implements IEmailService {
     this.OAuth2Client = new google.auth.OAuth2(
       configService.get<string>("GMAIL_CLIENT_ID"),
       configService.get<string>("GMAIL_CLIENT_SECRET"),
-      "https://developers.google.com/oauthplayground" // or your redirect URI
+      "https://developers.google.com/oauthplayground" //or your redirect URI
     );
     this.OAuth2Client.setCredentials({
       refresh_token: configService.get<string>("GMAIL_REFRESH_TOKEN"),
@@ -59,10 +59,11 @@ export default class NodemailerProvider implements IEmailService {
         }
         this.transporter.sendMail(
           {
-            from: {
-              name: configService.get<string>("COMPANY_NAME"),
-              address: configService.get<string>("COMPANY_EMAIL"),
-            },
+            // from: {
+            //   name: configService.get<string>("COMPANY_NAME"),
+            //   address: configService.get<string>("COMPANY_EMAIL"),
+            // },
+            from: configService.get<string>("COMPANY_EMAIL"),
             to,
             subject,
             html,
@@ -71,7 +72,7 @@ export default class NodemailerProvider implements IEmailService {
           //   secure: true // true for 465, false for other ports
           (err, info) => {
             if (err) {
-              this.logger.error("Error sending email", err);
+              this.logger.error("Error sending email", err, info);
               reject(err);
               return;
             }
