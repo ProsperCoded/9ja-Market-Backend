@@ -228,14 +228,4 @@ export class ProductService {
       );
     }
   }
-
-  async incrementProductClicks(productId: string): Promise<void> {
-    try {
-      await this.productRepository.incrementClicks(productId);
-    } catch (error) {
-      if (error instanceof BaseException) throw error;
-      this.logger.error("Failed to increment product clicks", error);
-      throw new InternalServerException("Failed to increment product clicks");
-    }
-  }
 }

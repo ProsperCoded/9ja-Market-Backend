@@ -12,10 +12,6 @@ import { MerchantRepository } from "../repositories/merchant.repository";
 import { ProductCreateDto } from "./dtos/product-create.dto";
 import { MulterMiddleware } from "../utils/middlewares/file-parser.middleware";
 import { ProductPaginationDto } from "./dtos/product-pagination.dto";
-import {
-  httpCacheDuration,
-  httpCacheNoCache,
-} from "../utils/middlewares/httpCache.middleware";
 
 const logger = new WinstonLogger("ProductService");
 const productRepository = new ProductRepository();
@@ -44,7 +40,6 @@ router.get(
 // Get Product by Id
 router.get(
   "/:id",
-  httpCacheDuration(3600 * 2),
   validator.single(IdDto, "params"),
   productController.getProductById
 );
@@ -114,13 +109,6 @@ router.delete(
   validator.single(IdDto, "params"),
   merchantAuthGaurd.authorise(),
   productController.deleteProduct
-);
-
-// Track Product Click
-router.put(
-  "/:id/click",
-  validator.single(IdDto, "params"),
-  productController.trackProductClick
 );
 
 export default router;

@@ -43,23 +43,4 @@ export enum SuccessMessages {
   AD_PAYMENT_INITIALIZATION_SUCCESS = "Ad Payment Initialized Successfully",
   FREE_AD_ACTIVATION_SUCCESS = "Free Ad Activated Successfully",
   AD_PAYMENT_VERIFICATION_SUCCESS = "Ad Payment Verified Successfully",
-  AD_FETCH_SUCCESS = "Ad Fetched Successfully",
-  AD_REVENUE_FETCH_SUCCESS = "Ad Revenue Statistics Fetched Successfully",
-  ADMIN_REGISTRATION_SUCCESSFUL = "Admin registration successful",
-  STATS_FETCH_SUCCESS = "Platform statistics fetched successfully",
-  REVENUE_FETCH_SUCCESS = "Revenue statistics fetched successfully",
-
-  // Marketer Success Messages
-  CREATE_MARKETER_SUCCESS = "Marketer created successfully",
-  GET_MARKETERS_SUCCESS = "Marketers fetched successfully",
-  GET_MARKETERS_WITH_EARNINGS_SUCCESS = "Marketers with earnings fetched successfully",
-  GET_MARKETER_SUCCESS = "Marketer fetched successfully",
-  UPDATE_MARKETER_SUCCESS = "Marketer updated successfully",
-  VERIFY_MARKETER_SUCCESS = "Marketer verified successfully",
-  DELETE_MARKETER_SUCCESS = "Marketer deleted successfully",
-  GET_MARKETER_EARNINGS_SUCCESS = "Marketer earnings fetched successfully",
-  CONNECT_MERCHANT_TO_MARKETER_SUCCESS = "Merchant connected to marketer successfully",
-
-  MARKETER_EARNINGS_RETRIEVED = "Marketer earnings retrieved successfully",
-  MARKETER_EARNINGS_PAID = "Marketer earnings marked as paid successfully",
 }

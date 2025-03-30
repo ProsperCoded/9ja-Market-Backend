@@ -59,17 +59,14 @@ export default class NodemailerProvider implements IEmailService {
         }
         this.transporter.sendMail(
           {
-            // from: {
-            //   name: configService.get<string>("COMPANY_NAME"),
-            //   address: configService.get<string>("COMPANY_EMAIL"),
-            // },
-            from: configService.get<string>("COMPANY_EMAIL"),
+            from: {
+              name: configService.get<string>("COMPANY_NAME"),
+              address: configService.get<string>("COMPANY_EMAIL"),
+            },
             to,
             subject,
             html,
           },
-          //   port: 587/465,
-          //   secure: true // true for 465, false for other ports
           (err, info) => {
             if (err) {
               this.logger.error("Error sending email", err, info);

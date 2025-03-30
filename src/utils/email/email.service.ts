@@ -47,7 +47,6 @@ export class EmailService implements IEmailService {
           `Error sending email to ${to} with ${provider.constructor.name}`,
           error
         );
-        console.log(error);
       }
     }
     // If no provider succeeded

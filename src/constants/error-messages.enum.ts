@@ -79,22 +79,4 @@ export enum ErrorMessages {
   FREE_AD_EXISTS = "Free Ad Exists Already",
   MARKET_ALREADY_EXISTS = "Market Already Exists",
   NOT_YOUR_PRODUCT = "Product is not yours",
-  AD_FETCH_FAILED = "Unable to Fetch Ad",
-  ADMIN_REGISTRATION_FAILED = "Admin registration failed",
-  INTERNAL_SERVER_ERROR = "Internal Server Error",
-  REVENUE_FETCH_FAILED = "Failed to fetch revenue statistics",
-  STATS_FETCH_FAILED = "Stats Fetch Failed",
-
-  // Marketer Error Messages
-  MARKETER_NOT_FOUND = "Marketer not found",
-  CREATE_MARKETER_FAILED = "Failed to create marketer",
-  UPDATE_MARKETER_FAILED = "Failed to update marketer",
-  DELETE_MARKETER_FAILED = "Failed to delete marketer",
-  GET_MARKETER_FAILED = "Failed to get marketer",
-  GET_MARKETERS_FAILED = "Failed to get marketers",
-  VERIFY_MARKETER_FAILED = "Failed to verify marketer",
-  CALCULATE_MARKETER_EARNINGS_FAILED = "Failed to calculate marketer earnings",
-  INVALID_REFERRER_CODE = "Invalid referrer code",
-  MERCHANT_ALREADY_HAS_REFERRER = "Merchant already has a referrer",
-  EMAIL_REGISTERED_AS_MARKETER = "Email is already registered as a marketer",
 }

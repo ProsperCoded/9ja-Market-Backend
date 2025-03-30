@@ -37,7 +37,6 @@ export class ProductRepository {
             displayImage: true,
             images: true,
             ratings: true,
-            ads: true,
             merchant: {
               include: {
                 market: true,
@@ -120,7 +119,6 @@ export class ProductRepository {
             displayImage: true,
             images: true,
             ratings: true,
-            ads: true,
             merchant: {
               include: {
                 market: true,
@@ -146,7 +144,6 @@ export class ProductRepository {
             displayImage: true,
             images: true,
             ratings: true,
-            ads: true,
             merchant: {
               include: {
                 market: true,
@@ -183,9 +180,6 @@ export class ProductRepository {
                 phoneNumbers: true,
               },
             },
-          },
-          orderBy: {
-            createdAt: "desc",
           },
         });
         resolve(products);
@@ -509,39 +503,6 @@ export class ProductRepository {
         }
 
         resolve(featuredProducts);
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
-
-  async incrementClicks(productId: string): Promise<void> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await this.productDelegate.update({
-          where: { id: productId },
-          data: {
-            clicks: {
-              increment: 1,
-            },
-          },
-        });
-        resolve();
-      } catch (e) {
-        reject(e);
-      }
-    });
-  }
-
-  count(): Promise<number> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const count = await this.productDelegate.count({
-          where: {
-            deletedAt: null, // Only count non-deleted products
-          },
-        });
-        resolve(count);
       } catch (error) {
         reject(error);
       }
