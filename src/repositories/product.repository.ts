@@ -508,4 +508,7 @@ export class ProductRepository {
       }
     });
   }
+  async count(): Promise<number> {
+    return this.productDelegate.count();
+  }
 }

@@ -79,4 +79,7 @@ export enum ErrorMessages {
   FREE_AD_EXISTS = "Free Ad Exists Already",
   MARKET_ALREADY_EXISTS = "Market Already Exists",
   NOT_YOUR_PRODUCT = "Product is not yours",
+  INTERNAL_SERVER_ERROR = "Internal Server Error",
+  REVENUE_FETCH_FAILED = "Unable to Fetch Revenue",
+  STATS_FETCH_FAILED = "Unable to Fetch Stats",
 }
