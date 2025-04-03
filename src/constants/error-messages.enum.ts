@@ -24,6 +24,7 @@ export enum ErrorMessages {
   USER_UNAUTHORIZED = "User Unauthorized",
   REGISTER_CUSTOMER_FAILED = "Error Occurred While creating new Customer",
   REGISTER_MERCHANT_FAILED = "Error Occurred While creating new Merchant",
+  REGISTER_ADMIN_FAILED = "Error Occurred While Creating New Admin",
   FORGOT_PASSWORD_FAILED = "Forgot Password Failed",
   RESET_PASSWORD_FAILED = "Reset Password Failed",
   GOOGLE_AUTH_FAILED = "Google Authentication Failed",
@@ -79,7 +80,10 @@ export enum ErrorMessages {
   FREE_AD_EXISTS = "Free Ad Exists Already",
   MARKET_ALREADY_EXISTS = "Market Already Exists",
   NOT_YOUR_PRODUCT = "Product is not yours",
+  EMAIL_REGISTERED_AS_MARKETER = "Email is Already Registered as a Marketer",
   INTERNAL_SERVER_ERROR = "Internal Server Error",
   REVENUE_FETCH_FAILED = "Unable to Fetch Revenue",
   STATS_FETCH_FAILED = "Unable to Fetch Stats",
+  AD_FETCH_FAILED = "Unable to Fetch Ads",
+  ADMIN_REGISTRATION_FAILED = "Unable to Register Admin",
 }
