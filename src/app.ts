@@ -17,7 +17,6 @@ const app: express.Express = express();
 
 // Connect to Database
 databaseService.connect();
-
 // Configure App
 app.set("port", process.env.PORT || AppEnum.PORT);
 app.use(express.json());
