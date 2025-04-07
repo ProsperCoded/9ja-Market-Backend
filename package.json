@@ -70,6 +70,8 @@
     "passport-google-oauth20": "^2.0.0",
     "reflect-metadata": "^0.2.2",
     "supertest": "^7.0.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "typescript": "^5.5.4",
     "uuid": "^10.0.0",
     "winston": "^3.14.2"
@@ -106,7 +108,8 @@
     "ts-jest": "^29.2.5",
     "ts-lint": "^4.5.1",
     "ts-node": "^10.9.2",
-    "tslib": "^2.7.0"
+    "tslib": "^2.7.0",
+    "tsx": "^4.19.3"
   },
   "overrides": {
     "multer-storage-cloudinary": {
