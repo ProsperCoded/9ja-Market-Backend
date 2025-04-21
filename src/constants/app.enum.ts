@@ -4,7 +4,7 @@ export enum AppEnum {
   PORT = 3100,
   PREFIX = "/api/v1",
   BASE_URL = configService.get("BASE_URL") ||
-    ("http://localhost:3000/api/v1" as unknown as number),
+    ("http://localhost:3100/api/v1" as unknown as number),
   CLIENT_URL = configService.get("CLIENT_URL") ||
-    ("http://localhost:5173" as unknown as number),
+    ("http://localhost:3000" as unknown as number),
 }

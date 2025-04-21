@@ -7,20 +7,33 @@ import { AppEnum } from "./constants/app.enum";
 import errorHandler from "./utils/middlewares/error-handler.middleware";
 import "reflect-metadata";
 import "./auth/passport.config";
-import swaggerUi from 'swagger-ui-express';
-import { specs } from './utils/swagger/swagger.config';
+import swaggerUi from "swagger-ui-express";
+import { specs } from "./utils/swagger/swagger.config";
 
 // Import Index Router
 import IndexRouter from "./routes";
 import passport from "passport";
-
+import { EmailService } from "./utils/email/email.service";
+import { EmailSubjects, EmailPaths } from "./constants/email.enum";
 // Create App
 const app: express.Express = express();
+// const emailService = new EmailService();
+// emailService.sendMail({
+//   to: "enweremproper2@gmail.com",
+//   subject: EmailSubjects.WELCOME_MERCHANT,
+//   options: {
+//     template: EmailPaths.WELCOME_MERCHANT,
+//     data: {
+//       brandName: "John Doe",
+//       message: "This is a test email.",
+//     },
+//   },
+// });
 
 // Connect to Database
 databaseService.connect();
 // Configure App
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 app.set("port", process.env.PORT || AppEnum.PORT);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
