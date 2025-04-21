@@ -34,7 +34,6 @@ const router = Router();
 // Get All Products with pagination and optional category filter
 router.get(
   "/",
-  httpCacheDuration(60 * 5), // cache for 5 min
   validator.single(ProductPaginationDto, "query"),
   productController.getAllProducts
 );
