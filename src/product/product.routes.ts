@@ -12,6 +12,7 @@ import { MerchantRepository } from "../repositories/merchant.repository";
 import { ProductCreateDto } from "./dtos/product-create.dto";
 import { MulterMiddleware } from "../utils/middlewares/file-parser.middleware";
 import { ProductPaginationDto } from "./dtos/product-pagination.dto";
+import { httpCacheDuration } from "../utils/middlewares/httpCache.middleware";
 
 const logger = new WinstonLogger("ProductService");
 const productRepository = new ProductRepository();
@@ -33,6 +34,7 @@ const router = Router();
 // Get All Products with pagination and optional category filter
 router.get(
   "/",
+  httpCacheDuration(60 * 5), // cache for 5 min
   validator.single(ProductPaginationDto, "query"),
   productController.getAllProducts
 );

@@ -43,7 +43,7 @@ router.get(
 
 router.get(
   "/:marketId",
-  httpCacheDuration(3600),
+  httpCacheDuration(3600 * 24),
   validator.single(IdDto, "params"),
   marketController.getMarketById
 );
