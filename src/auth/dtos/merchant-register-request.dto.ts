@@ -11,6 +11,7 @@ import {
   IsOptional,
   IsString,
   IsStrongPassword,
+  MinLength,
   ValidateNested,
 } from "class-validator";
 import { AddressCreateDto } from "../../dtos/address-create.dto";
@@ -34,7 +35,7 @@ export class MerchantRegisterRequestDto implements MerchantCreateInput {
   @IsDefined()
   @IsNotEmpty()
   @IsString()
-  @IsStrongPassword()
+  @MinLength(5)
   declare password: string;
 
   @IsDefined()
