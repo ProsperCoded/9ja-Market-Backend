@@ -12,6 +12,7 @@ import { BaseException } from "../../exceptions/base.exception";
 export class CustomerAuthGaurd {
   private strict?: boolean;
   private id?: boolean;
+  private allowUnauthenticated?: boolean;
   constructor(
     private readonly customerRepository: CustomerRepository,
     private readonly logger: WinstonLogger,
@@ -23,10 +24,12 @@ export class CustomerAuthGaurd {
       strict?: boolean;
       id?: boolean;
       role?: Role;
+      allowUnauthenticated?: boolean;
     }): RequestHandler =>
     async (request: Request, response: Response, next: NextFunction) => {
       this.strict = options?.strict || false;
       this.id = options?.id || false;
+      this.allowUnauthenticated = options?.allowUnauthenticated || false;
 
       try {
         const customer = await this.validateRequest(
@@ -34,14 +37,30 @@ export class CustomerAuthGaurd {
             headers: { authorization: any };
             params: { customerId: string };
           }
-        );
-        if (options.role) {
-          if (!customer.role || customer.role !== options.role) {
-            this.logger.error(ErrorMessages.USER_UNAUTHORIZED);
-            throw new UnauthorizedException(ErrorMessages.USER_UNAUTHORIZED);
+        ).catch((error) => {
+          if (this.allowUnauthenticated) {
+            this.logger.warn("Proceeding without authentication");
+            next();
+            return null;
           }
+          throw error;
+        });
+
+        if (customer) {
+          if (options?.role) {
+            if (!customer.role || customer.role !== options.role) {
+              if (this.allowUnauthenticated) {
+                this.logger.warn("Proceeding without required role");
+              } else {
+                this.logger.error(ErrorMessages.USER_UNAUTHORIZED);
+                throw new UnauthorizedException(
+                  ErrorMessages.USER_UNAUTHORIZED
+                );
+              }
+            }
+          }
+          request.body.customer = customer;
         }
-        request.body.customer = customer;
         next();
       } catch (error) {
         next(error);

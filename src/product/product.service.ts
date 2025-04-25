@@ -20,7 +20,7 @@ export class ProductService {
 
   async getProducts(
     page: number = 1,
-    pageSize: number = 40,
+    pageSize: number = 20,
     category?: ProductCategory,
     state?: string
   ): Promise<PaginationResult<Product>> {

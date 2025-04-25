@@ -13,6 +13,9 @@ import { ProductCreateDto } from "./dtos/product-create.dto";
 import { MulterMiddleware } from "../utils/middlewares/file-parser.middleware";
 import { ProductPaginationDto } from "./dtos/product-pagination.dto";
 import { httpCacheDuration } from "../utils/middlewares/httpCache.middleware";
+import { CustomerAuthGaurd } from "../utils/middlewares/guards/customer.auth.guard";
+import { CustomerRepository } from "../repositories/customer.repository";
+import { LoggerPath } from "../constants/logger-paths.enum";
 
 const logger = new WinstonLogger("ProductService");
 const productRepository = new ProductRepository();
@@ -28,12 +31,21 @@ const merchantAuthGaurd = new MerchantAuthGaurd(
 
 const validator = new Validator();
 const fileParser = new MulterMiddleware(logger);
-
+const customerRepository = new CustomerRepository();
+const customerAuthGuard = new CustomerAuthGaurd(
+  customerRepository,
+  new WinstonLogger(LoggerPath.CustomerAuthService),
+  jwtService
+);
 const router = Router();
 
 // Get All Products with pagination and optional category filter
 router.get(
   "/",
+  customerAuthGuard.authorise({
+    strict: false,
+    allowUnauthenticated: true,
+  }),
   validator.single(ProductPaginationDto, "query"),
   productController.getAllProducts
 );
@@ -49,12 +61,17 @@ router.get(
 router.get(
   "/merchant/:merchantId",
   validator.single(IdDto, "params"),
+  httpCacheDuration(60),
   productController.getProductByMerchantId
 );
 
 // Get product by marketId
 router.get(
   "/market/:marketId",
+  customerAuthGuard.authorise({
+    strict: false,
+    allowUnauthenticated: true,
+  }),
   validator.single(IdDto, "params"),
   productController.getMarketProducts
 );

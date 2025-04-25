@@ -4,8 +4,12 @@ import { ResponseDto } from "../dtos/response.dto";
 import { ResponseStatus } from "../dtos/interfaces/response.interface";
 import { SuccessMessages } from "../constants/success-messages.enum";
 import { HttpStatus } from "../constants/http-status.enum";
-import { Product } from "@prisma/client";
+import { Customer, Product } from "@prisma/client";
 import { DataFormatterHelper } from "../helpers/format.helper";
+import {
+  PRODUCT_PAGINATION_PAGE_SIZE,
+  PRODUCT_CACHE_DURATION,
+} from "../constants";
 
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
@@ -29,19 +33,27 @@ export class ProductController {
       const { page, pageSize, category, state } = request.query;
       const result = await this.productService.getProducts(
         Number(page) || 1,
-        Number(pageSize) || 40,
+        Number(pageSize) || PRODUCT_PAGINATION_PAGE_SIZE,
         category as any,
         state as string
       );
 
       // Format each product in the items array
-      result.items.forEach((product) => this.formatProductData(product));
+      // result.items.forEach((product) => this.formatProductData(product));
 
       const resObj = new ResponseDto(
         ResponseStatus.SUCCESS,
         SuccessMessages.GET_PRODUCTS_SUCCESS,
         result
       );
+      // if customer is not admin cache the response for 1 hour
+      let customer = request.body.customer as Customer;
+      if (!customer || customer.role !== "ADMIN") {
+        response.setHeader(
+          "Cache-Control",
+          `public, max-age=${PRODUCT_CACHE_DURATION}`
+        );
+      }
       return response.status(HttpStatus.OK).send(resObj);
     } catch (e) {
       next(e);
@@ -238,6 +250,14 @@ export class ProductController {
         SuccessMessages.GET_MARKET_PRODUCTS_SUCCESS,
         result
       );
+      // if customer is not admin cache the response for 1 hour
+      let customer = request.body.customer as Customer;
+      if (!customer || customer.role !== "ADMIN") {
+        response.setHeader(
+          "Cache-Control",
+          `public, max-age=${PRODUCT_CACHE_DURATION}`
+        );
+      }
       return response.status(HttpStatus.OK).send(resObj);
     } catch (e) {
       next(e);
