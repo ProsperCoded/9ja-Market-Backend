@@ -31,9 +31,9 @@ const customerAuthGuard = new CustomerAuthGaurd(
 
 router.get("/names", marketController.getMarketNames);
 
-router.get("/", httpCacheDuration(3600), marketController.getAllMarkets);
+router.get("/", httpCacheDuration(60 * 60), marketController.getAllMarkets);
 
-router.get("/malls", httpCacheDuration(3600), marketController.getAllMalls);
+router.get("/malls", httpCacheDuration(60 * 60), marketController.getAllMalls);
 
 router.get(
   "/",

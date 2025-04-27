@@ -13,7 +13,7 @@ export class ProductPaginationDto {
   @IsInt()
   @Min(1)
   @Type(() => Number)
-  pageSize?: number = 40;
+  pageSize?: number = 20;
 
   @IsOptional()
   @IsEnum($Enums.ProductCategory)

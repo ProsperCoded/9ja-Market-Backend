@@ -81,13 +81,13 @@ export class ProductRepository {
             displayImage: true,
             images: true,
             ratings: true,
-            merchant: {
-              include: {
-                market: true,
-                addresses: true,
-                phoneNumbers: true,
-              },
-            },
+            // merchant: {
+            //   include: {
+            //     market: true,
+            //     addresses: true,
+            //     phoneNumbers: true,
+            //   },
+            // },
           },
           orderBy: {
             createdAt: "desc", // Most recent products first
@@ -144,13 +144,13 @@ export class ProductRepository {
             displayImage: true,
             images: true,
             ratings: true,
-            merchant: {
-              include: {
-                market: true,
-                addresses: true,
-                phoneNumbers: true,
-              },
-            },
+            // merchant: {
+            //   include: {
+            //     market: true,
+            //     addresses: true,
+            //     phoneNumbers: true,
+            //   },
+            // },
           },
         });
         resolve(products);
@@ -173,13 +173,13 @@ export class ProductRepository {
             displayImage: true,
             images: true,
             ratings: true,
-            merchant: {
-              include: {
-                market: true,
-                addresses: true,
-                phoneNumbers: true,
-              },
-            },
+            // merchant: {
+            //   include: {
+            //     market: true,
+            //     addresses: true,
+            //     phoneNumbers: true,
+            //   },
+            // },
           },
         });
         resolve(products);
