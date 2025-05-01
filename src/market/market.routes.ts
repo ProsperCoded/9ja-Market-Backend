@@ -35,11 +35,11 @@ router.get("/", httpCacheDuration(60 * 60), marketController.getAllMarkets);
 
 router.get("/malls", httpCacheDuration(60 * 60), marketController.getAllMalls);
 
-router.get(
-  "/",
-  validator.single(GetByNameDto, "body"),
-  marketController.getMarketByName
-);
+// router.get(
+//   "/",
+//   validator.single(GetByNameDto, "body"),
+//   marketController.getMarketByName
+// );
 
 router.get(
   "/:marketId",

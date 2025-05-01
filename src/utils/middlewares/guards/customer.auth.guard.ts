@@ -32,19 +32,22 @@ export class CustomerAuthGaurd {
       this.allowUnauthenticated = options?.allowUnauthenticated || false;
 
       try {
-        const customer = await this.validateRequest(
-          request as unknown as {
-            headers: { authorization: any };
-            params: { customerId: string };
-          }
-        ).catch((error) => {
+        let customer;
+        try {
+          customer = await this.validateRequest(
+            request as unknown as {
+              headers: { authorization: any };
+              params: { customerId: string };
+            }
+          );
+        } catch (error) {
           if (this.allowUnauthenticated) {
-            this.logger.warn("Proceeding without authentication");
+            this.logger.warn("Proceeding without authentication", error);
             next();
             return null;
           }
           throw error;
-        });
+        }
 
         if (customer) {
           if (options?.role) {

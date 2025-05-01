@@ -244,7 +244,8 @@ export class ProductController {
       const result = await this.productService.getMarketProducts(
         request.params.marketId
       );
-      result.forEach((product) => this.formatProductData(product));
+
+      // result.forEach((product) => this.formatProductData(product));
       const resObj = new ResponseDto(
         ResponseStatus.SUCCESS,
         SuccessMessages.GET_MARKET_PRODUCTS_SUCCESS,

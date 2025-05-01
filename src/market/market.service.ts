@@ -73,6 +73,7 @@ export class MarketService {
   async getMarketById(id: string) {
     try {
       const market = await this.marketRepository.findById(id);
+      console.log("market", market);
       if (!market) {
         throw new NotFoundException(ErrorMessages.MARKET_NOT_FOUND);
       }

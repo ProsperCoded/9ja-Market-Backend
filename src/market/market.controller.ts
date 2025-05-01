@@ -26,9 +26,11 @@ export class MarketController {
     next: NextFunction
   ) => {
     try {
+      console.log("market id", request.params.marketId);
       const result = await this.marketService.getMarketById(
         request.params.marketId
       );
+      console.log("market result", result);
       this.formatMarketData(result);
       const resObj = new ResponseDto(
         ResponseStatus.SUCCESS,

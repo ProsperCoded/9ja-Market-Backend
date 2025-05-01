@@ -77,6 +77,7 @@ export class ProductService {
   async getMarketProducts(marketId: string): Promise<Product[]> {
     try {
       const products = await this.productRepository.getMarketProducts(marketId);
+      console.log("products", products);
       return products;
     } catch (e) {
       if (e instanceof BaseException) {
