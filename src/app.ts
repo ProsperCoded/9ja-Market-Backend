@@ -17,9 +17,11 @@ import { EmailService } from "./utils/email/email.service";
 import { EmailSubjects, EmailPaths } from "./constants/email.enum";
 // Create App
 const app: express.Express = express();
+
+// ! Testing email service
 // const emailService = new EmailService();
 // emailService.sendMail({
-//   to: "enweremproper2@gmail.com",
+//   to: "enweremproper@gmail.com",
 //   subject: EmailSubjects.WELCOME_MERCHANT,
 //   options: {
 //     template: EmailPaths.WELCOME_MERCHANT,

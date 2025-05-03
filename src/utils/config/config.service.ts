@@ -1,7 +1,16 @@
-import { ConfigInterface } from "./config.interface";
-import { config } from "dotenv";
+import { config as dotenvConfig } from "dotenv";
+import { resolve } from "path";
+import { existsSync } from "fs";
 
-config();
+// load base .env first (no override)
+dotenvConfig({ path: resolve(process.cwd(), ".env") });
+
+// if running locally and .env.local exists, load it with override
+if (existsSync(resolve(process.cwd(), ".env.local"))) {
+  dotenvConfig({ path: resolve(process.cwd(), ".env.local"), override: true });
+}
+
+import { ConfigInterface } from "./config.interface";
 
 class ConfigService implements ConfigInterface {
   private readonly config: any;
@@ -24,4 +33,4 @@ class ConfigService implements ConfigInterface {
   }
 }
 
-export const configService = ConfigService.getInstance(); // To return an instance of the ConfigService class
+export const configService = ConfigService.getInstance();

@@ -8,3 +8,5 @@ export enum AppEnum {
   CLIENT_URL = configService.get("CLIENT_URL") ||
     ("http://localhost:3000" as unknown as number),
 }
+
+console.log("base url", AppEnum.BASE_URL);
