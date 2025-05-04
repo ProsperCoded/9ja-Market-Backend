@@ -82,21 +82,24 @@ export class AdService {
         merchant.id
       );
 
-      const paymentInit = await this.paymentService.initializePayment(
-        merchant.email,
-        transaction.amount,
-        `txn-${transaction.id}`
-      );
+      const paystackReference = `txn-${transaction.id}`;
+      // ! Already intializing payment from frontend
+      // const paymentInit = await this.paymentService.initializePayment(
+      //   merchant.email,
+      //   transaction.amount,
+      //   `txn-${transaction.id}`
+      // );
 
-      if (!paymentInit)
-        throw new InternalServerException(
-          ErrorMessages.AD_PAYMENT_INITIALIZATION_FAILED
-        );
+      // if (!paymentInit)
+      //   throw new InternalServerException(
+      //     ErrorMessages.AD_PAYMENT_INITIALIZATION_FAILED
+      //   );
 
       return {
-        authorization_url: paymentInit.data.authorization_url,
-        reference: paymentInit.data.reference,
-        access_code: paymentInit.data.access_code,
+        // authorization_url: paymentInit.data.authorization_url,
+        // access_code: paymentInit.data.access_code,
+        reference: paystackReference,
+        transactionId: transaction.id,
       };
     } catch (error) {
       if (error instanceof BaseException) throw error;
