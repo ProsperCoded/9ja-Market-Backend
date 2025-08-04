@@ -3,14 +3,17 @@ import { EmailPaths, EmailSubjects } from "../../constants/email.enum";
 import { WinstonLogger } from "../logger/winston.logger";
 import { IEmailService } from "./email.service.interface";
 import { readdirSync } from "fs";
-import { NodemailerProvider } from "./providers";
+import { NodemailerProvider, BrevoProvider } from "./providers";
 
 export class EmailService implements IEmailService {
   private readonly logger: WinstonLogger;
   private providers: IEmailService[] = [];
   constructor() {
     this.logger = new WinstonLogger("EmailService");
-    this.providers = [new NodemailerProvider(this.logger)];
+    this.providers = [
+      new BrevoProvider(this.logger),
+      new NodemailerProvider(this.logger),
+    ];
     // this.loadProviders();
   }
 

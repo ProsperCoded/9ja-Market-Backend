@@ -40,10 +40,11 @@
       "dotenv/config"
     ]
   },
-  "author": "obycodez55",
+  "author": "prosper-coded",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@getbrevo/brevo": "^3.0.1",
     "@prisma/client": "^5.19.1",
     "@types/bcryptjs": "^2.4.6",
     "axios": "^1.7.8",
