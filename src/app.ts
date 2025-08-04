@@ -18,20 +18,6 @@ import { EmailSubjects, EmailPaths } from "./constants/email.enum";
 // Create App
 const app: express.Express = express();
 
-// ! Testing email service
-// const emailService = new EmailService();
-// emailService.sendMail({
-//   to: "enweremproper@gmail.com",
-//   subject: EmailSubjects.WELCOME_MERCHANT,
-//   options: {
-//     template: EmailPaths.WELCOME_MERCHANT,
-//     data: {
-//       brandName: "John Doe",
-//       message: "This is a test email.",
-//     },
-//   },
-// });
-
 // Connect to Database
 databaseService.connect();
 // Configure App
