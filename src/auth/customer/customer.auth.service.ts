@@ -51,14 +51,14 @@ export class CustomerAuthService implements IAuthService {
     this.emailService = new EmailService();
 
     // test email
-    this.emailService.sendMail({
-      to: "enweremproper@gmail.com",
-      subject: EmailSubjects.WELCOME_CUSTOMER,
-      options: {
-        template: EmailPaths.WELCOME_CUSTOMER,
-        data: { firstName: "John", lastName: "Doe" },
-      },
-    });
+    // this.emailService.sendMail({
+    //   to: "enweremproper@gmail.com",
+    //   subject: EmailSubjects.WELCOME_CUSTOMER,
+    //   options: {
+    //     template: EmailPaths.WELCOME_CUSTOMER,
+    //     data: { firstName: "John", lastName: "Doe" },
+    //   },
+    // });
     this.eventEmiter = eventEmmiter;
     this.customerRepository = customerRepository;
     this.marketerRepository = new MarketerRepository();
