@@ -11,7 +11,7 @@ export class EmailService implements IEmailService {
   constructor() {
     this.logger = new WinstonLogger("EmailService");
     this.providers = [
-      new BrevoProvider(this.logger),
+      // new BrevoProvider(this.logger),
       new NodemailerProvider(this.logger),
     ];
     // this.loadProviders();
@@ -48,7 +48,7 @@ export class EmailService implements IEmailService {
       } catch (error) {
         this.logger.error(
           `Error sending email to ${to} with ${provider.constructor.name}`,
-          error
+          error.message
         );
       }
     }
