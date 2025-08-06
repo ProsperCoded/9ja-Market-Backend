@@ -17,7 +17,6 @@ export default class NodemailerProvider implements IEmailService {
 
   constructor(logger: ILogger) {
     this.logger = logger;
-    console.log(" client id", configService.get<string>("GMAIL_CLIENT_ID"));
     this.OAuth2Client = new google.auth.OAuth2(
       configService.get<string>("GMAIL_CLIENT_ID"),
       configService.get<string>("GMAIL_CLIENT_SECRET"),
